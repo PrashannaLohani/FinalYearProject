@@ -5,12 +5,10 @@ import {
   CardBody,
   CardFooter,
   CardHeader,
-  CheckboxIcon,
   Flex,
   Heading,
   Image,
   List,
-  ListIcon,
   ListItem,
   OrderedList,
   SimpleGrid,
@@ -177,7 +175,7 @@ export default function Home() {
           <Text>Contact: plohani2003@gmail.com</Text>
           <Text>Privacy policy</Text>
           <Text>Terms of Service</Text>
-          <Text>2024 React&Rise. All right reserved.</Text>
+          <Text>2024 React&Rise.&copy; All right reserved.</Text>
         </Flex>
       </footer>
     </>
