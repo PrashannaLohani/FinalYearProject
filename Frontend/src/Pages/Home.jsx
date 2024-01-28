@@ -15,7 +15,8 @@ import {
   Spacer,
   Text,
 } from "@chakra-ui/react";
-import { FaCircle } from "react-icons/fa6";
+import { NavLink } from "react-router-dom";
+import Login from "./Login";
 export default function Home() {
   return (
     <>
@@ -27,13 +28,15 @@ export default function Home() {
         </Box>
         <Spacer />
         <Flex gap="1rem" flexWrap="wrap">
-          <Button
-            colorScheme="blackAlpha"
-            borderRadius="8"
-            backgroundColor="black"
-          >
-            Login
-          </Button>
+          <NavLink to="/Login" element={<Login />}>
+            <Button
+              colorScheme="blackAlpha"
+              borderRadius="8"
+              backgroundColor="black"
+            >
+              Login
+            </Button>
+          </NavLink>
           <Button variant="ghost" borderRadius="8">
             Signup
           </Button>
