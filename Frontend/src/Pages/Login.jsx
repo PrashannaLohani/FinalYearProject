@@ -40,11 +40,15 @@ const LoginForm = () => {
       <form>
         <FormControl>
           <FormLabel>Username/Email</FormLabel>
-          <Input type="email" placeholder="Enter username or Email" />
+          <Input
+            type="email"
+            placeholder="Enter username or Email"
+            isRequired
+          />
         </FormControl>
         <FormControl mt={4}>
           <FormLabel>Password</FormLabel>
-          <Input type="password" placeholder="Enter your password" />
+          <Input type="password" placeholder="Enter your password" isRequired />
         </FormControl>
         <HStack justifyContent="space-between" mt="1rem">
           <Box>

@@ -17,6 +17,7 @@ import {
 } from "@chakra-ui/react";
 import { NavLink } from "react-router-dom";
 import Login from "./Login";
+import Signup from "./Signup";
 export default function Home() {
   return (
     <>
@@ -37,9 +38,11 @@ export default function Home() {
               Login
             </Button>
           </NavLink>
-          <Button variant="ghost" borderRadius="8">
-            Signup
-          </Button>
+          <NavLink to="/Signup" element={<Signup />}>
+            <Button variant="ghost" borderRadius="8">
+              Signup
+            </Button>
+          </NavLink>
         </Flex>
       </Flex>
       <hr />
