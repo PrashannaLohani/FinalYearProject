@@ -8,6 +8,7 @@ import RootLayout from "./Layout/RootLayout";
 import Home from "./Pages/Home";
 import Login from "./Pages/Login";
 import Signup from "./Pages/Signup";
+import Error from "./Pages/Error";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -15,8 +16,9 @@ const router = createBrowserRouter(
       <Route index element={<Home />} />
       <Route path="/Login" element={<Login />} />
       <Route path="/Signup" element={<Signup />} />
-      <Route path="/PageNotFound" errorElement={<Error />} />
-      <Route path="/" element={<RootLayout />}></Route>
+      <Route path="/" element={<RootLayout />}>
+        <Route Component={Error} />
+      </Route>
     </>
   )
 );
