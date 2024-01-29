@@ -9,7 +9,9 @@ import {
   Heading,
   Input,
   Link,
+  Text,
 } from "@chakra-ui/react";
+import { useState } from "react";
 
 export default function Signup() {
   return (
@@ -33,29 +35,46 @@ const SignupHeader = () => {
 };
 
 const SignupForm = () => {
+  const [isChecked, setIsChecked] = useState(false);
+
+  const handleCheckBox = () => {
+    setIsChecked(!isChecked);
+  };
   return (
     <Box my="2rem" textAlign="left">
       <form>
         <FormControl>
           <FormLabel>Fullname</FormLabel>
-          <Input type="Text" placeholder="Enter your Fullname" isRequired />
+          <Input
+            type="Text"
+            name="fullname"
+            placeholder="Enter your Fullname"
+            isRequired
+          />
         </FormControl>
         <FormControl mt={4}>
           <FormLabel>Email</FormLabel>
           <Input
             type="email"
+            name="email"
             placeholder="Enter your email address"
             isRequired
           />
         </FormControl>
         <FormControl mt={4}>
           <FormLabel>Password</FormLabel>
-          <Input type="password" placeholder="Enter your password" isRequired />
+          <Input
+            type="password"
+            name="password"
+            placeholder="Enter your password"
+            isRequired
+          />
         </FormControl>
         <FormControl mt={4}>
           <FormLabel>Confirm Password</FormLabel>
           <Input
             type="password"
+            name="cpassword"
             placeholder="Re-enter your password"
             isRequired
           />
@@ -63,11 +82,22 @@ const SignupForm = () => {
 
         <Box mt="1rem">
           <HStack>
-            <Checkbox>
-              <Link>Terms&Policy</Link>
-            </Checkbox>
-            <Checkbox>
-              <Link>Privacy Policy</Link>
+            <Checkbox
+              name="checkbox"
+              isChecked={isChecked}
+              onChange={handleCheckBox}
+            >
+              <Text>
+                I accecpt the{" "}
+                <Link as="b" color="blue.500">
+                  Privacy Policy
+                </Link>{" "}
+                and
+                <Link as="b" color="blue.500">
+                  {" "}
+                  Terms of service
+                </Link>
+              </Text>
             </Checkbox>
           </HStack>
         </Box>
@@ -76,7 +106,8 @@ const SignupForm = () => {
           colorScheme="blackAlpha"
           bgColor="Black"
           mt="1rem"
-          //   isDisabled
+          isDisabled={!isChecked}
+          name="button"
         >
           Sign Up
         </Button>
