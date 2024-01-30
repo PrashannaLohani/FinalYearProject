@@ -1,5 +1,13 @@
-import { Box, Button, Flex, Spacer, Text } from "@chakra-ui/react";
-import { NavLink } from "react-router-dom";
+import {
+  Box,
+  Flex,
+  Spacer,
+  TabList,
+  Tabs,
+  Text,
+  Tab,
+  TabIndicator,
+} from "@chakra-ui/react";
 
 export default function Navbar() {
   return (
@@ -12,7 +20,7 @@ export default function Navbar() {
         </Box>
         <Spacer />
         <Flex gap="1rem" flexWrap="wrap">
-          <Tab />
+          <TabLayout />
         </Flex>
       </Flex>
       <hr />
@@ -20,4 +28,20 @@ export default function Navbar() {
   );
 }
 
-const Tab = () => {};
+const TabLayout = () => {
+  return (
+    <>
+      <Box>
+        <Tabs variant="soft-rounded" colorScheme="teal">
+          <TabList>
+            <Tab>Home</Tab>
+            <Tab>Create Room</Tab>
+            <Tab>Code Generation</Tab>
+            <Tab>User Profile</Tab>
+            <Tab>Logout</Tab>
+          </TabList>
+        </Tabs>
+      </Box>
+    </>
+  );
+};
