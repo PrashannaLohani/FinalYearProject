@@ -19,6 +19,11 @@ import { NavLink } from "react-router-dom";
 import Login from "./Login";
 import Signup from "./Signup";
 export default function Home() {
+  // const cardStyle =()=>{
+  //   return(
+
+  //   )
+  // }
   return (
     <>
       <Flex margin="1rem" flexWrap="wrap">
@@ -61,7 +66,7 @@ export default function Home() {
         <Box minH="auto" borderRadius="1rem">
           <Flex justifyContent="center">
             <Text fontSize="4xl" as="b" mt="4rem">
-              Achieve Sucess with React&Rise
+              Achieve Sucess with React & Rise
             </Text>
           </Flex>
 
@@ -104,7 +109,7 @@ export default function Home() {
                 <Button>Read more</Button>
               </CardFooter>
             </Card>
-            <Card>
+            <Card style={{}}>
               <Image src="./Image/Engagement.jpg" borderRadius="8" />
               <CardHeader>
                 <Heading size="lg">Engagement</Heading>
@@ -112,7 +117,7 @@ export default function Home() {
               <CardBody>
                 <Text>
                   Elevate the level of participation and captivate every
-                  audience during your presentations using React&Rise. Embrace
+                  audience during your presentations using React & Rise. Embrace
                   innovative features to foster engagement and elevate the
                   overall interactive experience for your audience.
                 </Text>
