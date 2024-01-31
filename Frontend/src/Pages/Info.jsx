@@ -133,13 +133,17 @@ const Section4 = () => {
           <Box p="1rem" border="1px" borderRadius="5px" borderColor="gray.300">
             <Flex flexDir="column">
               <Text fontSize="sm">Paricipants</Text>
-              <Text fontSize="2xl">50</Text>
+              <Text fontSize="2xl" as="b">
+                50
+              </Text>
             </Flex>
           </Box>
           <Box p="1rem" border="1px" borderRadius="5px" borderColor="gray.300">
             <Flex flexDir="column">
               <Text fontSize="sm">Question Asked</Text>
-              <Text fontSize="2xl">100</Text>
+              <Text fontSize="2xl" as="b">
+                100
+              </Text>
             </Flex>
           </Box>
         </SimpleGrid>

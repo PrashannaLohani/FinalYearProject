@@ -1,13 +1,6 @@
-import {
-  Box,
-  Flex,
-  Spacer,
-  TabList,
-  Tabs,
-  Text,
-  Tab,
-  TabIndicator,
-} from "@chakra-ui/react";
+import { Box, Flex, Spacer, TabList, Tabs, Text, Tab } from "@chakra-ui/react";
+import Info from "../Pages/Info";
+import { NavLink } from "react-router-dom";
 
 export default function Navbar() {
   return (
@@ -34,8 +27,12 @@ const TabLayout = () => {
       <Box>
         <Tabs variant="soft-rounded" colorScheme="teal">
           <TabList>
-            <Tab>Home</Tab>
+            <NavLink to="/Info" element={<Info />}>
+              <Tab>Home</Tab>
+            </NavLink>
+
             <Tab>Create Room</Tab>
+
             <Tab>Code Generation</Tab>
             <Tab>User Profile</Tab>
             <Tab>Logout</Tab>
