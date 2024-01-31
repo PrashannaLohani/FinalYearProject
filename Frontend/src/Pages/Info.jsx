@@ -13,6 +13,7 @@ import {
   SimpleGrid,
   Text,
 } from "@chakra-ui/react";
+import BarChart from "../Components/BarGraph";
 
 export default function Info() {
   return (
@@ -27,6 +28,7 @@ export default function Info() {
         <hr />
         <Section3 />
         <Section4 />
+        <Section5 />
       </Box>
     </>
   );
@@ -143,5 +145,15 @@ const Section4 = () => {
         </SimpleGrid>
       </Box>
     </>
+  );
+};
+
+const Section5 = () => {
+  return (
+    <Box display="flex">
+      <Flex justifyContent="center" width="100%">
+        <BarChart />
+      </Flex>
+    </Box>
   );
 };
