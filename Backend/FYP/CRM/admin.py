@@ -1,5 +1,11 @@
 from django.contrib import admin
 from .models import CustomUser
+from .forms import CustomUserCreationForm
 
-# Register your models here.
-admin.site.register(CustomUser)
+class CustomUserAdmin(admin.ModelAdmin):
+    add_form = CustomUserCreationForm  # Use the CustomUserCreationForm for the add view
+    form = CustomUserCreationForm  # Use the CustomUserCreationForm for the change view
+    model = CustomUser
+    
+
+admin.site.register(CustomUser, CustomUserAdmin)
