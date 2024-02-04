@@ -1,6 +1,7 @@
 import { Box, Flex, Spacer, TabList, Tabs, Text, Tab } from "@chakra-ui/react";
 import Info from "../Pages/Info";
 import { NavLink } from "react-router-dom";
+import Profile from "../Pages/Profile";
 
 export default function Navbar() {
   return (
@@ -34,7 +35,9 @@ const TabLayout = () => {
             <Tab>Create Room</Tab>
 
             <Tab>Code Generation</Tab>
-            <Tab>User Profile</Tab>
+            <NavLink to="/Profile" element={<Profile />}>
+              <Tab>User Profile</Tab>
+            </NavLink>
             <Tab>Logout</Tab>
           </TabList>
         </Tabs>
