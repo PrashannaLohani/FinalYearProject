@@ -40,8 +40,8 @@ const BarGraph = () => {
     datasets: [
       {
         label: "Last 6 Room",
-        data: [20],
-        backgroundColor: "rgba(255, 99, 132, 0.5)",
+        data: [20, 30, 40, 30, 10, 12],
+        backgroundColor: "rgba(200, 50, 100, 0.5)",
       },
     ],
   };

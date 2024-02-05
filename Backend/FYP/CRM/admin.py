@@ -1,11 +1,15 @@
 from django.contrib import admin
-from .models import CustomUser
-from .forms import CustomUserCreationForm
+from .models import Signup
+# Register your models here.
 
-class CustomUserAdmin(admin.ModelAdmin):
-    add_form = CustomUserCreationForm  # Use the CustomUserCreationForm for the add view
-    form = CustomUserCreationForm  # Use the CustomUserCreationForm for the change view
-    model = CustomUser
-    
 
-admin.site.register(CustomUser, CustomUserAdmin)
+class CRMAdmin(admin.ModelAdmin):
+    list_display = ['id','name']
+
+    from .models import Signup
+
+class SignupAdmin(admin.ModelAdmin):
+    list_display = ('id','name', 'email', 'password', 'Cpassword')
+    writeonly_fields = ('password','Cpassword')
+    # readonly_fields = ('password', 'Cpassword')
+admin.site.register(Signup, SignupAdmin)

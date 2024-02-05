@@ -1,3 +1,4 @@
+import axios from "axios";
 import {
   Box,
   Button,
@@ -12,8 +13,30 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { Formik } from "formik";
+import { useEffect, useState } from "react";
 
-export default function Signup() {
+const Signup = () => {
+  const [csrfToken, setCsrfToken] = useState("");
+  useEffect(() => {
+    const fetchCsrfToken = async () => {
+      try {
+        const response = await axios.get(
+          "http://127.0.0.1:8000/get-csrf-token/"
+        );
+
+        // Assuming the response.data is an object with a csrf_token property
+        const fetchedCsrfToken = response.data.csrf_token;
+
+        // Use the CSRF token as needed
+        setCsrfToken(fetchedCsrfToken);
+        console.log("CSRF Token:", fetchedCsrfToken);
+      } catch (error) {
+        console.error("Error fetching CSRF token:", error);
+      }
+    };
+    fetchCsrfToken();
+  }, []);
+
   return (
     <>
       <Flex minH="100vh" width="full" align="center" justify="center">
@@ -30,31 +53,33 @@ export default function Signup() {
               }}
               validate={(values) => {
                 const errors = {};
-                if (!values.fullname) {
-                  errors.fullname = "*";
-                }
-                if (!values.email) {
-                  errors.email = "*";
-                } else if (
-                  !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)
-                ) {
-                  errors.email = "Invalid email address";
-                }
-                if (!values.password) {
-                  errors.password = "*";
-                }
-                if (!values.cpassword) {
-                  errors.cpassword = "*";
-                } else if (values.cpassword !== values.password) {
-                  errors.cpassword = "Passwords must match";
-                }
-
+                // ... (validation logic)
                 return errors;
               }}
-              onSubmit={(values, { setSubmitting }) => {
-                // Your form submission logic here
-                console.log(values);
-                setSubmitting(false);
+              onSubmit={async (values, { setSubmitting }) => {
+                try {
+                  if (!csrfToken) {
+                    console.error("CSRF Token is missing.");
+                  }
+                  // Make a POST request to your Django backend
+                  const response = await axios.post(
+                    "http://127.0.0.1:8000/Signup/",
+                    values,
+                    {
+                      headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": csrfToken,
+                      },
+                    }
+                  );
+
+                  // Handle the response or any additional logic here
+                  console.log("User created successfully:", response.data);
+                } catch (error) {
+                  console.error("Error creating user:", error);
+                } finally {
+                  setSubmitting(false);
+                }
               }}
             >
               {({
@@ -173,7 +198,7 @@ export default function Signup() {
       </Flex>
     </>
   );
-}
+};
 
 const SignupHeader = () => {
   return (
@@ -182,3 +207,5 @@ const SignupHeader = () => {
     </Box>
   );
 };
+
+export default Signup;

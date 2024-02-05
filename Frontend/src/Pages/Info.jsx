@@ -155,7 +155,7 @@ const Section4 = () => {
 const Section5 = () => {
   return (
     <Box display="flex">
-      <Flex justifyContent="center" width="100%">
+      <Flex justifyContent="center" maxW="100%">
         <BarChart />
       </Flex>
     </Box>
