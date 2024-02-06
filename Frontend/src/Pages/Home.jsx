@@ -19,11 +19,6 @@ import { NavLink } from "react-router-dom";
 import Login from "./Login";
 import Signup from "./Signup";
 export default function Home() {
-  // const cardStyle =()=>{
-  //   return(
-
-  //   )
-  // }
   return (
     <>
       <Flex margin="1rem" flexWrap="wrap">
@@ -174,13 +169,7 @@ export default function Home() {
           </List>
         </Box>
       </SimpleGrid>
-      {/* <Box bgImage="./Image/BG.jpg" bgRepeat="no-repeat" bgSize="cover">
-        <Flex alignItems="center" height="10rem">
-          <Text fontSize="4xl">
-            Dazzle your audience with engaging and interactive presentations.
-          </Text>
-        </Flex>
-      </Box> */}
+      <Aboutus />
       <footer>
         <Flex gap="1.5rem" justifyContent="center" flexWrap="wrap" m="2rem">
           <Text>Contact: plohani2003@gmail.com</Text>
@@ -192,3 +181,49 @@ export default function Home() {
     </>
   );
 }
+
+const Aboutus = () => {
+  return (
+    <Box mt="3rem">
+      <Flex justifyContent="center">
+        <Heading size="2xl">About us</Heading>
+      </Flex>
+      <SimpleGrid minChildWidth="400px" spacing="2" padding="2rem" mt="3rem">
+        <Box p="2rem">
+          <Heading>Our Dream is Global Learning Transformation</Heading>
+          <Flex alignItems="center">
+            <Text fontSize="xl" mt="2rem">
+              At React&Rise, we are passionate about facilitating meaningful
+              communication and collaboration through our innovative web
+              application. Our mission is to empower individuals and teams to
+              connect, engage, and grow together in a digital environment.
+            </Text>
+          </Flex>
+        </Box>
+        <Box>
+          <Image src="./Image/aboutus.jpg" />
+        </Box>
+      </SimpleGrid>
+      <SimpleGrid minChildWidth="400px" spacing="2" padding="2rem" mt="3rem">
+        <Box px="2rem">
+          <Flex justifyContent="flex-end">
+            <Image src="./Image/aboutus2.jpg" />
+          </Flex>
+        </Box>
+        <Box p="2rem">
+          <Heading>Our Mission</Heading>
+          <Flex alignItems="center">
+            <Text fontSize="xl" mt="2rem">
+              Our mission is to provide a user-friendly and effective platform
+              for communication, enabling users to connect, collaborate, and
+              succeed in their endeavors.
+            </Text>
+          </Flex>
+          <Button mt="2rem" bgColor="Black" colorScheme="blackAlpha">
+            Learn More
+          </Button>
+        </Box>
+      </SimpleGrid>
+    </Box>
+  );
+};
