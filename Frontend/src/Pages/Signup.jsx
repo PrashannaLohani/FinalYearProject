@@ -10,12 +10,23 @@ import {
   Heading,
   Input,
   Link,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Text,
+  useDisclosure,
 } from "@chakra-ui/react";
+import { NavLink } from "react-router-dom";
 import { Formik } from "formik";
 import { useEffect, useState } from "react";
+import Login from "./Login";
 
 const Signup = () => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [csrfToken, setCsrfToken] = useState(null);
   const apiURL = "http://127.0.0.1:8000/Signup/";
 
@@ -63,7 +74,7 @@ const Signup = () => {
                       "X-CSRFToken": csrfToken,
                     },
                   });
-
+                  onOpen();
                   // Handle the response or any additional logic here
                   console.log("User created successfully:", response.data);
                 } catch (error) {
@@ -178,6 +189,7 @@ const Signup = () => {
                     mt="1rem"
                     type="submit"
                     isDisabled={!values?.checkbox || isSubmitting}
+                    onClick={onOpen}
                   >
                     Sign Up
                   </Button>
@@ -187,6 +199,35 @@ const Signup = () => {
           </Box>
         </Box>
       </Flex>
+      <Message_popup isOpen={isOpen} onClose={onClose} />
+    </>
+  );
+};
+
+const Message_popup = ({ isOpen, onClose }) => {
+  return (
+    <>
+      <Modal isOpen={isOpen} onClose={onClose} isCentered>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>User Created</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text>Now you can login and use the services.</Text>
+          </ModalBody>
+
+          <ModalFooter gap="1rem">
+            <NavLink to="/Login" element={<Login />}>
+              <Button bgColor="black" colorScheme="blackAlpha">
+                Login
+              </Button>
+            </NavLink>
+            <Button variant="ghost" mr={3} onClick={onClose}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </>
   );
 };
