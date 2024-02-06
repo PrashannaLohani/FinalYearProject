@@ -3,6 +3,8 @@ from django.http import HttpResponse
 
 from rest_framework.renderers import JSONRenderer 
 from rest_framework.parsers import JSONParser 
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 
 from .serializers import SignupSerializer
 import io
@@ -10,7 +12,8 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 
-
+@api_view(['POST'])
+@permission_classes([AllowAny])
 @ensure_csrf_cookie
 def user_create(request):
     if request.method =='POST':
@@ -25,6 +28,7 @@ def user_create(request):
             return HttpResponse(json_data, content_type = 'application/json')
         else:
             errors = serializer.errors
+            print(errors)
             return JsonResponse({'error':errors}, status = 400) 
 
     return HttpResponse(status=405, content="Method Not Allowed")

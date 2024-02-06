@@ -16,26 +16,23 @@ import { Formik } from "formik";
 import { useEffect, useState } from "react";
 
 const Signup = () => {
-  const [csrfToken, setCsrfToken] = useState("");
+  const [csrfToken, setCsrfToken] = useState(null);
+  const apiURL = "http://127.0.0.1:8000/Signup/";
+
   useEffect(() => {
     const fetchCsrfToken = async () => {
       try {
         const response = await axios.get(
           "http://127.0.0.1:8000/get-csrf-token/"
         );
-
-        // Assuming the response.data is an object with a csrf_token property
-        const fetchedCsrfToken = response.data.csrf_token;
-
-        // Use the CSRF token as needed
-        setCsrfToken(fetchedCsrfToken);
-        console.log("CSRF Token:", fetchedCsrfToken);
+        setCsrfToken(response.data.csrf_token);
       } catch (error) {
         console.error("Error fetching CSRF token:", error);
       }
     };
+
     fetchCsrfToken();
-  }, []);
+  }, []); // Empty dependency array ensures the effect runs once on component mount
 
   return (
     <>
@@ -57,21 +54,15 @@ const Signup = () => {
                 return errors;
               }}
               onSubmit={async (values, { setSubmitting }) => {
+                console.log("Form Values:", values);
                 try {
-                  if (!csrfToken) {
-                    console.error("CSRF Token is missing.");
-                  }
                   // Make a POST request to your Django backend
-                  const response = await axios.post(
-                    "http://127.0.0.1:8000/Signup/",
-                    values,
-                    {
-                      headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRFToken": csrfToken,
-                      },
-                    }
-                  );
+                  const response = await axios.post(apiURL, values, {
+                    headers: {
+                      "Content-Type": "application/json",
+                      "X-CSRFToken": csrfToken,
+                    },
+                  });
 
                   // Handle the response or any additional logic here
                   console.log("User created successfully:", response.data);

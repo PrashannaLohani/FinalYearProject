@@ -1,9 +1,14 @@
 from django.db import models
+from django.contrib.auth.hashers import make_password
 
 class Signup (models.Model):
-    name=models.CharField(max_length = 100)
-    email = models.CharField(max_length = 100)
-    password = models.CharField(max_length = 30 )
-    Cpassword = models.CharField(max_length = 30)
+    fullname=models.CharField(max_length = 300)
+    email = models.EmailField(max_length = 100)
+    password = models.CharField(max_length = 300 )
+   
 
-    
+    def save(self, *args, **kwargs):
+        # Hash the password before saving
+        self.password = make_password(self.password)
+       
+        super().save(*args, **kwargs)
