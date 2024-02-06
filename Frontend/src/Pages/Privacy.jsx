@@ -1,11 +1,17 @@
-import { Box, Flex, Heading, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, Heading, Spacer, Text } from "@chakra-ui/react";
+import { NavLink } from "react-router-dom";
+import Login from "./Login";
+import Signup from "./Signup";
 
 export default function Privacy() {
   return (
     <>
       <Box minH="100vh">
+        <Navbar />
+        <hr />
         <PrivacyHeader />
         <PrivacyDesc />
+        <Footer />
       </Box>
     </>
   );
@@ -132,5 +138,47 @@ const PrivacyDesc = () => {
         this App, or your dealings with this App, please contact us at:
       </Text>
     </Box>
+  );
+};
+
+const Navbar = () => {
+  return (
+    <Flex margin="1rem" flexWrap="wrap">
+      <Box>
+        <Text fontSize="2xl" as="b">
+          React & Rise
+        </Text>
+      </Box>
+      <Spacer />
+      <Flex gap="1rem" flexWrap="wrap">
+        <NavLink to="/Login" element={<Login />}>
+          <Button
+            colorScheme="blackAlpha"
+            borderRadius="8"
+            backgroundColor="black"
+          >
+            Login
+          </Button>
+        </NavLink>
+        <NavLink to="/Signup" element={<Signup />}>
+          <Button variant="ghost" borderRadius="8">
+            Signup
+          </Button>
+        </NavLink>
+      </Flex>
+    </Flex>
+  );
+};
+
+const Footer = () => {
+  return (
+    <footer>
+      <Flex gap="1.5rem" justifyContent="center" flexWrap="wrap" m="2rem">
+        <Text>Contact: plohani2003@gmail.com</Text>
+        <Text>Privacy policy</Text>
+        <Text>Terms of Service</Text>
+        <Text>2024 React&Rise.&copy; All right reserved.</Text>
+      </Flex>
+    </footer>
   );
 };

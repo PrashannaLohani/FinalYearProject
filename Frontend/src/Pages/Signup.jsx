@@ -25,6 +25,7 @@ import { Formik } from "formik";
 import { useEffect, useState } from "react";
 import Login from "./Login";
 import Privacy from "./Privacy";
+import Terms from "./terms&service";
 
 const Signup = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -178,8 +179,8 @@ const Signup = () => {
                         </NavLink>{" "}
                         and
                         <NavLink
-                          to="#"
-                          element
+                          to="/Terms&Services"
+                          element={<Terms />}
                           style={{
                             fontWeight: "bold",
                             textDecoration: "underline",
