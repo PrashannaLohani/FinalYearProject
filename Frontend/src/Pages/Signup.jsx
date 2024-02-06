@@ -24,6 +24,7 @@ import { NavLink } from "react-router-dom";
 import { Formik } from "formik";
 import { useEffect, useState } from "react";
 import Login from "./Login";
+import Privacy from "./Privacy";
 
 const Signup = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -162,19 +163,32 @@ const Signup = () => {
                         isChecked={values.checkbox}
                         onChange={handleChange}
                         isDisabled={isSubmitting}
-                      >
-                        <Text>
-                          I accept the{" "}
-                          <Link as="b" color="blue.500">
-                            Privacy Policy
-                          </Link>{" "}
-                          and
-                          <Link as="b" color="blue.500">
-                            {" "}
-                            Terms of service
-                          </Link>
-                        </Text>
-                      </Checkbox>
+                      ></Checkbox>
+                      <Text>
+                        I accept the{" "}
+                        <NavLink
+                          to="/Privacy-Policy"
+                          element={<Privacy />}
+                          style={{
+                            fontWeight: "bold",
+                            textDecoration: "underline",
+                          }}
+                        >
+                          Privacy Policy
+                        </NavLink>{" "}
+                        and
+                        <NavLink
+                          to="#"
+                          element
+                          style={{
+                            fontWeight: "bold",
+                            textDecoration: "underline",
+                          }}
+                        >
+                          {" "}
+                          Terms of service
+                        </NavLink>
+                      </Text>
                     </HStack>
                   </Box>
                   <Button

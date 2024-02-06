@@ -1,6 +1,6 @@
 import { Box, Flex, Heading, Text } from "@chakra-ui/react";
 
-export default function Privacy() {
+export default function Terms() {
   return (
     <>
       <Box minH="100vh">
