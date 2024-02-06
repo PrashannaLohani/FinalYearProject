@@ -34,7 +34,7 @@ const Signup = () => {
     const fetchCsrfToken = async () => {
       try {
         const response = await axios.get(
-          "http://127.0.0.1:8000/get-csrf-token/"
+          "http://127.0.0.1:8000/get-csrf-token/signup/"
         );
         setCsrfToken(response.data.csrf_token);
       } catch (error) {
@@ -192,6 +192,12 @@ const Signup = () => {
                 </form>
               )}
             </Formik>
+            <Flex mt="1rem" justify="center" gap="5px">
+              <Text>Already have an account?</Text>
+              <NavLink to="/Login">
+                <Link as="b">Login</Link>
+              </NavLink>
+            </Flex>
           </Box>
         </Box>
       </Flex>

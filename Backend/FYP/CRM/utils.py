@@ -1,8 +1,15 @@
+from django.views.decorators.csrf import get_token
 from django.http import JsonResponse
-from django.middleware.csrf import get_token
 
-def get_csrf_token(request):
-    # Get the CSRF token from the cookie
-    if request.method == 'GET':
-        csrf_token = request.COOKIES.get('csrftoken', '')
-        return JsonResponse({'csrf_token': csrf_token})
+def get_csrf_token(request, token_type):
+    if token_type == 'login':
+        csrf_token = get_token(request)  # Extract from cookies for login
+    elif token_type == 'signup':
+        csrf_token = get_token(request)  # Generate a new token for signup
+    else:
+        return JsonResponse({'error': 'Invalid token type'}, status=400)
+    
+    return JsonResponse({'csrf_token': csrf_token})
+
+    
+    # {"csrf_signup_token": "n4F78ipyzjrsYrVRXyEzhP7DJejweZR9"}

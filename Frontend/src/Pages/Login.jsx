@@ -1,7 +1,7 @@
+import axios from "axios";
 import {
   Box,
   Button,
-  Checkbox,
   Flex,
   FormControl,
   FormLabel,
@@ -13,6 +13,7 @@ import {
 } from "@chakra-ui/react";
 import { NavLink } from "react-router-dom";
 import { Formik } from "formik";
+import { useEffect, useState } from "react";
 
 export default function Login() {
   return (
@@ -36,6 +37,23 @@ const LoginHeader = () => {
 };
 
 const LoginForm = () => {
+  const [csrfToken, setCsrfToken] = useState(null);
+  const apiURL = "http://127.0.0.1:8000/login/";
+
+  useEffect(() => {
+    const fetchCsrfToken = async () => {
+      try {
+        const response = await axios.get(
+          "http://127.0.0.1:8000/get-csrf-token/login/"
+        );
+        setCsrfToken(response.data.csrf_token);
+      } catch (error) {
+        console.error("Error fetching CSRF token:", error);
+      }
+    };
+
+    fetchCsrfToken();
+  }, []);
   return (
     <Box my="2rem" textAlign="left">
       <Formik
@@ -62,17 +80,24 @@ const LoginForm = () => {
 
           return errors;
         }}
-        onSubmit={(values, { setSubmitting }) => {
-          // Your form submission logic goes here
+        onSubmit={async (values, { setSubmitting }) => {
           console.log("Form Values:", values);
+          try {
+            // Make a POST request to your Django backend
+            const response = await axios.post(apiURL, values, {
+              headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken,
+              },
+            });
 
-          // Simulate API call or navigate to the next page
-          // For a real API call, you would use axios or fetch
-          setTimeout(() => {
             // Handle the response or any additional logic here
-            console.log("User logged in successfully");
+            console.log("User created successfully:", response.data);
+          } catch (error) {
+            console.error("Error creating user:", error);
+          } finally {
             setSubmitting(false);
-          }, 1000);
+          }
         }}
       >
         {({
@@ -84,7 +109,7 @@ const LoginForm = () => {
           handleSubmit,
           isSubmitting,
         }) => (
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} method="post" action="/login/">
             <FormControl isInvalid={errors.email && touched.email}>
               <FormLabel>Email</FormLabel>
               <Input
