@@ -89,7 +89,6 @@ const Signup = () => {
                 errors,
                 touched,
                 handleChange,
-                handleBlur,
                 handleSubmit,
                 isSubmitting,
               }) => (
@@ -106,7 +105,6 @@ const Signup = () => {
                       name="fullname"
                       placeholder="Enter your Fullname"
                       onChange={handleChange}
-                      onBlur={handleBlur}
                       value={values.fullname}
                     />
                   </FormControl>
@@ -123,7 +121,6 @@ const Signup = () => {
                       name="email"
                       placeholder="Enter your email address"
                       onChange={handleChange}
-                      onBlur={handleBlur}
                       value={values.email}
                     />
                   </FormControl>
@@ -139,7 +136,6 @@ const Signup = () => {
                       name="password"
                       placeholder="Enter your password"
                       onChange={handleChange}
-                      onBlur={handleBlur}
                       value={values.password}
                     />
                   </FormControl>
@@ -155,7 +151,6 @@ const Signup = () => {
                       name="cpassword"
                       placeholder="Re-enter your password"
                       onChange={handleChange}
-                      onBlur={handleBlur}
                       value={values.cpassword}
                     />
                   </FormControl>
@@ -190,6 +185,7 @@ const Signup = () => {
                     type="submit"
                     isDisabled={!values?.checkbox || isSubmitting}
                     onClick={onOpen}
+                    isLoading={isSubmitting}
                   >
                     Sign Up
                   </Button>
