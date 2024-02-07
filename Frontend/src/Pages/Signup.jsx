@@ -27,6 +27,13 @@ import Login from "./Login";
 import Privacy from "./Privacy";
 import Terms from "./terms&service";
 
+const SignupHeader = () => {
+  return (
+    <Box textAlign="center">
+      <Heading>Signup</Heading>
+    </Box>
+  );
+};
 const Signup = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [csrfToken, setCsrfToken] = useState(null);
@@ -63,11 +70,28 @@ const Signup = () => {
               }}
               validate={(values) => {
                 const errors = {};
-                // ... (validation logic)
+                if (!values.fullname) {
+                  errors.fullname = "*";
+                }
+                if (!values.email) {
+                  errors.email = "*";
+                }
+                if (!values.password) {
+                  errors.password = "*";
+                }
+                if (!values.cpassword) {
+                  errors.cpassword = "*";
+                } else if (values.cpassword !== values.password) {
+                  errors.cpassword = "Passwords do not match";
+                }
+                if (!values.checkbox) {
+                  errors.checkbox =
+                    "You must accept the terms and privacy policy";
+                }
                 return errors;
               }}
               onSubmit={async (values, { setSubmitting }) => {
-                console.log("Form Values:", values);
+                // console.log("Form Values:", values);
                 try {
                   // Make a POST request to your Django backend
                   const response = await axios.post(apiURL, values, {
@@ -76,9 +100,9 @@ const Signup = () => {
                       "X-CSRFToken": csrfToken,
                     },
                   });
-                  onOpen();
                   // Handle the response or any additional logic here
-                  console.log("User created successfully:", response.data);
+                  // console.log("User created successfully:", response.data);
+                  onOpen();
                 } catch (error) {
                   console.error("Error creating user:", error);
                 } finally {
@@ -108,6 +132,7 @@ const Signup = () => {
                       placeholder="Enter your Fullname"
                       onChange={handleChange}
                       value={values.fullname}
+                      isRequired
                     />
                   </FormControl>
                   <FormControl mt={4}>
@@ -124,6 +149,7 @@ const Signup = () => {
                       placeholder="Enter your email address"
                       onChange={handleChange}
                       value={values.email}
+                      isRequired
                     />
                   </FormControl>
                   <FormControl mt={4}>
@@ -139,6 +165,7 @@ const Signup = () => {
                       placeholder="Enter your password"
                       onChange={handleChange}
                       value={values.password}
+                      isRequired
                     />
                   </FormControl>
                   <FormControl mt={4}>
@@ -154,6 +181,7 @@ const Signup = () => {
                       placeholder="Re-enter your password"
                       onChange={handleChange}
                       value={values.cpassword}
+                      isRequired
                     />
                   </FormControl>
 
@@ -199,7 +227,7 @@ const Signup = () => {
                     mt="1rem"
                     type="submit"
                     isDisabled={!values?.checkbox || isSubmitting}
-                    onClick={onOpen}
+                    onSubmit={onOpen}
                     isLoading={isSubmitting}
                   >
                     Sign Up
@@ -246,14 +274,6 @@ const Message_popup = ({ isOpen, onClose }) => {
         </ModalContent>
       </Modal>
     </>
-  );
-};
-
-const SignupHeader = () => {
-  return (
-    <Box textAlign="center">
-      <Heading>Signup</Heading>
-    </Box>
   );
 };
 
