@@ -14,6 +14,7 @@ import {
 import { NavLink } from "react-router-dom";
 import { Formik } from "formik";
 import { useEffect, useState } from "react";
+import Info from "./Info";
 
 export default function Login() {
   return (
@@ -57,6 +58,9 @@ const LoginForm = () => {
 
     fetchCsrfToken();
   }, []);
+  const handleRedirect = () => {
+    return <NavLink to="/Info" element={<Info />} />;
+  };
   return (
     <Box my="2rem" textAlign="left">
       <Formik
@@ -95,6 +99,8 @@ const LoginForm = () => {
               // Set JWT token
               setJwtToken(response.data.token);
               // Handle successful login (redirect, show success message, etc.)
+              setLoginSuccess(true);
+              handleRedirect();
             } else {
               // Handle login failure
               setErrorMessage("Enter correct Email or password");
