@@ -37,6 +37,9 @@ const LoginHeader = () => {
 };
 
 const LoginForm = () => {
+  const [jwtToken, setJwtToken] = useState(null);
+  const [LoginSuccess, setLoginSuccess] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
   const [csrfToken, setCsrfToken] = useState(null);
   const apiURL = "http://127.0.0.1:8000/login/";
 
@@ -85,16 +88,21 @@ const LoginForm = () => {
           try {
             // Make a POST request to your Django backend
             const response = await axios.post(apiURL, values, {
-              headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": csrfToken,
-              },
+              withCredentials: true, // Ensure cookies are sent with the request
             });
 
-            // Handle the response or any additional logic here
-            console.log("User created successfully:", response.data);
+            if (response.data.message === "Login success") {
+              // Set JWT token
+              setJwtToken(response.data.token);
+              // Handle successful login (redirect, show success message, etc.)
+            } else {
+              // Handle login failure
+              setErrorMessage("Enter correct Email or password");
+            }
           } catch (error) {
-            console.error("Error creating user:", error);
+            console.error("Error:", error);
+            // Handle other errors (network error, server error, etc.)
+            setErrorMessage("Something went wrong. Please try again later.");
           } finally {
             setSubmitting(false);
           }
