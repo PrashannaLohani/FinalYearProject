@@ -9,7 +9,15 @@ import {
   Heading,
   Input,
   Link,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Text,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { NavLink } from "react-router-dom";
 import { Formik } from "formik";
@@ -28,7 +36,6 @@ export default function Login() {
     </>
   );
 }
-
 const LoginHeader = () => {
   return (
     <Box textAlign="center">
@@ -38,29 +45,10 @@ const LoginHeader = () => {
 };
 
 const LoginForm = () => {
-  const [jwtToken, setJwtToken] = useState(null);
-  const [LoginSuccess, setLoginSuccess] = useState(null);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [csrfToken, setCsrfToken] = useState(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [formSubmitted, setFormSubmitted] = useState(false);
   const apiURL = "http://127.0.0.1:8000/login/";
 
-  useEffect(() => {
-    const fetchCsrfToken = async () => {
-      try {
-        const response = await axios.get(
-          "http://127.0.0.1:8000/get-csrf-token/login/"
-        );
-        setCsrfToken(response.data.csrf_token);
-      } catch (error) {
-        console.error("Error fetching CSRF token:", error);
-      }
-    };
-
-    fetchCsrfToken();
-  }, []);
-  const handleRedirect = () => {
-    return <NavLink to="/Info" element={<Info />} />;
-  };
   return (
     <Box my="2rem" textAlign="left">
       <Formik
@@ -88,28 +76,25 @@ const LoginForm = () => {
           return errors;
         }}
         onSubmit={async (values, { setSubmitting }) => {
-          console.log("Form Values:", values);
+          // console.log("Form Values:", values);
           try {
             // Make a POST request to your Django backend
             const response = await axios.post(apiURL, values, {
               withCredentials: true, // Ensure cookies are sent with the request
             });
 
-            if (response.data.message === "Login success") {
-              // Set JWT token
-              setJwtToken(response.data.token);
-              // Handle successful login (redirect, show success message, etc.)
-              setLoginSuccess(true);
-              handleRedirect();
-            } else {
-              // Handle login failure
-              setErrorMessage("Enter correct Email or password");
+            if (response.status === 200 && response.data.access_token) {
+              // Store tokens in local storage
+              localStorage.setItem("accessToken", response.data.access_token);
+              localStorage.setItem("refreshToken", response.data.refresh_token);
+              // Open the modal
+              onOpen();
             }
           } catch (error) {
-            console.error("Error:", error);
-            // Handle other errors (network error, server error, etc.)
-            setErrorMessage("Something went wrong. Please try again later.");
+            setFormSubmitted(true);
+            console.error("An error occurred:", error);
           } finally {
+            setFormSubmitted(false);
             setSubmitting(false);
           }
         }}
@@ -156,6 +141,12 @@ const LoginForm = () => {
               )}
             </FormControl>
 
+            {formSubmitted && (
+              <Text color="red" mt={2}>
+                Your email or password is incorrect.
+              </Text>
+            )}
+
             <HStack justifyContent="space-between" mt="1rem">
               <Box></Box>
               <Box>
@@ -182,6 +173,35 @@ const LoginForm = () => {
           <Link as="b">Signup</Link>
         </NavLink>
       </Flex>
+      <Message_popup isOpen={isOpen} onClose={onClose} />
     </Box>
+  );
+};
+
+const Message_popup = ({ isOpen, onClose }) => {
+  return (
+    <>
+      <Modal isOpen={isOpen} onClose={onClose} isCentered>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Welcome!</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text>You have successfully Logged IN.</Text>
+          </ModalBody>
+
+          <ModalFooter gap="1rem">
+            <NavLink to="/Info" element={<Info />}>
+              <Button bgColor="black" colorScheme="blackAlpha">
+                Proceed
+              </Button>
+            </NavLink>
+            <Button variant="ghost" mr={3} onClick={onClose}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
   );
 };

@@ -1,11 +1,8 @@
 
+from django.forms import ValidationError
 from rest_framework import serializers
 from .models import Signup
-from .models import Login
-
-
-
-
+from django.contrib.auth import authenticate
 
 class SignupSerializer(serializers.Serializer):
     id = serializers.IntegerField(required = False)
@@ -21,6 +18,10 @@ class SignupSerializer(serializers.Serializer):
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(max_length = 100)
     password = serializers.CharField(max_length = 128)
+
+    def check_user(self,clean_data):
+        user = authenticate(username = clean_data['email'], password = clean_data['password'])
         
-    def create(self,validate_data ):
-        return Login.objects.create(**validate_data)
+        if not user:
+            raise ValidationError('user not found')
+        return user
