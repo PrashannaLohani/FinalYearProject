@@ -23,6 +23,7 @@ import { NavLink } from "react-router-dom";
 import Login from "./Login";
 import Signup from "./Signup";
 import { Field, Form, Formik } from "formik";
+import ContactForm from "../Components/Contact";
 export default function Home() {
   return (
     <>
@@ -231,6 +232,7 @@ export default function Home() {
         </Box>
       </SimpleGrid>
       <Aboutus />
+      <Contact />
       <footer>
         <Flex gap="1.5rem" justifyContent="center" flexWrap="wrap" m="2rem">
           <Text>Contact: plohani2003@gmail.com</Text>
@@ -287,4 +289,8 @@ const Aboutus = () => {
       </SimpleGrid>
     </Box>
   );
+};
+
+const Contact = () => {
+  return <ContactForm />;
 };

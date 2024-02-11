@@ -39,6 +39,7 @@ const TabLayout = () => {
             <NavLink to="/Profile" element={<Profile />}>
               <Tab>User Profile</Tab>
             </NavLink>
+            <Tab>About Us</Tab>
             <Tab>Logout</Tab>
           </TabList>
         </Tabs>
