@@ -13,6 +13,7 @@ import Info from "./Pages/Info";
 import Profile from "./Pages/Profile";
 import Privacy from "./Pages/Privacy";
 import Terms from "./Pages/terms&service";
+import CreateRoom from "./Pages/CreateRoom";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -25,6 +26,7 @@ const router = createBrowserRouter(
       <Route path="/" element={<RootLayout />}>
         <Route path="/Info" element={<Info />} />
         <Route path="/Profile" element={<Profile />} />
+        <Route path="/CreateRoom" element={<CreateRoom />} />
         <Route Component={Error} />
       </Route>
     </>

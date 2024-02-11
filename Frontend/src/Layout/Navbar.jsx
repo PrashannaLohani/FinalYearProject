@@ -2,6 +2,7 @@ import { Box, Flex, Spacer, TabList, Tabs, Text, Tab } from "@chakra-ui/react";
 import Info from "../Pages/Info";
 import { NavLink } from "react-router-dom";
 import Profile from "../Pages/Profile";
+import CreateRoom from "../Pages/CreateRoom";
 
 export default function Navbar() {
   return (
@@ -31,8 +32,9 @@ const TabLayout = () => {
             <NavLink to="/Info" element={<Info />}>
               <Tab>Home</Tab>
             </NavLink>
-
-            <Tab>Create Room</Tab>
+            <NavLink to="/CreateRoom" element={<CreateRoom />}>
+              <Tab>Create Room</Tab>
+            </NavLink>
 
             <NavLink to="/Profile" element={<Profile />}>
               <Tab>User Profile</Tab>
