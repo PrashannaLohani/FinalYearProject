@@ -34,7 +34,6 @@ const TabLayout = () => {
 
             <Tab>Create Room</Tab>
 
-            <Tab>Code Generation</Tab>
             <NavLink to="/Profile" element={<Profile />}>
               <Tab>User Profile</Tab>
             </NavLink>

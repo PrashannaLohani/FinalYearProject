@@ -6,8 +6,12 @@ import {
   CardFooter,
   CardHeader,
   Flex,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
   Heading,
   Image,
+  Input,
   List,
   ListItem,
   OrderedList,
@@ -18,6 +22,7 @@ import {
 import { NavLink } from "react-router-dom";
 import Login from "./Login";
 import Signup from "./Signup";
+import { Field, Form, Formik } from "formik";
 export default function Home() {
   return (
     <>
@@ -46,16 +51,72 @@ export default function Home() {
         </Flex>
       </Flex>
       <hr />
-      <Flex justify="center" flexDir="column" alignItems="center">
+      <Flex justify="center" flexDir="column" alignItems="center" gap="1rem">
         <Text as="b" fontSize="4xl" mt="2rem" textAlign="center">
           Welcome to React & Rise
         </Text>
-        <Text textAlign="center" mt="1rem">
+        <Text textAlign="center">
           The platform where you can interact without hesitation.
         </Text>
-        <Button colorScheme="blackAlpha" backgroundColor="black" mt="1rem">
-          Get started
-        </Button>
+        <Formik
+          initialValues={{ roomCode: "" }}
+          validate={(values) => {
+            const errors = {};
+            if (!values.roomCode) {
+              errors.roomCode = "Required";
+            }
+            return errors;
+          }}
+          onSubmit={(values, { setSubmitting }) => {
+            // Handle form submission here
+            console.log(values.roomCode);
+            setSubmitting(false);
+          }}
+        >
+          {({ isSubmitting }) => (
+            <Form>
+              <Flex
+                justifyContent="center"
+                alignItems="center"
+                gap="1rem"
+                flexDir="column"
+              >
+                <Field name="roomCode">
+                  {({ field, form }) => (
+                    <FormControl
+                      isInvalid={form.errors.roomCode && form.touched.roomCode}
+                    >
+                      <FormLabel htmlFor="roomCode">
+                        Enter your room code
+                      </FormLabel>
+
+                      <Input
+                        {...field}
+                        id="roomCode"
+                        type="text"
+                        placeholder="XXXXXX"
+                        maxW="25rem"
+                        textAlign="center"
+                      />
+                      <FormErrorMessage>
+                        {form.errors.roomCode}
+                      </FormErrorMessage>
+                    </FormControl>
+                  )}
+                </Field>
+                <Button
+                  type="submit"
+                  bgColor="black"
+                  colorScheme="blackAlpha"
+                  minW="5rem"
+                  isLoading={isSubmitting}
+                >
+                  Join
+                </Button>
+              </Flex>
+            </Form>
+          )}
+        </Formik>
       </Flex>
       <Flex height="100vh" justifyContent="center">
         <Box minH="auto" borderRadius="1rem">
