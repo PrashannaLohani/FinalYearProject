@@ -24,33 +24,12 @@ import Login from "./Login";
 import Signup from "./Signup";
 import { Field, Form, Formik } from "formik";
 import ContactForm from "../Components/Contact";
+import HomepageNav from "../Layout/Homepage/HomepageNavbar";
+import HomepageFooter from "../Layout/Homepage/HomepageFooter";
 export default function Home() {
   return (
     <>
-      <Flex margin="1rem" flexWrap="wrap">
-        <Box>
-          <Text fontSize="2xl" as="b">
-            React & Rise
-          </Text>
-        </Box>
-        <Spacer />
-        <Flex gap="1rem" flexWrap="wrap">
-          <NavLink to="/Login" element={<Login />}>
-            <Button
-              colorScheme="blackAlpha"
-              borderRadius="8"
-              backgroundColor="black"
-            >
-              Login
-            </Button>
-          </NavLink>
-          <NavLink to="/Signup" element={<Signup />}>
-            <Button variant="ghost" borderRadius="8">
-              Signup
-            </Button>
-          </NavLink>
-        </Flex>
-      </Flex>
+      <HomepageNav />
       <hr />
       <Flex justify="center" flexDir="column" alignItems="center" gap="1rem">
         <Text as="b" fontSize="4xl" mt="2rem" textAlign="center">
@@ -233,14 +212,7 @@ export default function Home() {
       </SimpleGrid>
       <Aboutus />
       <Contact />
-      <footer>
-        <Flex gap="1.5rem" justifyContent="center" flexWrap="wrap" m="2rem">
-          <Text>Contact: plohani2003@gmail.com</Text>
-          <Text>Privacy policy</Text>
-          <Text>Terms of Service</Text>
-          <Text>2024 React&Rise.&copy; All right reserved.</Text>
-        </Flex>
-      </footer>
+      <HomepageFooter />
     </>
   );
 }

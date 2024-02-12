@@ -23,6 +23,7 @@ import { NavLink } from "react-router-dom";
 import { Formik } from "formik";
 import { useEffect, useState } from "react";
 import Info from "./Info";
+import EmailVerification from "./Forget Password/EmailVerification";
 
 export default function Login() {
   return (
@@ -150,7 +151,13 @@ const LoginForm = () => {
             <HStack justifyContent="space-between" mt="1rem">
               <Box></Box>
               <Box>
-                <Link color="gray">Forgot your password?</Link>
+                <NavLink
+                  color="gray"
+                  to="/EmailVerification"
+                  element={<EmailVerification />}
+                >
+                  Forgot your password?
+                </NavLink>
               </Box>
             </HStack>
 
