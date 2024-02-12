@@ -15,6 +15,8 @@ import Privacy from "./Pages/Privacy";
 import Terms from "./Pages/terms&service";
 import CreateRoom from "./Pages/CreateRoom";
 import EmailVerification from "./Pages/Forget Password/EmailVerification";
+import OTP from "./Pages/Forget Password/OTP";
+import UpdatePassword from "./Pages/Forget Password/ChangePassword";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -25,6 +27,8 @@ const router = createBrowserRouter(
       <Route path="/Privacy-Policy" element={<Privacy />} />
       <Route path="/Terms&Services" element={<Terms />} />
       <Route path="/EmailVerificaiton" element={<EmailVerification />} />
+      <Route path="/UpadePassword" element={<UpdatePassword />} />
+      <Route path="/OTP" element={<OTP />} />
       <Route path="/" element={<RootLayout />}>
         <Route path="/Info" element={<Info />} />
         <Route path="/Profile" element={<Profile />} />

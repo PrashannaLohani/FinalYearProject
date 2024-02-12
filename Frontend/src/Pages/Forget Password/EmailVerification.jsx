@@ -2,6 +2,8 @@ import { Box, Button, Flex, Heading, Input, Text } from "@chakra-ui/react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import HomepageNav from "../../Layout/Homepage/HomepageNavbar";
 import HomepageFooter from "../../Layout/Homepage/HomepageFooter";
+import { NavLink } from "react-router-dom";
+import OTP from "./OTP";
 
 export default function EmailVerification() {
   return (
@@ -87,14 +89,16 @@ const Section2 = () => {
               )}
             </Field>
             <ErrorMessage name="email" component="div" color="red" />
-            <Button
-              type="submit"
-              bgColor="black"
-              colorScheme="blackAlpha"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Sending..." : "Send Verification Code"}
-            </Button>
+            <NavLink to="/OTP" element={<OTP />}>
+              <Button
+                type="submit"
+                bgColor="black"
+                colorScheme="blackAlpha"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Sending..." : "Send Verification Code"}
+              </Button>
+            </NavLink>
           </Flex>
         </Form>
       )}
