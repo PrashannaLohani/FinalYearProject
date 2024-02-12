@@ -187,7 +187,7 @@ const Message_popup = ({ isOpen, onClose }) => {
           <ModalHeader>Welcome!</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Text>You have successfully Logged IN.</Text>
+            <Text>You have successfully Logged in.</Text>
           </ModalBody>
 
           <ModalFooter gap="1rem">

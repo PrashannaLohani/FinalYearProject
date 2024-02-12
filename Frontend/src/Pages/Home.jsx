@@ -87,7 +87,7 @@ export default function Home() {
                     <FormControl
                       isInvalid={form.errors.roomCode && form.touched.roomCode}
                     >
-                      <FormLabel htmlFor="roomCode">
+                      <FormLabel htmlFor="roomCode" textAlign="center">
                         Enter your room code
                       </FormLabel>
 
@@ -96,7 +96,7 @@ export default function Home() {
                         id="roomCode"
                         type="text"
                         placeholder="XXXXXX"
-                        maxW="25rem"
+                        minW="25rem"
                         textAlign="center"
                       />
                       <FormErrorMessage>
