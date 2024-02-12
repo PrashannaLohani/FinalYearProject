@@ -21,7 +21,7 @@ import {
 } from "@chakra-ui/react";
 import { NavLink } from "react-router-dom";
 import { Formik } from "formik";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Info from "./Info";
 import EmailVerification from "./Forget Password/EmailVerification";
 
@@ -153,7 +153,7 @@ const LoginForm = () => {
               <Box>
                 <NavLink
                   color="gray"
-                  to="/EmailVerification"
+                  to="/EmailVerificaiton"
                   element={<EmailVerification />}
                 >
                   Forgot your password?
