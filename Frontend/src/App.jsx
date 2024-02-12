@@ -27,7 +27,7 @@ const router = createBrowserRouter(
       <Route path="/Privacy-Policy" element={<Privacy />} />
       <Route path="/Terms&Services" element={<Terms />} />
       <Route path="/EmailVerificaiton" element={<EmailVerification />} />
-      <Route path="/UpadePassword" element={<UpdatePassword />} />
+      <Route path="/UpdatePassword" element={<UpdatePassword />} />
       <Route path="/OTP" element={<OTP />} />
       <Route path="/" element={<RootLayout />}>
         <Route path="/Info" element={<Info />} />
