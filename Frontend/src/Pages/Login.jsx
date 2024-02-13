@@ -156,7 +156,20 @@ const LoginForm = () => {
                   to="/EmailVerificaiton"
                   element={<EmailVerification />}
                 >
-                  Forgot your password?
+                  <span
+                    style={{
+                      textDecoration: "none",
+                      borderBottom: "1px solid transparent",
+                    }} // set default border to transparent
+                    onMouseEnter={(e) => {
+                      e.target.style.borderBottom = "1px solid gray";
+                    }} // change border on hover
+                    onMouseLeave={(e) => {
+                      e.target.style.borderBottom = "1px solid transparent";
+                    }} // revert border on mouse leave
+                  >
+                    Forgot your password?
+                  </span>
                 </NavLink>
               </Box>
             </HStack>

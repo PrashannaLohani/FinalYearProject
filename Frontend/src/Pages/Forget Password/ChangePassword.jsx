@@ -3,7 +3,6 @@ import {
   Button,
   Flex,
   FormControl,
-  FormHelperText,
   FormLabel,
   Heading,
   Input,
@@ -59,9 +58,6 @@ const Section2 = () => {
         validate={(values) => {
           const errors = {};
           // Add your custom validation logic here
-          if (!values.oldPassword) {
-            errors.oldPassword = "Old password is required";
-          }
           if (!values.newPassword) {
             errors.newPassword = "New password is required";
           }
@@ -77,15 +73,6 @@ const Section2 = () => {
         {({ isSubmitting }) => (
           <Form>
             <Flex flexDir="column">
-              <FormControl>
-                <FormLabel>Old password</FormLabel>
-                <Field type="password" name="oldPassword" as={Input} />
-                <ErrorMessage
-                  name="oldPassword"
-                  component="div"
-                  style={{ color: "red" }}
-                />
-              </FormControl>
               <FormControl>
                 <FormLabel>New password</FormLabel>
                 <Field type="password" name="newPassword" as={Input} />
