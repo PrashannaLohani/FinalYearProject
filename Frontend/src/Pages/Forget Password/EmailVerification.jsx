@@ -1,24 +1,19 @@
 import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
   Box,
   Button,
   Flex,
   Heading,
   Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Text,
-  useDisclosure,
 } from "@chakra-ui/react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import HomepageNav from "../../Layout/Homepage/HomepageNavbar";
 import HomepageFooter from "../../Layout/Homepage/HomepageFooter";
 import axios from "axios";
-import { NavLink } from "react-router-dom";
 import { useState } from "react";
 
 export default function EmailVerification() {
@@ -61,7 +56,8 @@ const Section1 = () => {
 
 const Section2 = () => {
   const [submitted, setSubmitted] = useState(false);
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [errorOccurred, setErrorOccurred] = useState(false);
+
   const initialValues = {
     email: "",
   };
@@ -85,8 +81,9 @@ const Section2 = () => {
       );
       console.log(response.data); // Log the response from the backend
       setSubmitted(true); // Set submitted state to true
+      setErrorOccurred(false);
     } catch (error) {
-      onOpen();
+      setErrorOccurred(true);
     } finally {
       setSubmitting(false); // Reset submitting state
     }
@@ -94,11 +91,7 @@ const Section2 = () => {
 
   return (
     <>
-      {submitted ? (
-        // If submitted is true, render the component you want to navigate to
-        <NavLink to="/OTP" element={<OTP />} />
-      ) : (
-        // Otherwise, render the form
+      {!submitted && (
         <Formik
           initialValues={initialValues}
           validateOnChange={false}
@@ -138,30 +131,13 @@ const Section2 = () => {
           )}
         </Formik>
       )}
-      <Message_popup isOpen={isOpen} onClose={onClose} />
-    </>
-  );
-};
-
-const Message_popup = ({ isOpen, onClose }) => {
-  return (
-    <>
-      <Modal isOpen={isOpen} onClose={onClose} isCentered>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Error!</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Text>Email not Found!</Text>
-          </ModalBody>
-
-          <ModalFooter gap="1rem">
-            <Button colorScheme="red" mr={3} onClick={onClose}>
-              Close
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      {errorOccurred && (
+        <Alert status="error" mt="1rem">
+          <AlertIcon />
+          <AlertTitle>Error!</AlertTitle>
+          <AlertDescription>Please enter correct Email.</AlertDescription>
+        </Alert>
+      )}
     </>
   );
 };

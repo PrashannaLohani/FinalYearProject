@@ -50,7 +50,6 @@ const Section2 = () => {
     <Box w="30rem" mt="2rem">
       <Formik
         initialValues={{
-          oldPassword: "",
           newPassword: "",
           confirmPassword: "",
         }}
