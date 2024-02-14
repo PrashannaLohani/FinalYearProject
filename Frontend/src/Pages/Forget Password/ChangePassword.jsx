@@ -6,7 +6,6 @@ import {
   FormLabel,
   Heading,
   Input,
-  Text,
 } from "@chakra-ui/react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import HomepageNav from "../../Layout/Homepage/HomepageNavbar";
