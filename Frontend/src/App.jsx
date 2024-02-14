@@ -15,7 +15,7 @@ import Privacy from "./Pages/Privacy";
 import Terms from "./Pages/terms&service";
 import CreateRoom from "./Pages/CreateRoom";
 import EmailVerification from "./Pages/Forget Password/EmailVerification";
-import UpdatePassword from "./Pages/Forget Password/ChangePassword";
+import UpdatePassword from "./Pages/Forget Password/UpdatePassword";
 
 const router = createBrowserRouter(
   createRoutesFromElements(

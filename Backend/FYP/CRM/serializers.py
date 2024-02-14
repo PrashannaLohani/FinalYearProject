@@ -38,3 +38,12 @@ class VerifySerializer(serializers.Serializer):
         if not email :
             raise ValidationError('Email not found')
         return email
+class ChangePasswordSerializer(serializers.Serializer):
+    password = serializers.CharField(max_length = 100)
+
+    def verify_user(self,clean_data):
+        password = authenticate(password = clean_data['password'])
+
+        if not password :
+            raise ValidationError('Password not found')
+        return password
