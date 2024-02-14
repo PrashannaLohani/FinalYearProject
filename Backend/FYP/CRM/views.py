@@ -2,12 +2,10 @@ from django.http import HttpResponse
 from rest_framework.renderers import JSONRenderer 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
-from .serializers import SignupSerializer
-from rest_framework.exceptions import AuthenticationFailed
+from .serializers import SignupSerializer,LoginSerializer , VerifySerializer
 from rest_framework.response import Response
 from django.http import JsonResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
-from .serializers import LoginSerializer
 from rest_framework.views import APIView
 from .models import Signup
 from django.contrib.auth.hashers import check_password
@@ -74,6 +72,22 @@ class LoginAPI(APIView):
             else:
                 # Incorrect password
                 return Response({'error': 'Incorrect password'}, status=status.HTTP_401_UNAUTHORIZED)
+        else:
+            # Invalid serializer data
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+
+class VerifyAPI(APIView):
+    def post(self,request):
+        serializer = VerifySerializer(data=request.data)
+        if serializer.is_valid():
+            try:
+                user = Signup.objects.get(email=serializer.validated_data['email'])
+                # Return a success response if the user is found
+                return Response({'message': 'User found', 'user_id': user.id}, status=status.HTTP_200_OK)
+            except Signup.DoesNotExist:
+                # Return a 404 response if the user is not found
+                return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
         else:
             # Invalid serializer data
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
