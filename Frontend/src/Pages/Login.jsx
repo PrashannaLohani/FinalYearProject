@@ -1,5 +1,9 @@
 import axios from "axios";
 import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
   Box,
   Button,
   Flex,
@@ -46,6 +50,7 @@ const LoginHeader = () => {
 };
 
 const LoginForm = () => {
+  const [errorOccurred, setErrorOccurred] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [formSubmitted, setFormSubmitted] = useState(false);
   const apiURL = "http://127.0.0.1:8000/login/";
@@ -90,10 +95,11 @@ const LoginForm = () => {
               localStorage.setItem("refreshToken", response.data.refresh_token);
               // Open the modal
               onOpen();
+              setErrorOccurred(false);
             }
           } catch (error) {
             setFormSubmitted(true);
-            console.error("An error occurred:", error);
+            setErrorOccurred(true);
           } finally {
             setFormSubmitted(false);
             setSubmitting(false);
@@ -187,6 +193,15 @@ const LoginForm = () => {
           </form>
         )}
       </Formik>
+      {errorOccurred && (
+        <Alert status="error" mt="1rem">
+          <AlertIcon />
+          <AlertTitle>Error!</AlertTitle>
+          <AlertDescription>
+            Please enter correct Email or Password.
+          </AlertDescription>
+        </Alert>
+      )}
       <Flex mt="1rem" justify="center" gap="5px">
         <Text>New User?</Text>
         <NavLink to="/Signup">
