@@ -57,10 +57,10 @@ const Section2 = () => {
           const errors = {};
           // Add your custom validation logic here
           if (!values.newPassword) {
-            errors.newPassword = "New password is required";
+            errors.newPassword = "Required";
           }
           if (!values.confirmPassword) {
-            errors.confirmPassword = "Confirm password is required";
+            errors.confirmPassword = "Required";
           } else if (values.newPassword !== values.confirmPassword) {
             errors.confirmPassword = "Passwords do not match";
           }

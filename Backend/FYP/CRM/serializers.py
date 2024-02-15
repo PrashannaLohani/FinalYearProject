@@ -41,9 +41,7 @@ class VerifySerializer(serializers.Serializer):
 class ChangePasswordSerializer(serializers.Serializer):
     password = serializers.CharField(max_length = 100)
 
-    def verify_user(self,clean_data):
-        password = authenticate(password = clean_data['password'])
-
-        if not password :
-            raise ValidationError('Password not found')
-        return password
+    def update(self,instance,validate_data):
+        instance.password = validate_data.get('password',instance.password)
+        instance.save()
+        return instance

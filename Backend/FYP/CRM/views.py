@@ -1,8 +1,10 @@
+
 from django.http import HttpResponse
+import jwt
 from rest_framework.renderers import JSONRenderer 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
-from .serializers import SignupSerializer,LoginSerializer , VerifySerializer
+from .serializers import SignupSerializer,LoginSerializer , VerifySerializer,ChangePasswordSerializer
 from rest_framework.response import Response
 from django.http import JsonResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -11,6 +13,8 @@ from .models import Signup
 from django.contrib.auth.hashers import check_password
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 
 
@@ -30,8 +34,15 @@ def user_create(request):
         else:
             errors = serializer.errors
             print(errors)
-            return JsonResponse({'error':errors}, status = 400) 
-
+            return JsonResponse({'error':errors}, status = 400)
+    if request.method == 'PUT':
+             serializer = ChangePasswordSerializer(data = request.data, partial = True)
+             if serializer.is_valid():
+                 serializer.save()
+                 res = {'msg':'data created'}
+                 json_data = JSONRenderer().render(res)
+                 return HttpResponse(json_data, content_type = 'application/json')
+                 
     return HttpResponse(status=405, content="Method Not Allowed")
 
 @api_view(['POST'])
@@ -75,6 +86,46 @@ class LoginAPI(APIView):
         else:
             # Invalid serializer data
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class InfoAPI(APIView):
+     def get(self, request):
+        # Get the Authorization header from the request
+        authorization_header = request.headers.get('Authorization')
+
+        if authorization_header:
+            try:
+                # Split the Authorization header to get the token
+                token = authorization_header.split(' ')[1]
+
+                # Decode the token
+                decoded_token = jwt.decode(token, 'secret', algorithms=['HS256'])
+
+                # Return the decoded token as JSON response
+                return Response(decoded_token, status=status.HTTP_200_OK)
+            except jwt.ExpiredSignatureError:
+                return Response({'error': 'Token has expired'}, status=status.HTTP_401_UNAUTHORIZED)
+            except jwt.InvalidTokenError:
+                return Response({'error': 'Invalid token'}, status=status.HTTP_401_UNAUTHORIZED)
+            except Exception as e:
+                return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response({'error': 'Authorization header missing'}, status=status.HTTP_400_BAD_REQUEST)
+        
+    
+class LogoutAPI(APIView):
+    permission_classes = [IsAuthenticated]  # Ensure only authenticated users can log out
+
+    def post(self, request):
+        refresh_token = request.data.get('refresh_token')
+
+        if not refresh_token:
+            return Response({'error': 'No refresh token provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            token = RefreshToken(refresh_token)
+            token.blacklist()  # Add the refresh token to the blacklist
+            return Response({'message': 'Logout successful'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
 
 class VerifyAPI(APIView):

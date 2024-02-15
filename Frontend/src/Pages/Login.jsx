@@ -54,7 +54,6 @@ const LoginForm = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [formSubmitted, setFormSubmitted] = useState(false);
   const apiURL = "http://127.0.0.1:8000/login/";
-
   return (
     <Box my="2rem" textAlign="left">
       <Formik
