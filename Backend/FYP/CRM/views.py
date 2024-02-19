@@ -142,3 +142,20 @@ class VerifyAPI(APIView):
         else:
             # Invalid serializer data
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+class ChangePasswordView(APIView):
+    def post(self,request, user_id):
+        serializer = ChangePasswordSerializer(data= request.data)
+
+        if serializer.is_valid():
+            try:
+                user = Signup.objects.get(pk = user_id)
+
+            except Signup.DoesNotExist:
+                return Response("User not found", status=status.HTTP_404_NOT_FOUND)
+            
+
+            user = serializer.update(user, serializer.validated_data)
+            return Response("Password updated successfully", status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
