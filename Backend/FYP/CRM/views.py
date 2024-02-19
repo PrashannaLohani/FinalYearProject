@@ -15,8 +15,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
-
-
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
 
 @api_view(['POST'])
 @ensure_csrf_cookie
@@ -129,19 +130,26 @@ class LogoutAPI(APIView):
         
 
 class VerifyAPI(APIView):
-    def post(self,request):
-        serializer = VerifySerializer(data=request.data)
-        if serializer.is_valid():
-            try:
-                user = Signup.objects.get(email=serializer.validated_data['email'])
-                # Return a success response if the user is found
-                return Response({'message': 'User found', 'user_id': user.id}, status=status.HTTP_200_OK)
-            except Signup.DoesNotExist:
-                # Return a 404 response if the user is not found
-                return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+    user_id = None
+
+    def post(self, request):
+        email = request.data.get('email')
+        try:
+            user = Signup.objects.get(email=email)
+            self.user_id = user.id
+
+            # token = default_token_generator.make_token(user)
+            # uid = urlsafe_base64_encode(force_bytes(user.id))
+            return Response({'user_id': user.id}, status=status.HTTP_200_OK)
+        except Signup.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    def get(self, request):
+        user_id = request.session.get('user_id')
+        if user_id:
+            return Response({'user_id': user_id}, status=status.HTTP_200_OK)
         else:
-            # Invalid serializer data
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'User ID not available'}, status=status.HTTP_404_NOT_FOUND)
         
 class ChangePasswordView(APIView):
     def post(self,request, user_id):

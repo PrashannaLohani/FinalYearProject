@@ -10,6 +10,8 @@ import {
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import HomepageNav from "../../Layout/Homepage/HomepageNavbar";
 import HomepageFooter from "../../Layout/Homepage/HomepageFooter";
+import { useState } from "react";
+import axios from "axios";
 
 export default function UpdatePassword() {
   return (
@@ -40,10 +42,24 @@ const Section1 = () => {
 };
 
 const Section2 = () => {
-  const handleSubmit = (values, actions) => {
-    // Handle form submission logic here
-    console.log("Form submitted with values:", values);
-    actions.setSubmitting(false); // You can remove this line if you're redirecting or doing something else after submission
+  const [submitted, setSubmitted] = useState(false);
+  const [errorOccurred, setErrorOccurred] = useState(false);
+
+  const handleSubmit = async (values, { setSubmitting }) => {
+    try {
+      // Make an HTTP POST request to your backend
+      const response = await axios.post(
+        "http://localhost:8000/update-password/",
+        values
+      );
+      console.log(response.data); // Log the response from the backend
+      setSubmitted(true); // Set submitted state to true
+      setErrorOccurred(false);
+    } catch (error) {
+      setErrorOccurred(true);
+    } finally {
+      setSubmitting(false); // Reset submitting state
+    }
   };
 
   return (

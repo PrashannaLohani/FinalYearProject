@@ -7,6 +7,6 @@ from .models import Signup
 class CRMAdmin(admin.ModelAdmin):
     list_display = ['id','name']
 class SignupAdmin(admin.ModelAdmin):
-    list_display = ('id','fullname', 'email', 'password','created_at')
+    list_display = ('id','fullname', 'email', 'password','updated_at','created_at','is_active')
     readonly_fields = ('password',)
 admin.site.register(Signup, SignupAdmin)

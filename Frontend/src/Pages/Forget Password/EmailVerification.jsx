@@ -46,9 +46,7 @@ const Section1 = () => {
     <Box>
       <Heading>Verify the email</Heading>
       <Box>
-        <Text mt="1rem">
-          A OTP code will be sent to the email address you provide.
-        </Text>
+        <Text mt="1rem">A password reset link will be sent in your email.</Text>
       </Box>
     </Box>
   );
@@ -136,6 +134,13 @@ const Section2 = () => {
           <AlertIcon />
           <AlertTitle>Error!</AlertTitle>
           <AlertDescription>Please enter correct Email.</AlertDescription>
+        </Alert>
+      )}
+      {submitted && (
+        <Alert status="info" mt="1rem">
+          <AlertIcon />
+          <AlertTitle>Information</AlertTitle>
+          <AlertDescription>Please Check your Email.</AlertDescription>
         </Alert>
       )}
     </>
