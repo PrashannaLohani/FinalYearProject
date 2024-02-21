@@ -1,8 +1,9 @@
-from django.contrib.auth.models import AbstractBaseUser, UserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.hashers import make_password
 from django.db import models
 from django.utils import timezone
 
-class CustomUserManager(UserManager):
+class CustomUserManager(BaseUserManager):
     def create_user(self, email, full_name, password=None, **extra_fields):
         if not email:
             raise ValueError('The email field must be set')
@@ -12,7 +13,8 @@ class CustomUserManager(UserManager):
             full_name=full_name,
             **extra_fields
         )
-        user.set_password(password)
+        if password:
+            user.password = make_password(password)
         user.save(using=self._db)
         return user
     def create_superuser(self, email, full_name, password=None, **extra_fields):

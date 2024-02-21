@@ -15,7 +15,10 @@ class SignupSerializer(serializers.Serializer):
 
     
     def create(self,validate_data ):
-        return Signup.objects.create(**validate_data)
+        password = validate_data.pop('password')
+        hashed_password = make_password(password)
+
+        return Signup.objects.create(password=hashed_password,**validate_data)
     
     
 class LoginSerializer(serializers.Serializer):
@@ -30,7 +33,7 @@ class LoginSerializer(serializers.Serializer):
         hashed_password = make_password(password)
 
         # Authenticate the user with the hashed password
-        user = authenticate(email=email, password=password)
+        user = authenticate(email=email, password=hashed_password)
 
         if not user:
             raise ValidationError('User not found or invalid credentials')
