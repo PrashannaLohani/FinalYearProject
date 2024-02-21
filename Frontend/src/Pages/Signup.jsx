@@ -57,12 +57,12 @@ const Signup = () => {
   return (
     <>
       <Flex minH="100vh" width="full" align="center" justify="center">
-        <Box w="full" maxW="30rem" p={10} textAlign="center">
+        <Box w="full" maxW="35rem" p={10} textAlign="center">
           <SignupHeader />
           <Box mt="3rem">
             <Formik
               initialValues={{
-                fullname: "",
+                full_name: "",
                 email: "",
                 password: "",
                 cpassword: "",
@@ -70,17 +70,33 @@ const Signup = () => {
               }}
               validate={(values) => {
                 const errors = {};
-                if (!values.fullname) {
-                  errors.fullname = "*";
+                if (!values.full_name) {
+                  errors.full_name = "Fullname is required";
                 }
                 if (!values.email) {
-                  errors.email = "*";
+                  errors.email = "Email is required";
                 }
                 if (!values.password) {
-                  errors.password = "*";
+                  errors.password = "Password is required";
+                } else if (values.password.length < 8) {
+                  errors.password = "Password must be at least 8 characters";
+                } else if (/^\d+$/.test(values.password)) {
+                  errors.password = "Password can't be entirely numeric";
+                } else if (
+                  !/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]+/.test(values.password)
+                ) {
+                  errors.password =
+                    "Password must contain at least one special character";
+                } else if (!/[a-z]/.test(values.password)) {
+                  errors.password =
+                    "Password must contain at least one lowercase letter";
+                } else if (!/[A-Z]/.test(values.password)) {
+                  errors.password =
+                    "Password must contain at least one uppercase letter";
                 }
+
                 if (!values.cpassword) {
-                  errors.cpassword = "*";
+                  errors.cpassword = "Confirm password is required";
                 } else if (values.cpassword !== values.password) {
                   errors.cpassword = "Passwords do not match";
                 }
@@ -88,6 +104,7 @@ const Signup = () => {
                   errors.checkbox =
                     "You must accept the terms and privacy policy";
                 }
+
                 return errors;
               }}
               onSubmit={async (values, { setSubmitting }) => {
@@ -122,16 +139,16 @@ const Signup = () => {
                   <FormControl>
                     <Flex>
                       <FormLabel>Fullname</FormLabel>
-                      {errors.fullname && touched.fullname && (
-                        <Text color="red.500">{errors.fullname}</Text>
+                      {errors.full_name && touched.full_name && (
+                        <Text color="red.500">{errors.full_name}</Text>
                       )}
                     </Flex>
                     <Input
                       type="text"
-                      name="fullname"
+                      name="full_name"
                       placeholder="Enter your Fullname"
                       onChange={handleChange}
-                      value={values.fullname}
+                      value={values.full_name}
                       isRequired
                     />
                   </FormControl>

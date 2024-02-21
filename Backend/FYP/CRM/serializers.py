@@ -3,11 +3,12 @@ from datetime import datetime
 from django.forms import ValidationError
 from rest_framework import serializers
 from .models import Signup
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate
 
 class SignupSerializer(serializers.Serializer):
     id = serializers.IntegerField(required = False)
-    fullname = serializers.CharField(max_length = 300,required = False)
+    full_name = serializers.CharField(max_length = 300,required = False)
     email = serializers.EmailField(max_length = 100)
     password = serializers.CharField(max_length = 128)
     created_at = serializers.DateTimeField(read_only = True, default=datetime.now)
@@ -21,11 +22,18 @@ class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(max_length = 100)
     password = serializers.CharField(max_length = 128)
 
-    def check_user(self,clean_data):
-        user = authenticate(email = clean_data['email'], password = clean_data['password'])
-        
+    def check_user(self, clean_data):
+        email = clean_data.get('email')
+        password = clean_data.get('password')
+
+        # Hash the password
+        hashed_password = make_password(password)
+
+        # Authenticate the user with the hashed password
+        user = authenticate(email=email, password=password)
+
         if not user:
-            raise ValidationError('user not found')
+            raise ValidationError('User not found or invalid credentials')
         return user
     
 

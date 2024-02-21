@@ -33,7 +33,7 @@ const BarGraph = () => {
     },
   };
 
-  const labels = ["Room1", "Room2", "Room3", "Room4", "Room5", "Room6"];
+  const labels = ["Room1", "Room2", "Room3", "Room4", "Room5"];
 
   const data = {
     labels,

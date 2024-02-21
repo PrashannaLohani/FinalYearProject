@@ -1,12 +1,30 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
 from .models import Signup
 
-# Register your models here.
+class CustomUserAdmin(UserAdmin):
+    model = Signup
+    list_display = ('email', 'full_name', 'is_active', 'is_staff', 'is_superuser', 'date_joined', 'last_login')
+    search_fields = ('email', 'full_name')
+    readonly_fields = ('date_joined', 'last_login')
 
+    filter_horizontal = ()
+    list_filter = ()
+    fieldsets = ()
+    ordering = ('email',)
 
-class CRMAdmin(admin.ModelAdmin):
-    list_display = ['id','name']
-class SignupAdmin(admin.ModelAdmin):
-    list_display = ('id','fullname', 'email', 'password','updated_at','created_at','is_active')
-    readonly_fields = ('password',)
-admin.site.register(Signup, SignupAdmin)
+    fieldsets = (
+        (None, {'fields': ('email', 'password')}),
+        ('Personal info', {'fields': ('full_name',)}),
+        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser')}),
+        ('Important dates', {'fields': ('last_login', 'date_joined')}),
+    )
+
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('email', 'password1', 'password2'),
+        }),
+    )
+
+admin.site.register(Signup, CustomUserAdmin)

@@ -112,7 +112,11 @@ export default function Home() {
             spacing="2"
             padding="4rem"
           >
-            <Card>
+            <Card
+              style={{
+                boxShadow: "rgba(100, 100, 111, 0.2) 0px 7px 29px 0px",
+              }}
+            >
               <Image src="./Image/Feature1.jpg" borderRadius="8" />
               <CardHeader>
                 <Heading size="lg">Work</Heading>
@@ -129,7 +133,11 @@ export default function Home() {
                 <Button>Read more</Button>
               </CardFooter>
             </Card>
-            <Card>
+            <Card
+              style={{
+                boxShadow: "rgba(100, 100, 111, 0.2) 0px 7px 29px 0px",
+              }}
+            >
               <Image src="./Image/Education.jpg" borderRadius="8" />
               <CardHeader>
                 <Heading size="lg">Education</Heading>
@@ -145,7 +153,11 @@ export default function Home() {
                 <Button>Read more</Button>
               </CardFooter>
             </Card>
-            <Card style={{}}>
+            <Card
+              style={{
+                boxShadow: "rgba(100, 100, 111, 0.2) 0px 7px 29px 0px",
+              }}
+            >
               <Image src="./Image/Engagement.jpg" borderRadius="8" />
               <CardHeader>
                 <Heading size="lg">Engagement</Heading>

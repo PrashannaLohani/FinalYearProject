@@ -1,6 +1,6 @@
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import path , include
 from CRM import views
 from CRM import utils
 
@@ -13,4 +13,6 @@ urlpatterns = [
     path('info/', views.InfoAPI.as_view(), name='info'),
     path('logout/', views.LogoutAPI.as_view(), name='info'),
     path('get-csrf-token/<str:token_type>/', utils.get_csrf_token, name='get_csrf_token'),
+    path('accounts/', include('django.contrib.auth.urls')),
 ]
+
