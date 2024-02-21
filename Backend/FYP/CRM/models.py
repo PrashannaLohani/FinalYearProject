@@ -23,6 +23,7 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(email, full_name, password, **extra_fields)
 
 class Signup(AbstractBaseUser):
+    id = models.AutoField(primary_key=True)
     email = models.EmailField(unique=True)
     full_name = models.CharField(max_length=255, blank=True, default='')
     is_active = models.BooleanField(default=True)

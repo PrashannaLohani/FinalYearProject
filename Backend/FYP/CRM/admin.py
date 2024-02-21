@@ -4,7 +4,7 @@ from .models import Signup
 
 class CustomUserAdmin(UserAdmin):
     model = Signup
-    list_display = ('email', 'full_name', 'is_active', 'is_staff', 'is_superuser', 'date_joined', 'last_login')
+    list_display = ('id','email', 'full_name', 'is_active', 'is_staff', 'is_superuser', 'date_joined', 'last_login')
     search_fields = ('email', 'full_name')
     readonly_fields = ('date_joined', 'last_login')
 
