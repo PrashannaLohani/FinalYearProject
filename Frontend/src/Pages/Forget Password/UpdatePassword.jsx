@@ -47,12 +47,20 @@ const Section2 = () => {
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      // Make an HTTP POST request to your backend
       const response = await axios.post(
-        "http://localhost:8000/update-password/",
+        "http://localhost:8000/verify-email/",
         values
       );
-      console.log(response.data); // Log the response from the backend
+
+      const { uidb64, token } = response.data;
+
+      const updatePasswordResponse = await axios.post(
+        `http://localhost:8000/update-password/accounts/reset${uidb64}/${token}/`,
+        values
+      );
+
+      console.log(updatePasswordResponse.data); // Log the response from the backend
+
       setSubmitted(true); // Set submitted state to true
       setErrorOccurred(false);
     } catch (error) {

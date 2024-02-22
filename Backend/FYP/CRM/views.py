@@ -140,11 +140,11 @@ class VerifyAPI(APIView):
         full_name = request.data.get('full_name')
         try:
             user = Signup.objects.get(email=email)
-            self.user_id = user.id
- 
-            token = default_token_generator.make_token(user)
-            uid = urlsafe_base64_encode(force_bytes(user.id))
 
+            token = default_token_generator.make_token(user)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+            # Generate the URL without the '/accounts/reset/' part
             reset_password_url = reverse('password_reset_confirm', kwargs={'uidb64': uid, 'token': token})
             reset_password_full_url = f'http://127.0.0.1:8000/update-password{reset_password_url}'
 
@@ -154,10 +154,11 @@ class VerifyAPI(APIView):
             recipient_email = [email]
 
             send_mail(subject, message, sender_email, recipient_email)
-            return Response({'user_id': user.id,'token':token,'uid':uid}, status=status.HTTP_200_OK)
+
+            # Return uidb64 and token in the response
+            return Response({'uidb64': uid, 'token': token}, status=status.HTTP_200_OK)
         except Signup.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-   
         
 class ChangePasswordView(APIView):
     def post(self,request, user_id):
