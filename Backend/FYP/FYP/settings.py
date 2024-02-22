@@ -170,4 +170,12 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_HOST_USER = 'np03cs4s220275@heraldcollege.edu.np'
+DEFAULT_FROM_EMAIL = 'np03cs4s220275@heraldcollege.edu.np'
+EMAIL_HOST_PASSWORD = 'zfhm qnep yabx drvj'
+EMAIL_DEBUG = True

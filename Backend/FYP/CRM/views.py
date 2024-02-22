@@ -4,11 +4,14 @@ import jwt
 from rest_framework.renderers import JSONRenderer 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
+from FYP import settings
 from .serializers import SignupSerializer,LoginSerializer , VerifySerializer,ChangePasswordSerializer
 from rest_framework.response import Response
 from django.http import JsonResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework.views import APIView
+from django.urls import reverse
+from django.core.mail import send_mail
 from .models import Signup
 from django.contrib.auth.hashers import check_password
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -134,15 +137,27 @@ class VerifyAPI(APIView):
 
     def post(self, request):
         email = request.data.get('email')
+        full_name = request.data.get('full_name')
         try:
             user = Signup.objects.get(email=email)
             self.user_id = user.id
-
+ 
             token = default_token_generator.make_token(user)
             uid = urlsafe_base64_encode(force_bytes(user.id))
+
+            reset_password_url = reverse('password_reset_confirm', kwargs={'uidb64': uid, 'token': token})
+            reset_password_full_url = f'http://127.0.0.1:8000/update-password{reset_password_url}'
+
+            subject = 'Reset your password'
+            message = f'Hi {user.full_name},\n\nPlease click the following link to reset your password:\n{reset_password_full_url}'
+            sender_email = settings.DEFAULT_FROM_EMAIL
+            recipient_email = [email]
+
+            send_mail(subject, message, sender_email, recipient_email)
             return Response({'user_id': user.id,'token':token,'uid':uid}, status=status.HTTP_200_OK)
         except Signup.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+   
         
 class ChangePasswordView(APIView):
     def post(self,request, user_id):
