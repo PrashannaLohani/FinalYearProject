@@ -138,18 +138,11 @@ class VerifyAPI(APIView):
             user = Signup.objects.get(email=email)
             self.user_id = user.id
 
-            # token = default_token_generator.make_token(user)
-            # uid = urlsafe_base64_encode(force_bytes(user.id))
-            return Response({'user_id': user.id}, status=status.HTTP_200_OK)
+            token = default_token_generator.make_token(user)
+            uid = urlsafe_base64_encode(force_bytes(user.id))
+            return Response({'user_id': user.id,'token':token,'uid':uid}, status=status.HTTP_200_OK)
         except Signup.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-    
-    def get(self, request):
-        user_id = request.session.get('user_id')
-        if user_id:
-            return Response({'user_id': user_id}, status=status.HTTP_200_OK)
-        else:
-            return Response({'error': 'User ID not available'}, status=status.HTTP_404_NOT_FOUND)
         
 class ChangePasswordView(APIView):
     def post(self,request, user_id):
