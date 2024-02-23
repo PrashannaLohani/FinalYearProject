@@ -6,7 +6,7 @@ export default function Footer() {
       <Box>
         <footer>
           <Flex gap="1.5rem" justifyContent="center" flexWrap="wrap" m="2rem">
-            <Text>Contact: plohani2003@gmail.com</Text>
+            <Text>Contact: reactrise23@gmail.com</Text>
             <Text>Privacy policy</Text>
             <Text>Terms of Service</Text>
             <Text>2024 React&Rise.&copy; All right reserved.</Text>

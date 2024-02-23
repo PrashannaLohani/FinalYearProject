@@ -145,8 +145,8 @@ class VerifyAPI(APIView):
             uid = urlsafe_base64_encode(force_bytes(user.pk))
 
             # Generate the URL without the '/accounts/reset/' part
-            reset_password_url = reverse('password_reset_confirm', kwargs={'uidb64': uid, 'token': token})
-            reset_password_full_url = f'http://127.0.0.1:8000/update-password{reset_password_url}'
+            reset_password_url = reverse('password', kwargs={'uidb64': uid, 'token': token})
+            reset_password_full_url = f'http://localhost:5173{reset_password_url}'
 
             subject = 'Reset your password'
             message = f'Hi {user.full_name},\n\nPlease click the following link to reset your password:\n{reset_password_full_url}'

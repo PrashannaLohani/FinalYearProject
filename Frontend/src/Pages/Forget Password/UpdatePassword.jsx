@@ -55,7 +55,7 @@ const Section2 = () => {
       const { uidb64, token } = response.data;
 
       const updatePasswordResponse = await axios.post(
-        `http://localhost:8000/update-password/accounts/reset${uidb64}/${token}/`,
+        `http://localhost:8000/update-password/${uidb64}/${token}/`,
         values
       );
 
