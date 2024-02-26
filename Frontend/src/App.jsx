@@ -16,27 +16,33 @@ import Terms from "./Pages/terms&service";
 import CreateRoom from "./Pages/CreateRoom";
 import EmailVerification from "./Pages/Forget Password/EmailVerification";
 import UpdatePassword from "./Pages/Forget Password/UpdatePassword";
+import { useAuth } from "./AuthContext";
 
-const router = createBrowserRouter(
-  createRoutesFromElements(
-    <>
-      <Route index element={<Home />} />
-      <Route path="/Login" element={<Login />} />
-      <Route path="/Signup" element={<Signup />} />
-      <Route path="/Privacy-Policy" element={<Privacy />} />
-      <Route path="/Terms&Services" element={<Terms />} />
-      <Route path="/EmailVerificaiton" element={<EmailVerification />} />
-      <Route path={`/update-password/`} element={<UpdatePassword />} />
-      <Route path="/" element={<RootLayout />}>
-        <Route path="/Info" element={<Info />} />
-        <Route path="/Profile" element={<Profile />} />
-        <Route path="/CreateRoom" element={<CreateRoom />} />
-        <Route Component={Error} />
-      </Route>
-    </>
-  )
-);
 function App() {
+  const { uidb64, token } = useAuth();
+
+  const router = createBrowserRouter(
+    createRoutesFromElements(
+      <>
+        <Route index element={<Home />} />
+        <Route path="/Login" element={<Login />} />
+        <Route path="/Signup" element={<Signup />} />
+        <Route path="/Privacy-Policy" element={<Privacy />} />
+        <Route path="/Terms&Services" element={<Terms />} />
+        <Route path="/EmailVerificaiton" element={<EmailVerification />} />
+        <Route
+          path={`/update-password/:uidb64/:token`}
+          element={<UpdatePassword />}
+        />
+        <Route path="/" element={<RootLayout />}>
+          <Route path="/Info" element={<Info />} />
+          <Route path="/Profile" element={<Profile />} />
+          <Route path="/CreateRoom" element={<CreateRoom />} />
+          <Route Component={Error} />
+        </Route>
+      </>
+    )
+  );
   return <RouterProvider router={router} />;
 }
 

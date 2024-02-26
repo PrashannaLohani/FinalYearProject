@@ -77,7 +77,8 @@ const Section2 = () => {
         "http://localhost:8000/verify-email/",
         values
       );
-      console.log(response.data); // Log the response from the backend
+      const { uidb64, token } = response.data;
+      console.log(uidb64, token);
       setSubmitted(true); // Set submitted state to true
       setErrorOccurred(false);
     } catch (error) {
@@ -122,7 +123,7 @@ const Section2 = () => {
                   colorScheme="blackAlpha"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Sending..." : "Send Verification Code"}
+                  {isSubmitting ? "Sending..." : "Send"}
                 </Button>
               </Flex>
             </Form>

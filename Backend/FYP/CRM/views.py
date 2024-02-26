@@ -1,5 +1,4 @@
-
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 import jwt
 from rest_framework.renderers import JSONRenderer 
 from rest_framework.decorators import api_view, permission_classes
@@ -19,7 +18,7 @@ from rest_framework import status
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.tokens import default_token_generator
-from django.utils.http import urlsafe_base64_encode
+from django.utils.http import urlsafe_base64_encode ,urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 
 @api_view(['POST'])
@@ -159,6 +158,7 @@ class VerifyAPI(APIView):
             return Response({'uidb64': uid, 'token': token}, status=status.HTTP_200_OK)
         except Signup.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        
         
 class ChangePasswordView(APIView):
     def post(self,request, user_id):

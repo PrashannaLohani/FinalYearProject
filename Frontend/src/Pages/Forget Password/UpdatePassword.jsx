@@ -12,6 +12,7 @@ import HomepageNav from "../../Layout/Homepage/HomepageNavbar";
 import HomepageFooter from "../../Layout/Homepage/HomepageFooter";
 import { useState } from "react";
 import axios from "axios";
+import { useParams } from "react-router-dom";
 
 export default function UpdatePassword() {
   return (
@@ -44,16 +45,10 @@ const Section1 = () => {
 const Section2 = () => {
   const [submitted, setSubmitted] = useState(false);
   const [errorOccurred, setErrorOccurred] = useState(false);
+  const { uidb64, token } = useParams();
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      const response = await axios.post(
-        "http://localhost:8000/verify-email/",
-        values
-      );
-
-      const { uidb64, token } = response.data;
-
       const updatePasswordResponse = await axios.post(
         `http://localhost:8000/update-password/${uidb64}/${token}/`,
         values
