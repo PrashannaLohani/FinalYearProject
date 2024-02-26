@@ -51,8 +51,9 @@ class VerifySerializer(serializers.Serializer):
         return email
 class ChangePasswordSerializer(serializers.Serializer):
     password = serializers.CharField(max_length = 100)
+    confirm_password = serializers.CharField(max_length = 100)
 
     def update(self,instance,validate_data):
-        instance.password = validate_data.get('password',instance.password)
+        instance.set_password(validate_data.get('password'))
         instance.save()
         return instance

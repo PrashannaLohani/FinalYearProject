@@ -1,25 +1,26 @@
-from django.http import HttpResponse, HttpResponseBadRequest
+from datetime import datetime, timedelta
 import jwt
-from rest_framework.renderers import JSONRenderer 
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
-from FYP import settings
-from .serializers import SignupSerializer,LoginSerializer , VerifySerializer,ChangePasswordSerializer
-from rest_framework.response import Response
-from django.http import JsonResponse
-from django.views.decorators.csrf import ensure_csrf_cookie
-from rest_framework.views import APIView
-from django.urls import reverse
-from django.core.mail import send_mail
-from .models import Signup
-from django.contrib.auth.hashers import check_password
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework import status
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.permissions import IsAuthenticated
+
+from django.contrib.auth.hashers import check_password, make_password
 from django.contrib.auth.tokens import default_token_generator
-from django.utils.http import urlsafe_base64_encode ,urlsafe_base64_decode
-from django.utils.encoding import force_bytes
+from django.core.mail import send_mail
+from django.http import HttpResponse, JsonResponse
+from django.urls import reverse
+from django.utils.encoding import force_bytes, smart_str
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.views.decorators.csrf import ensure_csrf_cookie
+
+from rest_framework import status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.renderers import JSONRenderer
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+
+from FYP import settings
+from .models import Signup
+from .serializers import SignupSerializer, LoginSerializer, ChangePasswordSerializer
 
 @api_view(['POST'])
 @ensure_csrf_cookie
@@ -131,6 +132,8 @@ class LogoutAPI(APIView):
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
 
+
+token_cache = {}
 class VerifyAPI(APIView):
     user_id = None
 
@@ -142,6 +145,9 @@ class VerifyAPI(APIView):
 
             token = default_token_generator.make_token(user)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
+            expiry_time = datetime.now() + timedelta(minutes=1)
+
+            token_cache[token] = expiry_time
 
             # Generate the URL without the '/accounts/reset/' part
             reset_password_url = reverse('password', kwargs={'uidb64': uid, 'token': token})
@@ -161,18 +167,27 @@ class VerifyAPI(APIView):
         
         
 class ChangePasswordView(APIView):
-    def post(self,request, user_id):
-        serializer = ChangePasswordSerializer(data= request.data)
+     def post(self, request, uidb64, token):
+        try:
+            user_id = urlsafe_base64_decode(smart_str(uidb64))
+            user = Signup.objects.get(pk=user_id)
 
-        if serializer.is_valid():
-            try:
-                user = Signup.objects.get(pk = user_id)
+            serializer = ChangePasswordSerializer(data=request.data)
 
-            except Signup.DoesNotExist:
-                return Response("User not found", status=status.HTTP_404_NOT_FOUND)
-            
+            if serializer.is_valid():
+                new_password = serializer.validated_data.get('password')
+                confirm_password = serializer.validated_data.get('confirm_password')
 
-            user = serializer.update(user, serializer.validated_data)
-            return Response("Password updated successfully", status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                if new_password != confirm_password:
+                    return Response("New password and confirm password do not match", status=status.HTTP_400_BAD_REQUEST)
+
+                # Hash the new password
+                user.password = make_password(new_password)   
+                user.save()
+
+                return Response("Password updated successfully", status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except (TypeError, ValueError, OverflowError, Signup.DoesNotExist):
+            return Response("Invalid UID or token", status=status.HTTP_400_BAD_REQUEST)

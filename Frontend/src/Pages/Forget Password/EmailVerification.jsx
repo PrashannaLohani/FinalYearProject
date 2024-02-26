@@ -78,7 +78,6 @@ const Section2 = () => {
         values
       );
       const { uidb64, token } = response.data;
-      console.log(uidb64, token);
       setSubmitted(true); // Set submitted state to true
       setErrorOccurred(false);
     } catch (error) {
