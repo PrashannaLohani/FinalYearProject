@@ -1,4 +1,8 @@
 import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
   Box,
   Button,
   Flex,
@@ -59,7 +63,7 @@ const Section2 = () => {
 
       console.log(updatePasswordResponse.data); // Log the response from the backend
 
-      setSubmitted(true); // Set submitted state to true
+      setSubmitted(true);
       setErrorOccurred(false);
     } catch (error) {
       setErrorOccurred(true);
@@ -70,60 +74,85 @@ const Section2 = () => {
 
   return (
     <Box w="30rem" mt="2rem">
-      <Formik
-        initialValues={{
-          newPassword: "",
-          confirmPassword: "",
-        }}
-        validate={(values) => {
-          const errors = {};
-          // Add your custom validation logic here
-          if (!values.newPassword) {
-            errors.newPassword = "Required";
-          }
-          if (!values.confirmPassword) {
-            errors.confirmPassword = "Required";
-          } else if (values.newPassword !== values.confirmPassword) {
-            errors.confirmPassword = "Passwords do not match";
-          }
-          return errors;
-        }}
-        onSubmit={handleSubmit}
-      >
-        {({ isSubmitting }) => (
-          <Form>
-            <Flex flexDir="column">
-              <FormControl>
-                <FormLabel>New password</FormLabel>
-                <Field type="password" name="newPassword" as={Input} />
-                <ErrorMessage
-                  name="newPassword"
-                  component="div"
-                  style={{ color: "red" }}
-                />
-              </FormControl>
-              <FormControl>
-                <FormLabel>Confirm password</FormLabel>
-                <Field type="password" name="confirmPassword" as={Input} />
-                <ErrorMessage
-                  name="confirmPassword"
-                  component="div"
-                  style={{ color: "red" }}
-                />
-              </FormControl>
-              <Button
-                type="submit"
-                bgColor="black"
-                colorScheme="blackAlpha"
-                mt="1rem"
-                isLoading={isSubmitting}
-              >
-                Confirm
-              </Button>
-            </Flex>
-          </Form>
-        )}
-      </Formik>
+      {!submitted && (
+        <Formik
+          initialValues={{
+            newPassword: "",
+            confirmPassword: "",
+          }}
+          validate={(values) => {
+            const errors = {};
+            // Add your custom validation logic here
+            if (!values.newPassword) {
+              errors.newPassword = "Required";
+            } else if (values.newPassword.length < 8) {
+              errors.newPassword = "Password must be at least 8 characters";
+            } else if (/^\d+$/.test(values.newPassword)) {
+              errors.newPassword = "Password can't be entirely numeric";
+            } else if (
+              !/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]+/.test(values.newPassword)
+            ) {
+              errors.newPassword =
+                "Password must contain at least one special character";
+            } else if (!/[a-z]/.test(values.newPassword)) {
+              errors.newPassword =
+                "Password must contain at least one lowercase letter";
+            } else if (!/[A-Z]/.test(values.newPassword)) {
+              errors.newPassword =
+                "Password must contain at least one uppercase letter";
+            }
+
+            if (!values.confirmPassword) {
+              errors.confirmPassword = "Required";
+            } else if (values.newPassword !== values.confirmPassword) {
+              errors.confirmPassword = "Passwords do not match";
+            }
+            return errors;
+          }}
+          onSubmit={handleSubmit}
+        >
+          {({ isSubmitting }) => (
+            <Form>
+              <Flex flexDir="column">
+                <FormControl>
+                  <FormLabel>New password</FormLabel>
+                  <Field type="password" name="newPassword" as={Input} />
+                  <ErrorMessage
+                    name="newPassword"
+                    component="div"
+                    style={{ color: "red" }}
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>Confirm password</FormLabel>
+                  <Field type="password" name="confirmPassword" as={Input} />
+                  <ErrorMessage
+                    name="confirmPassword"
+                    component="div"
+                    style={{ color: "red" }}
+                  />
+                </FormControl>
+                <Button
+                  type="submit"
+                  bgColor="black"
+                  colorScheme="blackAlpha"
+                  mt="1rem"
+                  isLoading={isSubmitting}
+                >
+                  Confirm
+                </Button>
+              </Flex>
+            </Form>
+          )}
+        </Formik>
+      )}
+      {submitted && (
+        <Alert status="success" mt="1rem">
+          <AlertIcon />
+          <AlertTitle>Success</AlertTitle>
+          <AlertDescription>Your password has been updated.</AlertDescription>
+        </Alert>
+      )}
     </Box>
   );
 };
