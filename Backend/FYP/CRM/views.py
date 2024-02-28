@@ -49,23 +49,23 @@ def user_create(request):
                  
     return HttpResponse(status=405, content="Method Not Allowed")
 
-@api_view(['POST'])
-@permission_classes([AllowAny])
-@ensure_csrf_cookie
-def user_detail(request):
-    if request.method == 'POST':
-        serializer = LoginSerializer(data = request.data)
-        if serializer.is_valid():
-            serializer.save()
-            res = {'msg':'data created'}
-            json_data = JSONRenderer().render(res)
-            return HttpResponse(json_data, content_type = 'application/json')
-        else:
-            errors = serializer.errors
-            print(errors)
-            return JsonResponse({'error':errors}, status = 400) 
+# @api_view(['POST'])
+# @permission_classes([AllowAny])
+# @ensure_csrf_cookie
+# def user_detail(request):
+#     if request.method == 'POST':
+#         serializer = LoginSerializer(data = request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             res = {'msg':'data created'}
+#             json_data = JSONRenderer().render(res)
+#             return HttpResponse(json_data, content_type = 'application/json')
+#         else:
+#             errors = serializer.errors
+#             print(errors)
+#             return JsonResponse({'error':errors}, status = 400) 
 
-    return HttpResponse(status=405, content="Method Not Allowed")
+#     return HttpResponse(status=405, content="Method Not Allowed")
 
 class LoginAPI(APIView):
     def post(self, request):

@@ -51,7 +51,10 @@ const Section2 = () => {
     try {
       const updatePasswordResponse = await axios.post(
         `http://localhost:8000/update-password/${uidb64}/${token}/`,
-        values
+        {
+          password: values.newPassword,
+          confirm_password: values.confirmPassword,
+        }
       );
 
       console.log(updatePasswordResponse.data); // Log the response from the backend
