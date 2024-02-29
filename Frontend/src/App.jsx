@@ -16,11 +16,8 @@ import Terms from "./Pages/terms&service";
 import CreateRoom from "./Pages/CreateRoom";
 import EmailVerification from "./Pages/Forget Password/EmailVerification";
 import UpdatePassword from "./Pages/Forget Password/UpdatePassword";
-import { useAuth } from "./AuthContext";
 
 function App() {
-  const { uidb64, token } = useAuth();
-
   const router = createBrowserRouter(
     createRoutesFromElements(
       <>

@@ -16,12 +16,9 @@ import {
   ListItem,
   OrderedList,
   SimpleGrid,
-  Spacer,
   Text,
 } from "@chakra-ui/react";
-import { NavLink } from "react-router-dom";
-import Login from "./Login";
-import Signup from "./Signup";
+
 import { Field, Form, Formik } from "formik";
 import ContactForm from "../Components/Contact";
 import HomepageNav from "../Layout/Homepage/HomepageNavbar";

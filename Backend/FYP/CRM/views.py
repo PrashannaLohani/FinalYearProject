@@ -49,24 +49,6 @@ def user_create(request):
                  
     return HttpResponse(status=405, content="Method Not Allowed")
 
-# @api_view(['POST'])
-# @permission_classes([AllowAny])
-# @ensure_csrf_cookie
-# def user_detail(request):
-#     if request.method == 'POST':
-#         serializer = LoginSerializer(data = request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             res = {'msg':'data created'}
-#             json_data = JSONRenderer().render(res)
-#             return HttpResponse(json_data, content_type = 'application/json')
-#         else:
-#             errors = serializer.errors
-#             print(errors)
-#             return JsonResponse({'error':errors}, status = 400) 
-
-#     return HttpResponse(status=405, content="Method Not Allowed")
-
 class LoginAPI(APIView):
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
@@ -78,10 +60,19 @@ class LoginAPI(APIView):
             
             if check_password(serializer.validated_data['password'], user.password):
                 # User authenticated successfully
-                 refresh = RefreshToken.for_user(user)
-                 return Response({
+                refresh = RefreshToken.for_user(user)
+                # Define additional user information for token payload
+                payload = {
+                    'user_id': user.id,
+                    'full_name': user.full_name,
+                    'email': user.email
+                }
+                # Update payload with token-specific information (expiration, issued at, etc.) if needed
+                access_token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
+                request.session['access_token'] = access_token
+                return Response({
                     'message': 'Login successful',
-                    'access_token': str(refresh.access_token),
+                    'access_token': access_token,
                     'refresh_token': str(refresh)
                 }, status=status.HTTP_200_OK)
             else:
@@ -92,18 +83,12 @@ class LoginAPI(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 class InfoAPI(APIView):
      def get(self, request):
-        # Get the Authorization header from the request
-        authorization_header = request.headers.get('Authorization')
+        access_token = request.session.get('access_token')
 
-        if authorization_header:
+        if access_token:
             try:
-                # Split the Authorization header to get the token
-                token = authorization_header.split(' ')[1]
+                decoded_token = jwt.decode(access_token, settings.SECRET_KEY, algorithms=['HS256'])
 
-                # Decode the token
-                decoded_token = jwt.decode(token, 'secret', algorithms=['HS256'])
-
-                # Return the decoded token as JSON response
                 return Response(decoded_token, status=status.HTTP_200_OK)
             except jwt.ExpiredSignatureError:
                 return Response({'error': 'Token has expired'}, status=status.HTTP_401_UNAUTHORIZED)
@@ -112,7 +97,8 @@ class InfoAPI(APIView):
             except Exception as e:
                 return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
-            return Response({'error': 'Authorization header missing'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Token not found in session'}, status=status.HTTP_400_BAD_REQUEST)
+        
         
     
 class LogoutAPI(APIView):
