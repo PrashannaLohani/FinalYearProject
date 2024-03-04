@@ -111,7 +111,7 @@ const ContactForm = () => {
                   isLoading={isSubmitting}
                   loadingText="Submitting"
                 >
-                  Submit
+                  Send
                 </Button>
               </Flex>
             </Form>

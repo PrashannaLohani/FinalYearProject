@@ -1,3 +1,4 @@
+import React from "react";
 import { Box, Button, Flex, Image, Spacer, Text } from "@chakra-ui/react";
 import { NavLink } from "react-router-dom";
 import Login from "../../Pages/Login";
@@ -8,7 +9,9 @@ export default function HomepageNav() {
   return (
     <Box
       minH="5rem"
-      p="5px"
+      minW="32rem"
+      width="100%"
+      p={{ base: "5px", md: "10px" }}
       position="sticky"
       top="0"
       zIndex="99"
@@ -20,13 +23,13 @@ export default function HomepageNav() {
           <Box display="flex" alignItems="center">
             <Image
               width="100%"
-              height="50px"
+              height={{ base: "30px", md: "50px" }}
               objectFit="cover"
               src="./Image/React&Rise_Logo.png"
             />
             <Image
               width="100%"
-              height="40px"
+              height={{ base: "20px", md: "40px" }}
               objectFit="cover"
               src="./Image/React&Rise_Text.png"
             />
@@ -39,12 +42,17 @@ export default function HomepageNav() {
               colorScheme="blackAlpha"
               borderRadius="8"
               backgroundColor="black"
+              mt={{ base: "1rem", md: "0" }}
             >
               Login
             </Button>
           </NavLink>
           <NavLink to="/Signup" element={<Signup />}>
-            <Button variant="ghost" borderRadius="8">
+            <Button
+              variant="ghost"
+              borderRadius="8"
+              mt={{ base: "1rem", md: "0" }}
+            >
               Signup
             </Button>
           </NavLink>
