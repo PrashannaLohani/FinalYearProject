@@ -80,7 +80,7 @@ const Section2 = ({ fullName }) => {
     <>
       <Box textAlign="left" mb="2rem" mt="2rem" ml="2rem">
         <Flex gap="1rem" align="center">
-          <Avatar size="lg" name="Profile" />
+          <Avatar size="lg" name={fullName} />
           <Flex flexDir="column" gap="0.5rem">
             <Text as="b">{fullName}</Text>
             <Box

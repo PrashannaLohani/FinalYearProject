@@ -79,7 +79,7 @@ const Section2 = ({ fullName }) => {
       <Flex justifyContent="space-around" mt="2rem" alignItems="center">
         <Box textAlign="left" mb="2rem" mt="2rem">
           <Flex gap="1rem" align="center">
-            <Avatar size="lg" name="John" />
+            <Avatar size="lg" name={fullName} />
             <Flex flexDir="column" gap="0.5rem">
               <Text as="b">{fullName}</Text>
               <Box
@@ -140,7 +140,7 @@ const Infolayout = ({ fullName, email, date_joined }) => {
       <Flex gap="2rem" flexDir="column">
         <Box border="1px" borderColor="gray" borderRadius="8px" p="1rem">
           <Flex alignItems="center" gap="2rem">
-            <Avatar size="md" name="John" />
+            <Avatar size="md" name={fullName} />
             <Flex flexDir="column">
               <Text fontSize="lg" as="b">
                 Fullname
