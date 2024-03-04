@@ -117,8 +117,6 @@ const Signup = () => {
                       "X-CSRFToken": csrfToken,
                     },
                   });
-                  // Handle the response or any additional logic here
-                  // console.log("User created successfully:", response.data);
                   onOpen();
                 } catch (error) {
                   console.error("Error creating user:", error);

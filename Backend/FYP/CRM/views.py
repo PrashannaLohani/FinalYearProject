@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import jwt
 
 from django.contrib.auth.hashers import check_password, make_password
@@ -65,7 +65,9 @@ class LoginAPI(APIView):
                 payload = {
                     'user_id': user.id,
                     'full_name': user.full_name,
-                    'email': user.email
+                    'email': user.email,
+                    'date_joined': user.date_joined.timestamp()
+                    
                 }
                 # Update payload with token-specific information (expiration, issued at, etc.) if needed
                 access_token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
@@ -83,13 +85,31 @@ class LoginAPI(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 class InfoAPI(APIView):
      def get(self, request):
-        access_token = request.session.get('access_token')
-
+        access_token = request.headers.get('Authorization')
         if access_token:
             try:
-                decoded_token = jwt.decode(access_token, settings.SECRET_KEY, algorithms=['HS256'])
+                # Extract the token from the Authorization header
+                token = access_token.split()[1]
+                decoded_token = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
+                
+                user_id = decoded_token.get('user_id')
+                full_name = decoded_token.get('full_name')
+                email = decoded_token.get('email')
+                date_joined = decoded_token.get('date_joined')
 
-                return Response(decoded_token, status=status.HTTP_200_OK)
+                # Check if date_joined is not None and is a valid timestamp
+                if date_joined is not None and isinstance(date_joined, (int, float)):
+                    date_joined_str = datetime.utcfromtimestamp(date_joined).isoformat()
+                else:
+                    date_joined_str = None  # Set to None if date_joined is not valid
+                response_data = {
+                    'user_id': user_id,
+                    'full_name': full_name,
+                    'email': email,
+                    'date_joined': date_joined_str,
+                }
+
+                return Response(response_data, status=status.HTTP_200_OK)
             except jwt.ExpiredSignatureError:
                 return Response({'error': 'Token has expired'}, status=status.HTTP_401_UNAUTHORIZED)
             except jwt.InvalidTokenError:
@@ -97,7 +117,7 @@ class InfoAPI(APIView):
             except Exception as e:
                 return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
-            return Response({'error': 'Token not found in session'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Authorization header not found'}, status=status.HTTP_400_BAD_REQUEST)
         
         
     

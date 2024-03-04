@@ -14,17 +14,44 @@ import {
   Text,
 } from "@chakra-ui/react";
 import BarChart from "../Components/BarGraph";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import Profile from "./Profile";
 
 export default function Info() {
+  const [userInfo, setUserInfo] = useState(null);
+  useEffect(() => {
+    fetchUserInfo();
+  }, []);
+
+  const fetchUserInfo = async () => {
+    try {
+      const accessToken = localStorage.getItem("accessToken");
+      const config = {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      };
+      const response = await axios.get("http://127.0.0.1:8000/info/", config);
+
+      if (response.status === 200) {
+        setUserInfo(response.data);
+      } else {
+        console.error("Failed to fetch user info");
+      }
+    } catch (error) {
+      console.error("Error fetching user info:", error);
+    }
+  };
   return (
     <>
       <Box minH="100vh" p="4rem">
         <Flex justifyContent="center" align="center">
           <Box>
-            <Section1 />
+            <Section1 fullName={userInfo ? userInfo.full_name : ""} />
           </Box>
         </Flex>
-        <Section2 />
+        <Section2 fullName={userInfo ? userInfo.full_name : ""} />
         <hr />
         <Section3 />
         <Section4 />
@@ -34,11 +61,11 @@ export default function Info() {
   );
 }
 
-const Section1 = () => {
+const Section1 = ({ fullName }) => {
   return (
     <>
       <Box textAlign="center" my="4em">
-        <Heading>Welcome John Doe!</Heading>
+        <Heading>Welcome {fullName}!</Heading>
         <Text mt="1rem">Manage your room and profile</Text>
         <Button mt="1rem" colorScheme="blackAlpha" bgColor="black">
           Create Room
@@ -48,21 +75,21 @@ const Section1 = () => {
   );
 };
 
-const Section2 = () => {
+const Section2 = ({ fullName }) => {
   return (
     <>
       <Box textAlign="left" mb="2rem" mt="2rem" ml="2rem">
         <Flex gap="1rem" align="center">
           <Avatar size="lg" name="Profile" />
           <Flex flexDir="column" gap="0.5rem">
-            <Text as="b">John Doe</Text>
+            <Text as="b">{fullName}</Text>
             <Box
               bgColor="gray.300"
               borderRadius="1rem"
               textAlign="center"
               maxW="3rem"
             >
-              <Text fontSize="xs">Admin</Text>
+              <Text fontSize="xs">User</Text>
             </Box>
             <Link fontSize="xs">Manage your profile and setting</Link>
           </Flex>

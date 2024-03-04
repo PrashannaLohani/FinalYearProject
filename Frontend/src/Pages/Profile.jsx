@@ -17,19 +17,45 @@ import {
   StatNumber,
   Text,
 } from "@chakra-ui/react";
+import axios from "axios";
 import { ErrorMessage, Field, Formik } from "formik";
+import { useEffect, useState } from "react";
 import { FaEnvelope, FaClock } from "react-icons/fa6";
 import { Form } from "react-router-dom";
 
 export default function Profile() {
+  const [userInfo, setUserInfo] = useState(null);
+  useEffect(() => {
+    fetchUserInfo();
+  }, []);
+
+  const fetchUserInfo = async () => {
+    try {
+      const accessToken = localStorage.getItem("accessToken");
+      const config = {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      };
+      const response = await axios.get("http://127.0.0.1:8000/info/", config);
+
+      if (response.status === 200) {
+        setUserInfo(response.data);
+      } else {
+        console.error("Failed to fetch user info");
+      }
+    } catch (error) {
+      console.error("Error fetching user info:", error);
+    }
+  };
   return (
     <>
       <Box minH="100vh">
         <Box>
           <Section1 />
-          <Section2 />
+          <Section2 fullName={userInfo ? userInfo.full_name : ""} />
           <hr />
-          <Section3 />
+          <Section3 userInfo={userInfo} />
           <Section4 />
           <Section5 />
         </Box>
@@ -47,7 +73,7 @@ const Section1 = () => {
   );
 };
 
-const Section2 = () => {
+const Section2 = ({ fullName }) => {
   return (
     <>
       <Flex justifyContent="space-around" mt="2rem" alignItems="center">
@@ -55,14 +81,14 @@ const Section2 = () => {
           <Flex gap="1rem" align="center">
             <Avatar size="lg" name="John" />
             <Flex flexDir="column" gap="0.5rem">
-              <Text as="b">John Doe</Text>
+              <Text as="b">{fullName}</Text>
               <Box
                 bgColor="gray.300"
                 borderRadius="1rem"
                 textAlign="center"
                 maxW="3rem"
               >
-                <Text fontSize="xs">Owner</Text>
+                <Text fontSize="xs">User</Text>
               </Box>
               <Link fontSize="xs">Add a brief description of yourself</Link>
             </Flex>
@@ -83,7 +109,11 @@ const Section2 = () => {
   );
 };
 
-const Section3 = () => {
+const Section3 = ({ userInfo }) => {
+  const dateJoined = userInfo ? new Date(userInfo.date_joined) : null;
+  const formattedDate = dateJoined
+    ? dateJoined.toISOString().split("T")[0]
+    : "";
   return (
     <Box>
       <SimpleGrid minChildWidth="400px" column={2} spacing="2" padding="4rem">
@@ -93,14 +123,18 @@ const Section3 = () => {
           </Flex>
         </Box>
         <Box p="1rem">
-          <Infolayout />
+          <Infolayout
+            fullName={userInfo ? userInfo.full_name : ""}
+            email={userInfo ? userInfo.email : ""}
+            date_joined={formattedDate}
+          />
         </Box>
       </SimpleGrid>
     </Box>
   );
 };
 
-const Infolayout = () => {
+const Infolayout = ({ fullName, email, date_joined }) => {
   return (
     <>
       <Flex gap="2rem" flexDir="column">
@@ -111,7 +145,7 @@ const Infolayout = () => {
               <Text fontSize="lg" as="b">
                 Fullname
               </Text>
-              <Text fontSize="sm">John Doe</Text>
+              <Text fontSize="sm">{fullName}</Text>
             </Flex>
           </Flex>
         </Box>
@@ -122,7 +156,7 @@ const Infolayout = () => {
               <Text fontSize="lg" as="b">
                 Email
               </Text>
-              <Text fontSize="sm">abc@gmail.com</Text>
+              <Text fontSize="sm">{email}</Text>
             </Flex>
           </Flex>
         </Box>
@@ -133,7 +167,7 @@ const Infolayout = () => {
               <Text fontSize="lg" as="b">
                 Account Creation Date
               </Text>
-              <Text fontSize="sm">Jan 1, 2022</Text>
+              <Text fontSize="sm">{date_joined}</Text>
             </Flex>
           </Flex>
         </Box>
@@ -163,13 +197,7 @@ const Section4 = () => {
               if (!values.username) {
                 errors.username = "Required";
               }
-              if (!values.email) {
-                errors.email = "Required";
-              } else if (
-                !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)
-              ) {
-                errors.email = "Invalid email address";
-              }
+
               if (!values.password) {
                 errors.password = "Required";
               }
@@ -213,25 +241,7 @@ const Section4 = () => {
                       </FormControl>
                     )}
                   </Field>
-                  <Field name="email">
-                    {({ field }) => (
-                      <FormControl>
-                        <FormLabel htmlFor="email">Email</FormLabel>
-                        <Input
-                          {...field}
-                          id="email"
-                          type="email"
-                          placeholder="Email"
-                        />
-                        <ErrorMessage
-                          name="email"
-                          render={(msg) => (
-                            <div style={{ color: "red" }}>{msg}</div>
-                          )}
-                        />
-                      </FormControl>
-                    )}
-                  </Field>
+
                   <Field name="password">
                     {({ field }) => (
                       <FormControl>

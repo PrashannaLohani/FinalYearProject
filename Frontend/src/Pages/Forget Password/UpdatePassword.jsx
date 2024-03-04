@@ -60,9 +60,6 @@ const Section2 = () => {
           confirm_password: values.confirmPassword,
         }
       );
-
-      console.log(updatePasswordResponse.data); // Log the response from the backend
-
       setSubmitted(true);
       setErrorOccurred(false);
     } catch (error) {
