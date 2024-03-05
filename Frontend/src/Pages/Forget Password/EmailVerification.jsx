@@ -98,14 +98,20 @@ const Section2 = () => {
         >
           {({ isSubmitting }) => (
             <Form>
-              <Flex flexDir="column" gap="1rem">
+              <Flex
+                flexDir="column"
+                gap="1rem"
+                width="100%"
+                textAlign="center"
+                alignItems="center"
+              >
                 <Field name="email">
                   {({ field }) => (
                     <Input
                       {...field}
                       variant="filled"
                       type="email"
-                      width="25rem"
+                      width={["100%", "25rem"]} // Set width to 100% on smaller screens
                       minW="10rem"
                       maxW="100%"
                       placeholder="Email"
@@ -130,17 +136,21 @@ const Section2 = () => {
         </Formik>
       )}
       {errorOccurred && (
-        <Alert status="error" mt="1rem">
+        <Alert status="error" mt="1rem" w="100%">
           <AlertIcon />
           <AlertTitle>Error!</AlertTitle>
-          <AlertDescription>Please enter correct Email.</AlertDescription>
+          <AlertDescription w="100%" textAlign="center">
+            Please enter correct Email.
+          </AlertDescription>
         </Alert>
       )}
       {submitted && (
-        <Alert status="info" mt="1rem">
+        <Alert status="info" mt="1rem" w="100%">
           <AlertIcon />
           <AlertTitle>Information</AlertTitle>
-          <AlertDescription>Please Check your Email.</AlertDescription>
+          <AlertDescription w="100%" textAlign="center">
+            Please Check your Email.
+          </AlertDescription>
         </Alert>
       )}
     </>

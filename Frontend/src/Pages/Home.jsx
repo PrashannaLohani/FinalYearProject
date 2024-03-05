@@ -16,7 +16,14 @@ import ContactForm from "../Components/Contact";
 import HomepageNav from "../Layout/Homepage/HomepageNavbar";
 import HomepageFooter from "../Layout/Homepage/HomepageFooter";
 import { FaUserGroup, FaChartLine, FaStairs } from "react-icons/fa6";
+import { useEffect, useRef } from "react";
+
 export default function Home() {
+  // const textRef = useRef(null);
+
+  // useEffect(() => {
+  //   gsap.from(textRef.current, { opacity: 0, y: 50, duration: 1, delay: 0.5 });
+  // }, []);
   return (
     <>
       <HomepageNav />
@@ -202,7 +209,7 @@ const Section3 = () => {
 
 const Section4 = () => {
   return (
-    <Flex justifyContent="center" mt="4rem" flexDir="column" textAlign="center">
+    <Box mt="4rem" textAlign="center">
       <Heading>About us</Heading>
       <Text mt="1rem">
         Our goal is to streamline the process of developing modern web
@@ -213,7 +220,7 @@ const Section4 = () => {
         create and deploy stunning, efficient applications without the
         complexities of infrastructure management.
       </Text>
-    </Flex>
+    </Box>
   );
 };
 

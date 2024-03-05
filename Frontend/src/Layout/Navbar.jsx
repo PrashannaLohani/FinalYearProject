@@ -1,13 +1,4 @@
-import {
-  Box,
-  Flex,
-  Spacer,
-  TabList,
-  Tabs,
-  Text,
-  Tab,
-  Image,
-} from "@chakra-ui/react";
+import { Box, Flex, Spacer, TabList, Tabs, Tab, Image } from "@chakra-ui/react";
 import Info from "../Pages/Info";
 import { NavLink } from "react-router-dom";
 import Profile from "../Pages/Profile";

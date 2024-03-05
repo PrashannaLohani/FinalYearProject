@@ -1,15 +1,26 @@
-import React from "react";
-import { Box, Button, Flex, Image, Spacer, Text } from "@chakra-ui/react";
+import React, { useState } from "react";
+import {
+  Box,
+  Button,
+  Flex,
+  Image,
+  Spacer,
+  Text,
+  IconButton,
+} from "@chakra-ui/react";
 import { NavLink } from "react-router-dom";
 import Login from "../../Pages/Login";
 import Signup from "../../Pages/Signup";
 import Home from "../../Pages/Home";
+import { HiOutlineMenuAlt4 } from "react-icons/hi"; // Import the menu icon from `react-icons/hi`
 
 export default function HomepageNav() {
+  const [showNav, setShowNav] = useState(false); // Add a state to toggle the visibility of the navbar
+
   return (
     <Box
       minH="5rem"
-      minW="32rem"
+      minW="31rem"
       width="100%"
       p={{ base: "5px", md: "10px" }}
       position="sticky"
@@ -36,7 +47,12 @@ export default function HomepageNav() {
           </Box>
         </NavLink>
         <Spacer />
-        <Flex gap="1rem" flexWrap="wrap">
+        <Flex
+          gap="1rem"
+          flexWrap="wrap"
+          display={{ base: "none", md: "flex" }}
+          alignItems="center"
+        >
           <NavLink to="/Login" element={<Login />}>
             <Button
               colorScheme="blackAlpha"
@@ -57,7 +73,44 @@ export default function HomepageNav() {
             </Button>
           </NavLink>
         </Flex>
+        <IconButton
+          aria-label="Menu"
+          icon={<HiOutlineMenuAlt4 />}
+          size="md"
+          fontSize="2xl"
+          variant="ghost"
+          onClick={() => setShowNav(!showNav)} // Toggle the visibility of the navbar when the menu icon is clicked
+          display={{ base: "flex", md: "none" }}
+        />
       </Flex>
+      {showNav && ( // Show the navbar when `showNav` is true
+        <Flex
+          gap="1rem"
+          flexWrap="wrap"
+          display={{ base: "flex", md: "none" }}
+          alignItems="center"
+        >
+          <NavLink to="/Login" element={<Login />}>
+            <Button
+              colorScheme="blackAlpha"
+              borderRadius="8"
+              backgroundColor="black"
+              mt={{ base: "1rem", md: "0" }}
+            >
+              Login
+            </Button>
+          </NavLink>
+          <NavLink to="/Signup" element={<Signup />}>
+            <Button
+              variant="ghost"
+              borderRadius="8"
+              mt={{ base: "1rem", md: "0" }}
+            >
+              Signup
+            </Button>
+          </NavLink>
+        </Flex>
+      )}
     </Box>
   );
 }
