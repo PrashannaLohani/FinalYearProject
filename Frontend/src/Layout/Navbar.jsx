@@ -12,11 +12,17 @@ import {
   MenuDivider,
 } from "@chakra-ui/react";
 
-import { FaStar, FaScrewdriverWrench, FaUsers } from "react-icons/fa6";
+import {
+  FaStar,
+  FaScrewdriverWrench,
+  FaUsers,
+  FaDoorOpen,
+} from "react-icons/fa6";
 
 import { NavLink } from "react-router-dom";
 import Home from "../Pages/Home";
 import CustomAvatar from "../Components/Avatar";
+import { useUserInfo } from "../Components/UserInfo";
 
 export default function Navbar() {
   return (
@@ -51,6 +57,8 @@ export default function Navbar() {
 }
 
 const AvatarLayout = () => {
+  const userInfo = useUserInfo();
+  const { full_name, email } = userInfo || {};
   return (
     <>
       <Menu closeOnSelect={false}>
@@ -58,7 +66,23 @@ const AvatarLayout = () => {
           <CustomAvatar />
         </MenuButton>
         <MenuList>
-          <MenuGroup title="Details"></MenuGroup>
+          <MenuGroup isHoverable={false}>
+            <MenuItem
+              fontWeight="bold"
+              fontSize="lg"
+              style={{ pointerEvents: "none" }}
+            >
+              {full_name}
+            </MenuItem>
+            <MenuItem
+              color="gray.400"
+              fontSize="sm"
+              style={{ pointerEvents: "none" }}
+            >
+              {email}
+            </MenuItem>
+          </MenuGroup>
+          <MenuDivider />
           <MenuGroup title="Personal">
             <MenuItem
               as="a"
@@ -103,6 +127,18 @@ const AvatarLayout = () => {
               Upgrade to Preminum
             </MenuItem>
           </MenuGroup>
+          <MenuDivider />
+          <MenuItem
+            icon={<FaDoorOpen />}
+            minWidth="240px"
+            transition="all 0.2s"
+            borderRadius="md"
+            borderWidth="1px"
+            border="none"
+            _hover={{ bg: "black", color: "white" }}
+          >
+            Logout
+          </MenuItem>
         </MenuList>
       </Menu>
     </>

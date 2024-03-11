@@ -17,37 +17,13 @@ import {
   StatNumber,
   Text,
 } from "@chakra-ui/react";
-import axios from "axios";
 import { ErrorMessage, Field, Formik } from "formik";
-import { useEffect, useState } from "react";
 import { FaEnvelope, FaClock } from "react-icons/fa6";
 import { Form } from "react-router-dom";
+import { useUserInfo } from "../Components/UserInfo";
 
 export default function Profile() {
-  const [userInfo, setUserInfo] = useState(null);
-  useEffect(() => {
-    fetchUserInfo();
-  }, []);
-
-  const fetchUserInfo = async () => {
-    try {
-      const accessToken = localStorage.getItem("accessToken");
-      const config = {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      };
-      const response = await axios.get("http://127.0.0.1:8000/info/", config);
-
-      if (response.status === 200) {
-        setUserInfo(response.data);
-      } else {
-        console.error("Failed to fetch user info");
-      }
-    } catch (error) {
-      console.error("Error fetching user info:", error);
-    }
-  };
+  const userInfo = useUserInfo();
   return (
     <>
       <Box minH="100vh">
