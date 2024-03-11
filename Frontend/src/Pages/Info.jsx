@@ -16,7 +16,7 @@ import {
 import BarChart from "../Components/BarGraph";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Profile from "./Profile";
+import CustomAvatar from "../Components/Avatar";
 
 export default function Info() {
   const [userInfo, setUserInfo] = useState(null);
@@ -80,7 +80,7 @@ const Section2 = ({ fullName }) => {
     <>
       <Box textAlign="left" mb="2rem" mt="2rem" ml="2rem">
         <Flex gap="1rem" align="center">
-          <Avatar size="lg" name={fullName} />
+          <CustomAvatar />
           <Flex flexDir="column" gap="0.5rem">
             <Text as="b">{fullName}</Text>
             <Box
