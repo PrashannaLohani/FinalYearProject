@@ -11,6 +11,7 @@ import {
   MenuGroup,
   MenuDivider,
   useDisclosure,
+  Badge,
 } from "@chakra-ui/react";
 
 import {
@@ -82,6 +83,9 @@ const AvatarLayout = () => {
               style={{ pointerEvents: "none" }}
             >
               {full_name}
+              <span>
+                <Badge colorScheme="green">Free</Badge>
+              </span>
             </MenuItem>
             <MenuItem
               color="gray.400"

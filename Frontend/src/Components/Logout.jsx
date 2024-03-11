@@ -15,7 +15,7 @@ export default function Logout({ isOpen, onClose }) {
   const handleLogout = async () => {
     try {
       const refreshToken = localStorage.getItem("refreshToken");
-      console.log(refreshToken);
+
       if (!refreshToken) {
         console.error("Refresh token not found in local storage");
         return;
