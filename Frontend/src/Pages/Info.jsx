@@ -14,8 +14,6 @@ import {
   Text,
 } from "@chakra-ui/react";
 import BarChart from "../Components/BarGraph";
-import { useEffect, useState } from "react";
-import axios from "axios";
 import CustomAvatar from "../Components/Avatar";
 import { useUserInfo } from "../Components/UserInfo";
 
