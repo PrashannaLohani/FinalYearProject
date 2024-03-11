@@ -17,32 +17,11 @@ import BarChart from "../Components/BarGraph";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import CustomAvatar from "../Components/Avatar";
+import { useUserInfo } from "../Components/UserInfo";
 
 export default function Info() {
-  const [userInfo, setUserInfo] = useState(null);
-  useEffect(() => {
-    fetchUserInfo();
-  }, []);
+  const userInfo = useUserInfo();
 
-  const fetchUserInfo = async () => {
-    try {
-      const accessToken = localStorage.getItem("accessToken");
-      const config = {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      };
-      const response = await axios.get("http://127.0.0.1:8000/info/", config);
-
-      if (response.status === 200) {
-        setUserInfo(response.data);
-      } else {
-        console.error("Failed to fetch user info");
-      }
-    } catch (error) {
-      console.error("Error fetching user info:", error);
-    }
-  };
   return (
     <>
       <Box minH="100vh" p="4rem">

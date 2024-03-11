@@ -2,12 +2,17 @@ import {
   Box,
   Flex,
   Spacer,
-  TabList,
-  Tabs,
-  Tab,
   Image,
-  Avatar,
+  Menu,
+  MenuButton,
+  IconButton,
+  MenuItem,
+  MenuList,
+  MenuGroup,
+  MenuDivider,
 } from "@chakra-ui/react";
+
+import { FaStar, FaScrewdriverWrench, FaUsers } from "react-icons/fa6";
 
 import { NavLink } from "react-router-dom";
 import Home from "../Pages/Home";
@@ -46,5 +51,60 @@ export default function Navbar() {
 }
 
 const AvatarLayout = () => {
-  return <CustomAvatar />;
+  return (
+    <>
+      <Menu closeOnSelect={false}>
+        <MenuButton as={IconButton} borderRadius="2rem">
+          <CustomAvatar />
+        </MenuButton>
+        <MenuList>
+          <MenuGroup title="Details"></MenuGroup>
+          <MenuGroup title="Personal">
+            <MenuItem
+              as="a"
+              icon={<FaScrewdriverWrench />}
+              href="#"
+              minWidth="240px"
+              transition="all 0.2s"
+              borderRadius="md"
+              borderWidth="1px"
+              border="none"
+              _hover={{ bg: "black", color: "white" }}
+            >
+              Setting
+            </MenuItem>
+            <MenuItem
+              as="a"
+              icon={<FaUsers />}
+              href="#"
+              minWidth="240px"
+              transition="all 0.2s"
+              borderRadius="md"
+              borderWidth="1px"
+              border="none"
+              _hover={{ bg: "black", color: "white" }}
+            >
+              Team members
+            </MenuItem>
+          </MenuGroup>
+          <MenuDivider />
+          <MenuGroup title="Billing">
+            <MenuItem
+              as="a"
+              icon={<FaStar />}
+              href="#"
+              minWidth="240px"
+              transition="all 0.2s"
+              borderRadius="md"
+              borderWidth="1px"
+              border="none"
+              _hover={{ bg: "blue.300", color: "yellow" }}
+            >
+              Upgrade to Preminum
+            </MenuItem>
+          </MenuGroup>
+        </MenuList>
+      </Menu>
+    </>
+  );
 };
