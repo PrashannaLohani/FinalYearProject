@@ -10,6 +10,7 @@ import {
   MenuList,
   MenuGroup,
   MenuDivider,
+  useDisclosure,
 } from "@chakra-ui/react";
 
 import {
@@ -23,6 +24,7 @@ import { NavLink } from "react-router-dom";
 import Home from "../Pages/Home";
 import CustomAvatar from "../Components/Avatar";
 import { useUserInfo } from "../Components/UserInfo";
+import Logout from "../Components/Logout";
 
 export default function Navbar() {
   return (
@@ -59,6 +61,13 @@ export default function Navbar() {
 const AvatarLayout = () => {
   const userInfo = useUserInfo();
   const { full_name, email } = userInfo || {};
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const handleLogout = () => {
+    onOpen();
+  };
+  const handleMenuItemClick = (targetPage) => {
+    window.location.href = targetPage;
+  };
   return (
     <>
       <Menu closeOnSelect={false}>
@@ -85,15 +94,14 @@ const AvatarLayout = () => {
           <MenuDivider />
           <MenuGroup title="Personal">
             <MenuItem
-              as="a"
               icon={<FaScrewdriverWrench />}
-              href="#"
               minWidth="240px"
               transition="all 0.2s"
               borderRadius="md"
               borderWidth="1px"
               border="none"
               _hover={{ bg: "black", color: "white" }}
+              onClick={() => handleMenuItemClick("/Setting")}
             >
               Setting
             </MenuItem>
@@ -136,11 +144,13 @@ const AvatarLayout = () => {
             borderWidth="1px"
             border="none"
             _hover={{ bg: "black", color: "white" }}
+            onClick={handleLogout}
           >
             Logout
           </MenuItem>
         </MenuList>
       </Menu>
+      <Logout isOpen={isOpen} onClose={onClose} />
     </>
   );
 };

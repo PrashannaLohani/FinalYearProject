@@ -16,6 +16,7 @@ import Terms from "./Pages/terms&service";
 import CreateRoom from "./Pages/CreateRoom";
 import EmailVerification from "./Pages/Forget Password/EmailVerification";
 import UpdatePassword from "./Pages/Forget Password/UpdatePassword";
+import Setting from "./Pages/Setting";
 
 function App() {
   const router = createBrowserRouter(
@@ -27,6 +28,7 @@ function App() {
         <Route path="/Privacy-Policy" element={<Privacy />} />
         <Route path="/Terms&Services" element={<Terms />} />
         <Route path="/EmailVerificaiton" element={<EmailVerification />} />
+        <Route path="/Setting" element={<Setting />} />
         <Route
           path={`/update-password/:uidb64/:token`}
           element={<UpdatePassword />}

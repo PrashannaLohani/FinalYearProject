@@ -122,8 +122,6 @@ class InfoAPI(APIView):
         
     
 class LogoutAPI(APIView):
-    permission_classes = [IsAuthenticated]  # Ensure only authenticated users can log out
-
     def post(self, request):
         refresh_token = request.data.get('refresh_token')
 
