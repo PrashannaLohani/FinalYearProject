@@ -8,14 +8,12 @@ import {
   Flex,
   Grid,
   Heading,
-  SimpleGrid,
+  Link,
   Text,
 } from "@chakra-ui/react";
 import Navbar from "../Layout/Navbar";
 import Sidebar from "../Layout/Sidebar";
 import { useUserInfo } from "../Components/UserInfo";
-import CustomAvatar from "../Components/Avatar";
-import { Link } from "react-router-dom";
 
 export default function Setting() {
   return (
@@ -40,7 +38,7 @@ const Content = () => {
           <h2>
             <AccordionButton>
               <Flex flexDir="column">
-                <Box as="span" textAlign="left">
+                <Box as="span" textAlign="left" fontWeight="bold">
                   Name&Image
                   <span>
                     <AccordionIcon />
@@ -64,11 +62,11 @@ const Content = () => {
           </AccordionPanel>
         </AccordionItem>
         <hr />
-        <AccordionItem sx={{ border: "none" }} mt="1rem">
+        <AccordionItem sx={{ border: "none" }} mt="2rem">
           <h2>
             <AccordionButton>
               <Flex flexDir="column">
-                <Box as="span" textAlign="left">
+                <Box as="span" textAlign="left" fontWeight="bold">
                   Email
                   <span>
                     <AccordionIcon />
@@ -88,13 +86,113 @@ const Content = () => {
             You have logged in with {email}. If you want to change the
             Information then{" "}
             <span>
-              <a>Click here!</a>
+              <Link as="b">Click here!</Link>
+            </span>
+          </AccordionPanel>
+        </AccordionItem>
+        <hr />
+        <AccordionItem sx={{ border: "none" }} mt="2rem">
+          <h2>
+            <AccordionButton>
+              <Flex flexDir="column">
+                <Box as="span" textAlign="left" fontWeight="bold">
+                  Password
+                  <span>
+                    <AccordionIcon />
+                  </span>
+                </Box>
+              </Flex>
+            </AccordionButton>
+          </h2>
+          <AccordionPanel pb={4}>
+            If you wanna change your existing password then{" "}
+            <span>
+              <Link as="b">Click here!</Link>
+            </span>
+          </AccordionPanel>
+        </AccordionItem>
+        <hr />
+        <AccordionItem sx={{ border: "none" }} mt="2rem">
+          <h2>
+            <AccordionButton>
+              <Flex flexDir="column">
+                <Box as="span" textAlign="left" fontWeight="bold">
+                  Background
+                  <span>
+                    <AccordionIcon />
+                  </span>
+                </Box>
+                <Text display="flex" alignItems="center">
+                  You are using light background{" "}
+                  <span style={{ marginLeft: "5px", fontWeight: "Bold" }}>
+                    {email}
+                  </span>
+                </Text>
+              </Flex>
+            </AccordionButton>
+          </h2>
+          <AccordionPanel pb={4}>
+            If you wanna change your existing password then{" "}
+            <span>
+              <Link as="b">Click here!</Link>
+            </span>
+          </AccordionPanel>
+        </AccordionItem>
+        <hr />
+        <AccordionItem sx={{ border: "none" }} mt="2rem">
+          <h2>
+            <AccordionButton>
+              <Flex flexDir="column">
+                <Box as="span" textAlign="left" fontWeight="bold">
+                  Logout
+                  <span>
+                    <AccordionIcon />
+                  </span>
+                </Box>
+                <Text display="flex" alignItems="center">
+                  You are using light background{" "}
+                  <span style={{ marginLeft: "5px", fontWeight: "Bold" }}>
+                    {email}
+                  </span>
+                </Text>
+              </Flex>
+            </AccordionButton>
+          </h2>
+          <AccordionPanel pb={4}>
+            If you wanna change your existing password then{" "}
+            <span>
+              <Link as="b">Click here!</Link>
+            </span>
+          </AccordionPanel>
+        </AccordionItem>
+        <hr />
+        <AccordionItem sx={{ border: "none" }} mt="2rem">
+          <h2>
+            <AccordionButton>
+              <Flex flexDir="column">
+                <Box as="span" textAlign="left" fontWeight="bold">
+                  Delete account
+                  <span>
+                    <AccordionIcon />
+                  </span>
+                </Box>
+                <Text display="flex" alignItems="center">
+                  You are using light background{" "}
+                  <span style={{ marginLeft: "5px", fontWeight: "Bold" }}>
+                    {email}
+                  </span>
+                </Text>
+              </Flex>
+            </AccordionButton>
+          </h2>
+          <AccordionPanel pb={4}>
+            If you wanna change your existing password then{" "}
+            <span>
+              <Link as="b">Click here!</Link>
             </span>
           </AccordionPanel>
         </AccordionItem>
       </Accordion>
-
-      <hr />
     </Box>
   );
 };
