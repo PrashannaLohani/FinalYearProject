@@ -15,7 +15,7 @@ const Elements = () => {
         My profile
       </Heading>
       <Flex gap="1rem" flexDir="column" mt="1rem">
-        <Text fontSize="lg" as="a" cursor="pointer">
+        <Text fontSize="lg" as="a" cursor="pointer" fontWeight="Bold">
           Settings
         </Text>
         <Text fontSize="lg" cursor="pointer">
