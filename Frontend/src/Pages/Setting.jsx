@@ -18,6 +18,7 @@ import Navbar from "../Layout/Navbar";
 import Sidebar from "../Layout/Sidebar";
 import { useUserInfo } from "../Components/UserInfo";
 import Logout from "../Components/Logout";
+import Delete from "../Components/DeleteUser";
 
 export default function Setting() {
   return (
@@ -33,9 +34,21 @@ export default function Setting() {
 const Content = () => {
   const userInfo = useUserInfo();
   const { full_name, email } = userInfo || {};
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: logoutIsOpen,
+    onOpen: logoutOnOpen,
+    onClose: logoutOnClose,
+  } = useDisclosure();
+  const {
+    isOpen: deleteIsOpen,
+    onOpen: deleteOnOpen,
+    onClose: deleteOnClose,
+  } = useDisclosure();
   const handleLogout = () => {
-    onOpen();
+    logoutOnOpen();
+  };
+  const handleDelete = () => {
+    deleteOnOpen();
   };
   return (
     <>
@@ -174,7 +187,12 @@ const Content = () => {
                 <Text display="flex" alignItems="center">
                   If you want to permanently delete the account.
                 </Text>
-                <Button colorScheme="red" maxW="5rem" my="1rem">
+                <Button
+                  colorScheme="red"
+                  maxW="5rem"
+                  my="1rem"
+                  onClick={handleDelete}
+                >
                   Delete
                 </Button>
               </Flex>
@@ -182,7 +200,8 @@ const Content = () => {
           </AccordionItem>
         </Accordion>
       </Box>
-      <Logout isOpen={isOpen} onClose={onClose} />
+      <Logout isOpen={logoutIsOpen} onClose={logoutOnClose} />
+      <Delete isOpen={deleteIsOpen} onClose={deleteOnClose} />
     </>
   );
 };
