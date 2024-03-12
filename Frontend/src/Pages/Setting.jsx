@@ -10,6 +10,7 @@ import {
   Flex,
   Grid,
   Heading,
+  Input,
   Link,
   Text,
   useDisclosure,
@@ -19,6 +20,7 @@ import Sidebar from "../Layout/Sidebar";
 import { useUserInfo } from "../Components/UserInfo";
 import Logout from "../Components/Logout";
 import Delete from "../Components/DeleteUser";
+import { Field } from "formik";
 
 export default function Setting() {
   return (
@@ -50,6 +52,7 @@ const Content = () => {
   const handleDelete = () => {
     deleteOnOpen();
   };
+
   return (
     <>
       <Box minH="100vh" padding="3rem">
@@ -77,10 +80,12 @@ const Content = () => {
               </AccordionButton>
             </h2>
             <AccordionPanel pb={4}>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat.
+              <Flex gap="1rem" flexDir="column">
+                <Input variant="filled" value={full_name} maxW="20rem" />
+                <Button colorScheme="blackAlpha" bgColor="black" maxW="10rem">
+                  Edit
+                </Button>
+              </Flex>
             </AccordionPanel>
           </AccordionItem>
           <hr />
@@ -105,11 +110,7 @@ const Content = () => {
               </AccordionButton>
             </h2>
             <AccordionPanel pb={4}>
-              You have logged in with {email}. If you want to change the
-              Information then{" "}
-              <span>
-                <Link as="b">Click here!</Link>
-              </span>
+              You have logged in with {email}.
             </AccordionPanel>
           </AccordionItem>
           <hr />

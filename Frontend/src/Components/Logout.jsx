@@ -12,6 +12,9 @@ import axios from "axios";
 import React from "react";
 
 export default function Logout({ isOpen, onClose }) {
+  const handleMenuItemClick = () => {
+    window.location.href = "/";
+  };
   const handleLogout = async () => {
     try {
       const refreshToken = localStorage.getItem("refreshToken");
@@ -24,7 +27,9 @@ export default function Logout({ isOpen, onClose }) {
       const response = await axios.post("http://127.0.0.1:8000/logout/", {
         refresh_token: refreshToken,
       });
-      console.log(response.data); // Handle successful logout response
+      // Handle successful logout response
+      console.log(response.data);
+      handleMenuItemClick();
     } catch (error) {
       console.error("Logout failed:", error.response.data.error);
       // Handle failed logout response
@@ -39,6 +44,7 @@ export default function Logout({ isOpen, onClose }) {
         isOpen={isOpen}
         leastDestructiveRef={cancelRef}
         onClose={onClose}
+        isCentered
       >
         <AlertDialogOverlay>
           <AlertDialogContent>

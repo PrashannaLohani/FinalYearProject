@@ -18,6 +18,7 @@ export default function Delete({ isOpen, onClose }) {
         isOpen={isOpen}
         leastDestructiveRef={cancelRef}
         onClose={onClose}
+        isCentered
       >
         <AlertDialogOverlay>
           <AlertDialogContent>
