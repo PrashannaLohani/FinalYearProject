@@ -20,7 +20,6 @@ import Sidebar from "../Layout/Sidebar";
 import { useUserInfo } from "../Components/UserInfo";
 import Logout from "../Components/Logout";
 import Delete from "../Components/DeleteUser";
-import { Field } from "formik";
 
 export default function Setting() {
   return (
@@ -56,7 +55,7 @@ const Content = () => {
   return (
     <>
       <Box minH="100vh" padding="3rem">
-        <Heading size="lg">Account Settings</Heading>
+        <Heading>Account Settings</Heading>
 
         <Accordion allowToggle mt="2rem">
           <AccordionItem sx={{ border: "none" }}>

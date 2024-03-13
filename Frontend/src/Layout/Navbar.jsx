@@ -135,6 +135,7 @@ const AvatarLayout = () => {
               borderWidth="1px"
               border="none"
               _hover={{ bg: "blue.300", color: "yellow" }}
+              onClick={() => handleMenuItemClick("/Billing")}
             >
               Upgrade to Preminum
             </MenuItem>
