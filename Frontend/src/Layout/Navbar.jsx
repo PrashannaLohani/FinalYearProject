@@ -128,7 +128,6 @@ const AvatarLayout = () => {
             <MenuItem
               as="a"
               icon={<FaStar />}
-              href="#"
               minWidth="240px"
               transition="all 0.2s"
               borderRadius="md"
