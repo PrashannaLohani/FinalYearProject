@@ -1,20 +1,18 @@
 import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
   Avatar,
   Box,
   Button,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
   Flex,
-  Grid,
   Heading,
-  Image,
-  Link,
   SimpleGrid,
   Text,
 } from "@chakra-ui/react";
-import CustomAvatar from "../Components/Avatar";
+
 import { useUserInfo } from "../Components/UserInfo";
 import { FaPlus } from "react-icons/fa6";
 import BarGraph from "../Components/BarGraph";
@@ -146,6 +144,22 @@ const Dashboard = () => {
         </Box>
         <Box {...boxStyle}>
           <Heading size="lg">Recent Rooms:</Heading>
+          <Accordion allowMultiple mt="1rem">
+            <AccordionItem>
+              <h2>
+                <AccordionButton>
+                  <Box as="span" flex="1" textAlign="left">
+                    Room ID:
+                  </Box>
+                  <AccordionIcon />
+                </AccordionButton>
+              </h2>
+              <AccordionPanel pb={4} gap="1rem">
+                <p> No. of People joined:</p>
+                <p> No. of comments:</p>
+              </AccordionPanel>
+            </AccordionItem>
+          </Accordion>
         </Box>
       </SimpleGrid>
     </Box>

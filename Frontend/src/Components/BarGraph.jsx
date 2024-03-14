@@ -39,9 +39,14 @@ const BarGraph = () => {
     labels,
     datasets: [
       {
-        label: "Last 6 Room",
+        label: "Number of people joined",
         data: [20, 30, 40, 30, 10, 12, 48],
         backgroundColor: "rgba(0, 0, 0, 0.8)",
+      },
+      {
+        label: "Number of comments",
+        data: [10, 15, 20, 12, 8, 10],
+        backgroundColor: "rgba(255, 99, 132, 0.8)", // You can change the color as desired
       },
     ],
   };
