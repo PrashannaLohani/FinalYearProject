@@ -45,14 +45,17 @@ export default function Info() {
 const Welcome = ({ full_name }) => {
   const [quote, setQuote] = useState("");
   useEffect(() => {
-    fetch("https://api.quotable.io/random")
-      .then((response) => response.json())
-      .then((data) => {
+    const fetchQuote = async () => {
+      try {
+        const response = await fetch("https://api.quotable.io/random");
+        const data = await response.json();
         setQuote(data.content);
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Error fetching quote:", error);
-      });
+      }
+    };
+
+    fetchQuote();
   }, []);
   return (
     <Box>
@@ -75,7 +78,7 @@ const Welcome = ({ full_name }) => {
           <p>{quote}</p>
         </Box>
         <Button mt="2rem" leftIcon={<FaPlus />} colorScheme="whiteAlpha">
-          Create
+          Create room
         </Button>
       </Box>
     </Box>
@@ -108,17 +111,32 @@ const Dashboard = () => {
         gap={4}
       >
         <Box {...boxStyle}>
-          <Heading size="lg">Total Rooms created:</Heading>
+          <Flex justifyItems="center" alignItems="center" flexDir="column">
+            <Heading size="lg">Total Rooms created:</Heading>
+            <Text fontSize="2xl" mt="1rem">
+              24
+            </Text>
+          </Flex>
         </Box>
         <Box {...boxStyle}>
-          <Heading size="lg">Total participants:</Heading>
+          <Flex justifyItems="center" alignItems="center" flexDir="column">
+            <Heading size="lg">Total participants:</Heading>
+            <Text fontSize="2xl" mt="1rem">
+              300
+            </Text>
+          </Flex>
         </Box>
         <Box {...boxStyle}>
-          <Heading size="lg">Total Comments:</Heading>
+          <Flex justifyItems="center" alignItems="center" flexDir="column">
+            <Heading size="lg">Total Comments:</Heading>
+            <Text fontSize="2xl" mt="1rem">
+              246
+            </Text>
+          </Flex>
         </Box>
         <Box
           maxH="10rem"
-          minH="15rem"
+          minH="25rem"
           bgColor="white"
           gridColumn="1 / span 2"
           borderRadius="2rem"

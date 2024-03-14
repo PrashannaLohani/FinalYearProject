@@ -33,15 +33,15 @@ const BarGraph = () => {
     },
   };
 
-  const labels = ["Room1", "Room2", "Room3", "Room4", "Room5"];
+  const labels = ["Room1", "Room2", "Room3", "Room4", "Room5", "Room6"];
 
   const data = {
     labels,
     datasets: [
       {
         label: "Last 6 Room",
-        data: [20, 30, 40, 30, 10, 12],
-        backgroundColor: "rgba(200, 50, 100, 0.5)",
+        data: [20, 30, 40, 30, 10, 12, 48],
+        backgroundColor: "rgba(0, 0, 0, 0.8)",
       },
     ],
   };
