@@ -2,6 +2,8 @@ import { Badge, Box, Flex, Heading, Text } from "@chakra-ui/react";
 import { NavLink } from "react-router-dom";
 import Setting from "../Pages/Setting";
 import Billing from "../Pages/Billing";
+import { FaAngleLeft } from "react-icons/fa6";
+import Info from "../Pages/Info";
 
 export default function Sidebar() {
   return (
@@ -14,7 +16,19 @@ export default function Sidebar() {
 const Elements = () => {
   return (
     <>
-      <Heading size="md" mt="1rem">
+      <NavLink to="/info" element={<Info />}>
+        <Flex
+          alignItems="center"
+          _hover={{ color: "gray", transition: "0.4s" }}
+          gap="2px"
+        >
+          <FaAngleLeft style={{ width: "20px", height: "20px" }} />
+          <Text as="b" fontSize="xl">
+            Back
+          </Text>
+        </Flex>
+      </NavLink>
+      <Heading size="md" mt="2rem">
         My profile
       </Heading>
       <Flex gap="1rem" flexDir="column" mt="1rem">

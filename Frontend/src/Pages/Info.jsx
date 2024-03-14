@@ -7,6 +7,7 @@ import {
   CardFooter,
   CardHeader,
   Flex,
+  Grid,
   Heading,
   Image,
   Link,
@@ -16,152 +17,63 @@ import {
 import BarChart from "../Components/BarGraph";
 import CustomAvatar from "../Components/Avatar";
 import { useUserInfo } from "../Components/UserInfo";
+import { FaBox } from "react-icons/fa6";
 
 export default function Info() {
   const userInfo = useUserInfo();
-
+  const { full_name } = userInfo || {};
   return (
     <>
-      <Box minH="100vh" p="4rem">
-        <Flex justifyContent="center" align="center">
-          <Box>
-            <Section1 fullName={userInfo ? userInfo.full_name : ""} />
-          </Box>
-        </Flex>
-        <Section2 fullName={userInfo ? userInfo.full_name : ""} />
-        <hr />
-        <Section3 />
-        <Section4 />
-        <Section5 />
+      <Box minH="100vh" p={{ base: "1rem", md: "3rem", lg: "5rem" }}>
+        <Box
+          minH="100vh"
+          borderRadius="2rem"
+          boxShadow="rgba(255, 255, 255, 0.1) 0px 1px 1px 0px inset, rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px"
+          p="2rem"
+          minW="20rem"
+        >
+          <Welcome full_name={full_name} />
+          <Dashboard />
+        </Box>
       </Box>
     </>
   );
 }
 
-const Section1 = ({ fullName }) => {
+const Welcome = ({ full_name }) => {
   return (
-    <>
-      <Box textAlign="center" my="4em">
-        <Heading>Welcome {fullName}!</Heading>
-        <Text mt="1rem">Manage your room and profile</Text>
-        <Button mt="1rem" colorScheme="blackAlpha" bgColor="black">
-          Create Room
-        </Button>
-      </Box>
-    </>
+    <Box>
+      <Heading size="lg">Welcome {full_name} !</Heading>
+      <Box bgColor="Yellow" height="15rem" mt="2rem" rounded="2rem"></Box>
+    </Box>
   );
 };
 
-const Section2 = ({ fullName }) => {
+const Dashboard = () => {
   return (
-    <>
-      <Box textAlign="left" mb="2rem" mt="2rem" ml="2rem">
-        <Flex gap="1rem" align="center">
-          <CustomAvatar />
-          <Flex flexDir="column" gap="0.5rem">
-            <Text as="b">{fullName}</Text>
-            <Box
-              bgColor="gray.300"
-              borderRadius="1rem"
-              textAlign="center"
-              maxW="3rem"
-            >
-              <Text fontSize="xs">User</Text>
-            </Box>
-            <Link fontSize="xs">Manage your profile and setting</Link>
-          </Flex>
-        </Flex>
-      </Box>
-    </>
-  );
-};
-
-const Section3 = () => {
-  return (
-    <>
-      <Box mt="2rem">
-        <SimpleGrid minChildWidth="400px" column={2} spacing="2" padding="4rem">
-          <Box display="flex">
-            <Flex alignItems="center" p="2rem">
-              <Heading fontSize="4xl">Your Rooms</Heading>
-            </Flex>
-          </Box>
-          <Box>
-            <Cardlayout />
-          </Box>
-        </SimpleGrid>
-      </Box>
-    </>
-  );
-};
-
-const Cardlayout = () => {
-  return (
-    <>
-      <Flex gap="2rem">
-        <Card>
-          <Image src="./Image/Feature1.jpg" borderRadius="8" />
-          <CardHeader>
-            <Heading size="md">Room 1</Heading>
-          </CardHeader>
-          <CardBody>
-            <Text fontSize="lg">Room Code:</Text>
-          </CardBody>
-          <CardFooter></CardFooter>
-        </Card>
-        <Card>
-          <Image src="./Image/Feature1.jpg" borderRadius="8" />
-          <CardHeader>
-            <Heading size="md">Room 2</Heading>
-          </CardHeader>
-          <CardBody>
-            <Text fontSize="lg">Room Code:</Text>
-          </CardBody>
-          <CardFooter></CardFooter>
-        </Card>
-      </Flex>
-    </>
-  );
-};
-
-const Section4 = () => {
-  return (
-    <>
-      <Box p="2rem">
-        <Flex justifyContent="center">
-          <Box display="flex">
-            <Heading>Room Analytics</Heading>
-          </Box>
-        </Flex>
-        <SimpleGrid column="2" minChildWidth="200px" gap="2rem" mt="2rem">
-          <Box p="1rem" border="1px" borderRadius="5px" borderColor="gray.300">
-            <Flex flexDir="column">
-              <Text fontSize="sm">Paricipants</Text>
-              <Text fontSize="2xl" as="b">
-                50
-              </Text>
-            </Flex>
-          </Box>
-          <Box p="1rem" border="1px" borderRadius="5px" borderColor="gray.300">
-            <Flex flexDir="column">
-              <Text fontSize="sm">Question Asked</Text>
-              <Text fontSize="2xl" as="b">
-                100
-              </Text>
-            </Flex>
-          </Box>
-        </SimpleGrid>
-      </Box>
-    </>
-  );
-};
-
-const Section5 = () => {
-  return (
-    <Box display="flex">
-      <Flex justifyContent="center" maxW="100%">
-        <BarChart />
-      </Flex>
+    <Box
+      bg="red"
+      minH="100vh"
+      minW="10rem"
+      mt="2rem"
+      p={{ base: "1rem", md: "2rem" }}
+    >
+      <SimpleGrid
+        minChildWidth="200px"
+        // templateColumns="repeat(3, 1fr)"
+        gap={4}
+      >
+        <Box maxH="10rem" minH="15rem" bgColor="blue"></Box>
+        <Box maxH="10rem" minH="15rem" bgColor="blue"></Box>
+        <Box maxH="10rem" minH="15rem" bgColor="blue"></Box>
+        <Box
+          maxH="10rem"
+          minH="15rem"
+          bgColor="blue"
+          // gridColumn="1 / span 2"
+        ></Box>
+        <Box maxH="10rem" minH="15rem" bgColor="blue"></Box>
+      </SimpleGrid>
     </Box>
   );
 };
