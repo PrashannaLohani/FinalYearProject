@@ -14,26 +14,28 @@ import {
   SimpleGrid,
   Text,
 } from "@chakra-ui/react";
-import BarChart from "../Components/BarGraph";
 import CustomAvatar from "../Components/Avatar";
 import { useUserInfo } from "../Components/UserInfo";
-import { FaBox } from "react-icons/fa6";
+import { FaPlus } from "react-icons/fa6";
+import BarGraph from "../Components/BarGraph";
+import { useEffect, useState } from "react";
 
 export default function Info() {
   const userInfo = useUserInfo();
   const { full_name } = userInfo || {};
   return (
     <>
-      <Box minH="100vh" p={{ base: "1rem", md: "3rem", lg: "5rem" }}>
+      <Box minH="100vh" p={{ base: "1rem", md: "3rem", lg: "3rem" }}>
         <Box
           minH="100vh"
           borderRadius="2rem"
           boxShadow="rgba(255, 255, 255, 0.1) 0px 1px 1px 0px inset, rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px"
-          p="2rem"
           minW="20rem"
         >
           <Welcome full_name={full_name} />
-          <Dashboard />
+          <Box pt="2rem">
+            <Dashboard />
+          </Box>
         </Box>
       </Box>
     </>
@@ -41,38 +43,92 @@ export default function Info() {
 }
 
 const Welcome = ({ full_name }) => {
+  const [quote, setQuote] = useState("");
+  useEffect(() => {
+    fetch("https://api.quotable.io/random")
+      .then((response) => response.json())
+      .then((data) => {
+        setQuote(data.content);
+      })
+      .catch((error) => {
+        console.error("Error fetching quote:", error);
+      });
+  }, []);
   return (
     <Box>
-      <Heading size="lg">Welcome {full_name} !</Heading>
-      <Box bgColor="Yellow" height="15rem" mt="2rem" rounded="2rem"></Box>
+      <Box
+        bgImage="../Image/Black.jpg"
+        bgPosition="center"
+        bgSize="cover"
+        color="white"
+        height="25rem"
+        mt="2rem"
+        borderRadius="2rem 2rem 5rem 0"
+        p="2rem"
+        boxShadow="rgba(255, 255, 255, 0.1) 0px 1px 1px 0px inset, rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px"
+      >
+        <Heading size="xl">Dashboard</Heading>
+        <Heading size="md" mt="1rem">
+          Welcome {full_name} !
+        </Heading>
+        <Box mt="1rem" maxW="25%">
+          <p>{quote}</p>
+        </Box>
+        <Button mt="2rem" leftIcon={<FaPlus />} colorScheme="whiteAlpha">
+          Create
+        </Button>
+      </Box>
     </Box>
   );
 };
 
 const Dashboard = () => {
+  const boxStyle = {
+    style: {
+      maxHeight: "15rem",
+      minHeight: "10rem",
+      borderRadius: "2rem",
+      bgColor: "white",
+      padding: "2rem",
+      boxShadow: "rgba(100, 100, 111, 0.2) 0px 7px 29px 0px",
+    },
+  };
   return (
     <Box
-      bg="red"
       minH="100vh"
       minW="10rem"
       mt="2rem"
-      p={{ base: "1rem", md: "2rem" }}
+      borderRadius="0 5rem 2rem 2rem"
+      p={{ base: "1rem", md: "3rem" }}
+      boxShadow="rgba(0, 0, 0, 0.25) 0px 14px 28px"
     >
       <SimpleGrid
         minChildWidth="200px"
         // templateColumns="repeat(3, 1fr)"
         gap={4}
       >
-        <Box maxH="10rem" minH="15rem" bgColor="blue"></Box>
-        <Box maxH="10rem" minH="15rem" bgColor="blue"></Box>
-        <Box maxH="10rem" minH="15rem" bgColor="blue"></Box>
+        <Box {...boxStyle}>
+          <Heading size="lg">Total Rooms created:</Heading>
+        </Box>
+        <Box {...boxStyle}>
+          <Heading size="lg">Total participants:</Heading>
+        </Box>
+        <Box {...boxStyle}>
+          <Heading size="lg">Total Comments:</Heading>
+        </Box>
         <Box
           maxH="10rem"
           minH="15rem"
-          bgColor="blue"
-          // gridColumn="1 / span 2"
-        ></Box>
-        <Box maxH="10rem" minH="15rem" bgColor="blue"></Box>
+          bgColor="white"
+          gridColumn="1 / span 2"
+          borderRadius="2rem"
+          boxShadow="rgba(100, 100, 111, 0.2) 0px 7px 29px 0px"
+        >
+          <BarGraph />
+        </Box>
+        <Box {...boxStyle}>
+          <Heading size="lg">Recent Rooms:</Heading>
+        </Box>
       </SimpleGrid>
     </Box>
   );
