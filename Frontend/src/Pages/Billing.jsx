@@ -31,10 +31,11 @@ const Bills = () => {
           </Text>
           <Button
             leftIcon={<FaStar />}
-            _hover={{ bg: "black", color: "yellow" }}
+            _hover={{ bgColor: "blue.200", color: "yellow" }}
             transition="all 0.4s"
             borderRadius="2rem"
-            colorScheme="blackAlpha"
+            color="white"
+            bgColor="black"
           >
             Upgrade
           </Button>

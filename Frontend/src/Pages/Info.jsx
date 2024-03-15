@@ -4,7 +4,6 @@ import {
   AccordionIcon,
   AccordionItem,
   AccordionPanel,
-  Avatar,
   Box,
   Button,
   Flex,
@@ -86,7 +85,7 @@ const Welcome = ({ full_name }) => {
 const Dashboard = () => {
   const boxStyle = {
     style: {
-      maxHeight: "15rem",
+      maxHeight: "auto",
       minHeight: "10rem",
       borderRadius: "2rem",
       bgColor: "white",
@@ -144,17 +143,22 @@ const Dashboard = () => {
         </Box>
         <Box {...boxStyle}>
           <Heading size="lg">Recent Rooms:</Heading>
-          <Accordion allowMultiple mt="1rem">
+          <Accordion
+            allowToggle
+            mt="1rem"
+            style={{ maxHeight: "300px", overflow: "auto" }}
+          >
             <AccordionItem>
               <h2>
                 <AccordionButton>
                   <Box as="span" flex="1" textAlign="left">
-                    Room ID:
+                    Room Title:
                   </Box>
                   <AccordionIcon />
                 </AccordionButton>
               </h2>
               <AccordionPanel pb={4} gap="1rem">
+                <p> Room ID:</p>
                 <p> No. of People joined:</p>
                 <p> No. of comments:</p>
               </AccordionPanel>

@@ -109,7 +109,7 @@ const Content = () => {
               </AccordionButton>
             </h2>
             <AccordionPanel pb={4}>
-              You have logged in with {email}.
+              You have logged in with {email}
             </AccordionPanel>
           </AccordionItem>
           <hr />
