@@ -15,7 +15,6 @@ import {
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
-import Navbar from "../Layout/Navbar";
 import Sidebar from "../Layout/Sidebar";
 import { useUserInfo } from "../Components/UserInfo";
 import Logout from "../Components/Logout";
@@ -24,7 +23,6 @@ import Delete from "../Components/DeleteUser";
 export default function Setting() {
   return (
     <Box>
-      <Navbar />
       <Grid templateColumns="1fr 3fr">
         <Sidebar />
         <Content />
@@ -82,7 +80,7 @@ const Content = () => {
               <Flex gap="1rem" flexDir="column">
                 <Input variant="filled" value={full_name} maxW="20rem" />
                 <Button colorScheme="blackAlpha" bgColor="black" maxW="10rem">
-                  Edit
+                  Save
                 </Button>
               </Flex>
             </AccordionPanel>

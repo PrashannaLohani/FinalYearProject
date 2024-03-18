@@ -1,13 +1,11 @@
 import { Box, Button, Flex, Grid, Heading, Text } from "@chakra-ui/react";
 import Sidebar from "../Layout/Sidebar";
-import Navbar from "../Layout/Navbar";
 
 import { FaStar } from "react-icons/fa6";
 
 export default function Billing() {
   return (
     <Box>
-      <Navbar />
       <Grid templateColumns="1fr 3fr">
         <Sidebar />
         <Bills />

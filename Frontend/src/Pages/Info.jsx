@@ -16,6 +16,8 @@ import { useUserInfo } from "../Components/UserInfo";
 import { FaPlus } from "react-icons/fa6";
 import BarGraph from "../Components/BarGraph";
 import { useEffect, useState } from "react";
+import { NavLink } from "react-router-dom";
+import CreateRoom from "./CreateRoom";
 
 export default function Info() {
   const userInfo = useUserInfo();
@@ -74,9 +76,11 @@ const Welcome = ({ full_name }) => {
         <Box mt="1rem" maxW="25%">
           <p>{quote}</p>
         </Box>
-        <Button mt="2rem" leftIcon={<FaPlus />} colorScheme="whiteAlpha">
-          Create room
-        </Button>
+        <NavLink to="/CreateRoom" element={<CreateRoom />}>
+          <Button mt="2rem" leftIcon={<FaPlus />} colorScheme="whiteAlpha">
+            Create room
+          </Button>
+        </NavLink>
       </Box>
     </Box>
   );
@@ -102,11 +106,7 @@ const Dashboard = () => {
       p={{ base: "1rem", md: "3rem" }}
       boxShadow="rgba(0, 0, 0, 0.25) 0px 14px 28px"
     >
-      <SimpleGrid
-        minChildWidth="200px"
-        // templateColumns="repeat(3, 1fr)"
-        gap={4}
-      >
+      <SimpleGrid minChildWidth="300px" column={3} gap={4}>
         <Box {...boxStyle}>
           <Flex justifyItems="center" alignItems="center" flexDir="column">
             <Heading size="lg">Total Rooms created:</Heading>
@@ -132,14 +132,15 @@ const Dashboard = () => {
           </Flex>
         </Box>
         <Box
-          maxH="10rem"
+          maxH="auto"
           minH="25rem"
           bgColor="white"
-          gridColumn="1 / span 2"
           borderRadius="2rem"
           boxShadow="rgba(100, 100, 111, 0.2) 0px 7px 29px 0px"
         >
-          <BarGraph />
+          <Flex justifyContent="center" alignItems="center">
+            <BarGraph />
+          </Flex>
         </Box>
         <Box {...boxStyle}>
           <Heading size="lg">Recent Rooms:</Heading>
