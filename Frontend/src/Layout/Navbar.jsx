@@ -26,13 +26,14 @@ import Home from "../Pages/Home";
 import CustomAvatar from "../Components/Avatar";
 import { useUserInfo } from "../Components/UserInfo";
 import Logout from "../Components/Logout";
+import Info from "../Pages/Info";
 
 export default function Navbar() {
   return (
     <>
       <Box px="1rem">
         <Flex margin="1rem" flexWrap="wrap" alignItems="center">
-          <NavLink to="/" element={<Home />}>
+          <NavLink to="/info" element={<Info />}>
             <Box display="flex" alignItems="center">
               <Image
                 width="100%"

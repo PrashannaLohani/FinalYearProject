@@ -19,6 +19,7 @@ import Sidebar from "../Layout/Sidebar";
 import { useUserInfo } from "../Components/UserInfo";
 import Logout from "../Components/Logout";
 import Delete from "../Components/DeleteUser";
+import ChangePassword from "../Components/ChangePassword";
 
 export default function Setting() {
   return (
@@ -43,11 +44,19 @@ const Content = () => {
     onOpen: deleteOnOpen,
     onClose: deleteOnClose,
   } = useDisclosure();
+  const {
+    isOpen: drawerIsOpen,
+    onOpen: drawerOnOpen,
+    onClose: drawerOnClose,
+  } = useDisclosure();
   const handleLogout = () => {
     logoutOnOpen();
   };
   const handleDelete = () => {
     deleteOnOpen();
+  };
+  const handleDrawer = () => {
+    drawerOnOpen();
   };
 
   return (
@@ -78,7 +87,7 @@ const Content = () => {
             </h2>
             <AccordionPanel pb={4}>
               <Flex gap="1rem" flexDir="column">
-                <Input variant="filled" value={full_name} maxW="20rem" />
+                <Input variant="filled" placeholder={full_name} maxW="20rem" />
                 <Button colorScheme="blackAlpha" bgColor="black" maxW="10rem">
                   Save
                 </Button>
@@ -127,7 +136,9 @@ const Content = () => {
             <AccordionPanel pb={4}>
               If you wanna change your existing password then{" "}
               <span>
-                <Link as="b">Click here!</Link>
+                <Link as="b" onClick={handleDrawer}>
+                  Click here!
+                </Link>
               </span>
             </AccordionPanel>
           </AccordionItem>
@@ -199,6 +210,7 @@ const Content = () => {
         </Accordion>
       </Box>
       <Logout isOpen={logoutIsOpen} onClose={logoutOnClose} />
+      <ChangePassword isOpen={drawerIsOpen} onClose={drawerOnClose} />
       <Delete isOpen={deleteIsOpen} onClose={deleteOnClose} />
     </>
   );
