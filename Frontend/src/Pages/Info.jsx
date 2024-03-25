@@ -30,6 +30,7 @@ export default function Info() {
           borderRadius="2rem"
           boxShadow="rgba(255, 255, 255, 0.1) 0px 1px 1px 0px inset, rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px"
           minW="20rem"
+          width="100%"
         >
           <Welcome full_name={full_name} />
           <Box pt="2rem">
@@ -106,8 +107,8 @@ const Dashboard = () => {
       p={{ base: "1rem", md: "3rem" }}
       boxShadow="rgba(0, 0, 0, 0.25) 0px 14px 28px"
     >
-      <SimpleGrid minChildWidth="300px" column={3} gap={4}>
-        <Box {...boxStyle}>
+      <SimpleGrid minChildWidth="300px" Columns={{ base: 1, md: 2 }} gap={4}>
+        <Box key={1} {...boxStyle}>
           <Flex justifyItems="center" alignItems="center" flexDir="column">
             <Heading size="lg">Total Rooms created:</Heading>
             <Text fontSize="2xl" mt="1rem">
@@ -115,7 +116,7 @@ const Dashboard = () => {
             </Text>
           </Flex>
         </Box>
-        <Box {...boxStyle}>
+        <Box key={2} {...boxStyle}>
           <Flex justifyItems="center" alignItems="center" flexDir="column">
             <Heading size="lg">Total participants:</Heading>
             <Text fontSize="2xl" mt="1rem">
@@ -123,7 +124,7 @@ const Dashboard = () => {
             </Text>
           </Flex>
         </Box>
-        <Box {...boxStyle}>
+        <Box key={3} {...boxStyle}>
           <Flex justifyItems="center" alignItems="center" flexDir="column">
             <Heading size="lg">Total Comments:</Heading>
             <Text fontSize="2xl" mt="1rem">
@@ -131,18 +132,21 @@ const Dashboard = () => {
             </Text>
           </Flex>
         </Box>
+
         <Box
           maxH="auto"
           minH="25rem"
           bgColor="white"
           borderRadius="2rem"
           boxShadow="rgba(100, 100, 111, 0.2) 0px 7px 29px 0px"
+          key={4}
+          gridColumn="span 2"
         >
           <Flex justifyContent="center" alignItems="center">
             <BarGraph />
           </Flex>
         </Box>
-        <Box {...boxStyle}>
+        <Box key={5} gridColumn={{ base: "auto", md: "span 1" }} {...boxStyle}>
           <Heading size="lg">Recent Rooms:</Heading>
           <Accordion
             allowToggle
