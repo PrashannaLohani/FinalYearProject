@@ -12,6 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import React from "react";
+import axios from "axios";
 
 export default function ChangePassword({ isOpen, onClose }) {
   return (
@@ -58,14 +59,21 @@ export default function ChangePassword({ isOpen, onClose }) {
               }
               return errors;
             }}
-            onSubmit={(values, { setSubmitting }) => {
-              // Handle form submission here
-              console.log(values);
-              // You can set submitting state to true here if needed
-              // setSubmitting(true);
-              // Once submission is complete, set isSubmitting back to false
-              // setSubmitting(false);
-              onClose(); // Close the drawer after submission
+            onSubmit={async (values, { setSubmitting }) => {
+              try {
+                // Send POST request to the backend
+                const response = await axios.post(
+                  "http://127.0.0.1:8000/change-password/",
+                  values
+                );
+                console.log(response.data); // Handle response data as needed
+                onClose(); // Close the drawer after successful submission
+              } catch (error) {
+                console.error("Error:", error);
+                // Handle error as needed
+              } finally {
+                setSubmitting(false); // Set submitting state back to false
+              }
             }}
           >
             {({ isSubmitting }) => (

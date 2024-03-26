@@ -22,6 +22,8 @@ from FYP import settings
 from .models import Signup
 from .serializers import SignupSerializer, LoginSerializer, ForgetPasswordSerializer,ChangePasswordSerializer
 
+from jwt import decode
+
 @api_view(['POST'])
 @ensure_csrf_cookie
 def user_create(request):
@@ -198,28 +200,40 @@ class ForgetPasswordView(APIView):
         
 
 class ChangePasswordView(APIView):
-    def post(self,request):
-        try:
-            serializer = ChangePasswordSerializer(request.data)
-            if serializer.is_valid():
-                user = request.user
-                old_password = serializer._validated_data.get('old_password')
-                new_password = serializer._validated_data.get('new_password')
-                confirm_password = serializer.validated_data.get('confirm_password')
+   
 
+    def post(self, request):
+        try:
+            # Extract JWT token from the request headers
+            jwt_token = request.headers.get('Authorization').split(' ')[1]  # Assuming the token is sent as "Bearer <token>"
+            
+            # Decode JWT token to extract user information
+            decoded_token = decode(jwt_token, 'your_secret_key', algorithms=['HS256'])
+
+            # Extract user id from decoded token
+            user_id = decoded_token['user_id']
+
+            # Retrieve user object using user_id
+            user = user.objects.get(pk=user_id)
+
+            # Assuming your serializer is used for validation
+            serializer = ChangePasswordSerializer(data=request.data)
+            if serializer.is_valid():
+                # Extract old and new password from serializer
+                old_password = serializer.validated_data.get('old_password')
+                new_password = serializer.validated_data.get('new_password')
+
+                # Check old password
                 if not user.check_password(old_password):
-                    return Response({"error":"Old Password is incorrect."},status=status.HTTP_400_BAD_REQUEST)
-                
-                if new_password != confirm_password:
-                    return Response({"error": "New passwords do not match."}, status=status.HTTP_400_BAD_REQUEST)
-                
-                user.password = make_password(new_password)
+                    return Response({"error": "Old Password is incorrect."}, status=status.HTTP_400_BAD_REQUEST)
+
+                # Update password
+                user.set_password(new_password)
                 user.save()
 
                 return Response({"message": "Password changed successfully"}, status=status.HTTP_200_OK)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            
 
-        except(TypeError, ValueError, OverflowError, Signup.DoesNotExist):
-            return Response("Old Password does't match",status=status.HTTP_404_NOT_FOUND)
+        except (KeyError, user.DoesNotExist, IndexError):
+            return Response("Invalid token or user not found", status=status.HTTP_401_UNAUTHORIZED)
