@@ -5,15 +5,20 @@ from CRM import views
 from CRM import utils
 
 urlpatterns = [
+    ## Sign Up and login URLS
     path('admin/', admin.site.urls),
     path('Signup/', views.user_create ),
     path('login/', views.LoginAPI.as_view(), name='login'),
     path('logout/', views.LogoutAPI.as_view(), name='info'),
     
+    ## User information URLS
     path('verify-email/', views.VerifyAPI.as_view(), name='verify'),
-    path('update-password/<uidb64>/<token>/', views.ChangePasswordView.as_view(), name='password'),
+    path('update-password/<uidb64>/<token>/', views.ForgetPasswordView.as_view(), name='password'),
+    path('change-password/', views.ChangePasswordView.as_view(), name='change_password'),
+
     path('info/', views.InfoAPI.as_view(), name='info'),
 
+    ## Account handling
     path('get-csrf-token/<str:token_type>/', utils.get_csrf_token, name='get_csrf_token'),
     path('accounts/', include('django.contrib.auth.urls')),
 ]

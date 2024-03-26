@@ -11,8 +11,8 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.decorators import api_view
+
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -20,7 +20,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from FYP import settings
 from .models import Signup
-from .serializers import SignupSerializer, LoginSerializer, ChangePasswordSerializer
+from .serializers import SignupSerializer, LoginSerializer, ForgetPasswordSerializer,ChangePasswordSerializer
 
 @api_view(['POST'])
 @ensure_csrf_cookie
@@ -170,13 +170,13 @@ class VerifyAPI(APIView):
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
         
         
-class ChangePasswordView(APIView):
+class ForgetPasswordView(APIView):
      def post(self, request, uidb64, token):
         try:
             user_id = urlsafe_base64_decode(smart_str(uidb64))
             user = Signup.objects.get(pk=user_id)
 
-            serializer = ChangePasswordSerializer(data=request.data)
+            serializer = ForgetPasswordSerializer(data=request.data)
 
             if serializer.is_valid():
                 new_password = serializer.validated_data.get('password')
@@ -195,3 +195,31 @@ class ChangePasswordView(APIView):
 
         except (TypeError, ValueError, OverflowError, Signup.DoesNotExist):
             return Response("Invalid UID or token", status=status.HTTP_400_BAD_REQUEST)
+        
+
+class ChangePasswordView(APIView):
+    def post(self,request):
+        try:
+            serializer = ChangePasswordSerializer(request.data)
+            if serializer.is_valid():
+                user = request.user
+                old_password = serializer._validated_data.get('old_password')
+                new_password = serializer._validated_data.get('new_password')
+                confirm_password = serializer.validated_data.get('confirm_password')
+
+                if not user.check_password(old_password):
+                    return Response({"error":"Old Password is incorrect."},status=status.HTTP_400_BAD_REQUEST)
+                
+                if new_password != confirm_password:
+                    return Response({"error": "New passwords do not match."}, status=status.HTTP_400_BAD_REQUEST)
+                
+                user.password = make_password(new_password)
+                user.save()
+
+                return Response({"message": "Password changed successfully"}, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+
+        except(TypeError, ValueError, OverflowError, Signup.DoesNotExist):
+            return Response("Old Password does't match",status=status.HTTP_404_NOT_FOUND)

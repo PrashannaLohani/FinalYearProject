@@ -49,7 +49,7 @@ class VerifySerializer(serializers.Serializer):
         if not email :
             raise ValidationError('Email not found')
         return email
-class ChangePasswordSerializer(serializers.Serializer):
+class ForgetPasswordSerializer(serializers.Serializer):
     password = serializers.CharField(max_length = 100)
     confirm_password = serializers.CharField(max_length = 100)
 
@@ -57,3 +57,12 @@ class ChangePasswordSerializer(serializers.Serializer):
         instance.set_password(validate_data.get('password'))
         instance.save()
         return instance
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(max_length = 100)
+    new_password = serializers.CharField(max_length = 100)
+    confirm_password = serializers.CharField(max_length = 100)
+
+    def validate(self, data):
+        if data['password'] != data['confirm_password']:
+            raise serializers.ValidationError("The new passwords do not match.")
+        return data
