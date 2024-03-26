@@ -40,7 +40,7 @@ const BarGraph = () => {
     datasets: [
       {
         label: "Number of people joined",
-        data: [20, 30, 40, 30, 10, 12, 48],
+        data: [20, 30, 40, 30, 20, 10, 25],
         backgroundColor: "rgba(0, 0, 0, 0.8)",
       },
       {
