@@ -146,18 +146,15 @@ const Content = () => {
           <AccordionItem sx={{ border: "none" }} mt="2rem">
             <h2>
               <AccordionButton>
-                <Flex flexDir="column" justifyItems="center">
+                <Flex flexDir="column">
                   <Box as="span" textAlign="left" fontWeight="bold">
-                    Background{" "}
-                    <span>
-                      <Badge colorScheme="blue">Beta</Badge>
-                      <AccordionIcon />
-                    </span>
+                    Background <Badge colorScheme="blue">Beta</Badge>
                   </Box>
                   <Text display="flex" alignItems="center">
                     You are using light background{" "}
                   </Text>
                 </Flex>
+                <AccordionIcon />
               </AccordionButton>
             </h2>
             <AccordionPanel pb={4}>{/* #### */}</AccordionPanel>

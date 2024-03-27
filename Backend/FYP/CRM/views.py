@@ -22,7 +22,7 @@ from FYP import settings
 from .models import Signup
 from .serializers import SignupSerializer, LoginSerializer, ForgetPasswordSerializer,ChangePasswordSerializer
 
-from jwt import decode
+from django.contrib.auth.models import User
 
 @api_view(['POST'])
 @ensure_csrf_cookie
@@ -200,40 +200,39 @@ class ForgetPasswordView(APIView):
         
 
 class ChangePasswordView(APIView):
-   
-
     def post(self, request):
         try:
-            # Extract JWT token from the request headers
-            jwt_token = request.headers.get('Authorization').split(' ')[1]  # Assuming the token is sent as "Bearer <token>"
-            
-            # Decode JWT token to extract user information
-            decoded_token = decode(jwt_token, 'your_secret_key', algorithms=['HS256'])
+            access_token = request.headers.get('Authorization')
+            if access_token:
+                jwt_token = access_token.split()[1]
 
-            # Extract user id from decoded token
-            user_id = decoded_token['user_id']
+                decoded_token = jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=['HS256'])
+                user_id = decoded_token.get('user_id')
 
-            # Retrieve user object using user_id
-            user = user.objects.get(pk=user_id)
+                user = Signup.objects.get(pk=user_id)
 
-            # Assuming your serializer is used for validation
-            serializer = ChangePasswordSerializer(data=request.data)
-            if serializer.is_valid():
-                # Extract old and new password from serializer
-                old_password = serializer.validated_data.get('old_password')
-                new_password = serializer.validated_data.get('new_password')
+                serializer = ChangePasswordSerializer(data=request.data)
+                if serializer.is_valid():
+                    old_password = serializer.validated_data.get('old_password')
+                    new_password = serializer.validated_data.get('new_password')
 
-                # Check old password
-                if not user.check_password(old_password):
-                    return Response({"error": "Old Password is incorrect."}, status=status.HTTP_400_BAD_REQUEST)
+                    if not user.check_password(old_password):
+                        return Response({"error": "Old Password is incorrect."}, status=status.HTTP_400_BAD_REQUEST)
 
-                # Update password
-                user.set_password(new_password)
-                user.save()
+                    user.set_password(new_password)
+                    user.save()
 
-                return Response({"message": "Password changed successfully"}, status=status.HTTP_200_OK)
+                    return Response({"message": "Password changed successfully"}, status=status.HTTP_200_OK)
+                else:
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'error': 'Authorization header not found'}, status=status.HTTP_400_BAD_REQUEST)
 
-        except (KeyError, user.DoesNotExist, IndexError):
-            return Response("Invalid token or user not found", status=status.HTTP_401_UNAUTHORIZED)
+        except jwt.ExpiredSignatureError:
+            return Response({'error': 'Token has expired'}, status=status.HTTP_401_UNAUTHORIZED)
+        except jwt.InvalidTokenError:
+            return Response({'error': 'Invalid token'}, status=status.HTTP_401_UNAUTHORIZED)
+        except Signup.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

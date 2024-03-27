@@ -9,12 +9,25 @@ import {
   DrawerOverlay,
   Flex,
   Input,
+  useToast,
 } from "@chakra-ui/react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import React from "react";
+import React, { useState } from "react";
 import axios from "axios";
 
 export default function ChangePassword({ isOpen, onClose }) {
+  const [error, setError] = useState(null);
+  const toast = useToast();
+  const SuccessToast = () => {
+    toast({
+      title: "Password Updated.",
+      description: "We've updated your password.",
+      status: "success",
+      duration: 9000,
+      isClosable: true,
+    });
+  };
+
   return (
     <>
       <Drawer isOpen={isOpen} placement="right" onClose={onClose} size="xs">
@@ -61,18 +74,39 @@ export default function ChangePassword({ isOpen, onClose }) {
             }}
             onSubmit={async (values, { setSubmitting }) => {
               try {
-                // Send POST request to the backend
+                const token = localStorage.getItem("accessToken");
+                const headers = {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                };
+
                 const response = await axios.post(
                   "http://127.0.0.1:8000/change-password/",
-                  values
+                  {
+                    old_password: values.oldPassword,
+                    new_password: values.newPassword,
+                    confirm_password: values.confirmPassword,
+                  },
+                  { headers }
                 );
-                console.log(response.data); // Handle response data as needed
-                onClose(); // Close the drawer after successful submission
+
+                console.log(response.data);
+                onClose();
+                SuccessToast();
               } catch (error) {
                 console.error("Error:", error);
-                // Handle error as needed
+                if (error.response) {
+                  // Server responded with an error status code
+                  setError(error.response.data.error);
+                } else if (error.request) {
+                  // The request was made but no response was received
+                  setError("No response received from the server.");
+                } else {
+                  // Something happened in setting up the request that triggered an error
+                  setError("An unexpected error occurred.");
+                }
               } finally {
-                setSubmitting(false); // Set submitting state back to false
+                setSubmitting(false);
               }
             }}
           >
