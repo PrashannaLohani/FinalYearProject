@@ -8,15 +8,33 @@ import {
   DrawerHeader,
   DrawerOverlay,
   Flex,
+  IconButton,
   Input,
+  InputGroup,
+  InputRightElement,
   useToast,
 } from "@chakra-ui/react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import React, { useState } from "react";
 import axios from "axios";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function ChangePassword({ isOpen, onClose }) {
   const [error, setError] = useState(null);
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const togglePasswordVisibilityOld = () => {
+    setShowOldPassword(!showOldPassword);
+  };
+  const togglePasswordVisibilityNew = () => {
+    setShowNewPassword(!showNewPassword);
+  };
+  const togglePasswordVisibilityConfirm = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
+
   const toast = useToast();
   const SuccessToast = () => {
     toast({
@@ -114,36 +132,70 @@ export default function ChangePassword({ isOpen, onClose }) {
               <Form>
                 <DrawerBody>
                   <Flex flexDir="column" gap="1rem">
-                    <Field
-                      type="Password"
-                      name="oldPassword"
-                      placeholder="Old Password"
-                      as={Input}
-                    />
+                    <InputGroup>
+                      <Field
+                        type={showOldPassword ? "text" : "password"}
+                        name="oldPassword"
+                        placeholder="Old password"
+                        as={Input}
+                      />
+                      <InputRightElement width="4.5rem">
+                        <Button
+                          h="1.75rem"
+                          size="sm"
+                          onClick={togglePasswordVisibilityOld}
+                        >
+                          {showOldPassword ? <FaEyeSlash /> : <FaEye />}
+                        </Button>
+                      </InputRightElement>
+                    </InputGroup>
+
                     <ErrorMessage
                       name="oldPassword"
                       component="div"
                       style={{ color: "red" }}
                     />
+                    <InputGroup>
+                      <Field
+                        type={showNewPassword ? "text" : "password"}
+                        name="newPassword"
+                        placeholder="New Password"
+                        as={Input}
+                      />
+                      <InputRightElement width="4.5rem">
+                        <Button
+                          h="1.75rem"
+                          size="sm"
+                          onClick={togglePasswordVisibilityNew}
+                        >
+                          {showNewPassword ? <FaEyeSlash /> : <FaEye />}
+                        </Button>
+                      </InputRightElement>
+                    </InputGroup>
 
-                    <Field
-                      type="Password"
-                      name="newPassword"
-                      placeholder="New Password"
-                      as={Input}
-                    />
                     <ErrorMessage
                       name="newPassword"
                       component="div"
                       style={{ color: "red" }}
                     />
+                    <InputGroup>
+                      <Field
+                        type={showConfirmPassword ? "text" : "password"}
+                        name="confirmPassword"
+                        placeholder="Confirm Password"
+                        as={Input}
+                      />
+                      <InputRightElement width="4.5rem">
+                        <Button
+                          h="1.75rem"
+                          size="sm"
+                          onClick={togglePasswordVisibilityConfirm}
+                        >
+                          {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                        </Button>
+                      </InputRightElement>
+                    </InputGroup>
 
-                    <Field
-                      type="Password"
-                      name="confirmPassword"
-                      placeholder="Confirm Password"
-                      as={Input}
-                    />
                     <ErrorMessage
                       name="confirmPassword"
                       component="div"
