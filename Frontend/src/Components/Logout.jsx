@@ -7,33 +7,34 @@ import {
   AlertDialogOverlay,
   Button,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
-import axios from "axios";
 import React from "react";
 
 export default function Logout({ isOpen, onClose }) {
   const handleMenuItemClick = () => {
     window.location.href = "/";
   };
-  const handleLogout = async () => {
-    try {
-      const refreshToken = localStorage.getItem("refreshToken");
+  const toast = useToast();
 
-      if (!refreshToken) {
-        console.error("Refresh token not found in local storage");
-        return;
-      }
+  const handleLogout = () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    const logoutToast = new Promise((resolve, reject) => {
+      setTimeout(() => resolve(200), 3000);
+    });
 
-      const response = await axios.post("http://127.0.0.1:8000/logout/", {
-        refresh_token: refreshToken,
-      });
-      // Handle successful logout response
-      console.log(response.data);
+    // Display toast based on the promise status
+    toast.promise(logoutToast, {
+      success: { title: "Logged Out.", description: "Logout successful" },
+      loading: { title: "Logging out...", description: "Please wait" },
+      error: { title: "Logout failed", description: "Something went wrong" },
+    });
+
+    // Redirect after a delay
+    setTimeout(() => {
       handleMenuItemClick();
-    } catch (error) {
-      console.error("Logout failed:", error.response.data.error);
-      // Handle failed logout response
-    }
+    }, 3000);
   };
 
   const cancelRef = React.useRef();

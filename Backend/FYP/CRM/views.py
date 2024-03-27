@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 import jwt
 
 from django.contrib.auth.hashers import check_password, make_password
@@ -22,7 +22,6 @@ from FYP import settings
 from .models import Signup
 from .serializers import SignupSerializer, LoginSerializer, ForgetPasswordSerializer,ChangePasswordSerializer
 
-from django.contrib.auth.models import User
 
 @api_view(['POST'])
 @ensure_csrf_cookie
@@ -51,12 +50,14 @@ def user_create(request):
                  
     return HttpResponse(status=405, content="Method Not Allowed")
 
+
 class LoginAPI(APIView):
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
             try:
                 user = Signup.objects.get(email=serializer.validated_data['email'])
+               
             except Signup.DoesNotExist:
                 return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
             
@@ -136,7 +137,10 @@ class LogoutAPI(APIView):
             return Response({'message': 'Logout successful'}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        
+
+class DeleteAPI(APIView):
+    def post(self, request):
+        pass
 
 
 token_cache = {}
