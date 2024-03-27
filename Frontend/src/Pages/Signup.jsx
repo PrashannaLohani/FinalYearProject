@@ -12,20 +12,12 @@ import {
   InputGroup,
   InputRightElement,
   Link,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Text,
-  useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import { NavLink } from "react-router-dom";
 import { Formik } from "formik";
 import { useEffect, useState } from "react";
-import Login from "./Login";
 import Privacy from "./Privacy";
 import Terms from "./terms&service";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -38,7 +30,6 @@ const SignupHeader = () => {
   );
 };
 const Signup = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const [csrfToken, setCsrfToken] = useState(null);
   const apiURL = "http://127.0.0.1:8000/Signup/";
   const [showPassword, setShowPassword] = useState(false);
@@ -49,6 +40,17 @@ const Signup = () => {
   };
   const showConfirmPass = () => {
     setShowConfirmPassword(!showConfirmPassword);
+  };
+
+  const toast = useToast();
+  const SuccessToast = () => {
+    toast({
+      title: "Account created.",
+      description: "You can access your login with your account now.",
+      status: "success",
+      duration: 9000,
+      isClosable: true,
+    });
   };
 
   useEffect(() => {
@@ -119,7 +121,7 @@ const Signup = () => {
 
                 return errors;
               }}
-              onSubmit={async (values, { setSubmitting }) => {
+              onSubmit={async (values, { setSubmitting, resetForm }) => {
                 // console.log("Form Values:", values);
                 try {
                   // Make a POST request to your Django backend
@@ -129,7 +131,8 @@ const Signup = () => {
                       "X-CSRFToken": csrfToken,
                     },
                   });
-                  onOpen();
+                  SuccessToast();
+                  resetForm();
                 } catch (error) {
                   console.error("Error creating user:", error);
                 } finally {
@@ -278,7 +281,6 @@ const Signup = () => {
                     mt="1rem"
                     type="submit"
                     isDisabled={!values?.checkbox || isSubmitting}
-                    onSubmit={onOpen}
                     isLoading={isSubmitting}
                   >
                     Sign Up
@@ -295,35 +297,6 @@ const Signup = () => {
           </Box>
         </Box>
       </Flex>
-      <Message_popup isOpen={isOpen} onClose={onClose} />
-    </>
-  );
-};
-
-const Message_popup = ({ isOpen, onClose }) => {
-  return (
-    <>
-      <Modal isOpen={isOpen} onClose={onClose} isCentered>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>User Created</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Text>Now you can login and use the services.</Text>
-          </ModalBody>
-
-          <ModalFooter gap="1rem">
-            <NavLink to="/Login" element={<Login />}>
-              <Button bgColor="black" colorScheme="blackAlpha">
-                Login
-              </Button>
-            </NavLink>
-            <Button variant="ghost" mr={3} onClick={onClose}>
-              Close
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
     </>
   );
 };
