@@ -17,6 +17,10 @@ export const UserInfoProvider = ({ children }) => {
   const fetchUserInfo = async () => {
     try {
       const accessToken = localStorage.getItem("accessToken");
+      if (!accessToken) {
+        return;
+      }
+
       const config = {
         headers: {
           Authorization: `Bearer ${accessToken}`,
