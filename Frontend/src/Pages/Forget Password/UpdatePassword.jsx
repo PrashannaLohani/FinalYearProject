@@ -10,6 +10,8 @@ import {
   FormLabel,
   Heading,
   Input,
+  InputGroup,
+  InputRightElement,
 } from "@chakra-ui/react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import HomepageNav from "../../Layout/Homepage/HomepageNavbar";
@@ -17,6 +19,7 @@ import HomepageFooter from "../../Layout/Homepage/HomepageFooter";
 import { useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function UpdatePassword() {
   return (
@@ -50,6 +53,15 @@ const Section2 = () => {
   const [submitted, setSubmitted] = useState(false);
   const [errorOccurred, setErrorOccurred] = useState(false);
   const { uidb64, token } = useParams();
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const togglePasswordVisibilityNew = () => {
+    setShowNewPassword(!showNewPassword);
+  };
+  const togglePasswordVisibilityConfirm = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
@@ -113,7 +125,23 @@ const Section2 = () => {
               <Flex flexDir="column">
                 <FormControl>
                   <FormLabel>New password</FormLabel>
-                  <Field type="password" name="newPassword" as={Input} />
+                  <InputGroup>
+                    <Field
+                      type={showNewPassword ? "text" : "password"}
+                      name="newPassword"
+                      as={Input}
+                    />
+                    <InputRightElement width="4.5rem">
+                      <Button
+                        h="1.75rem"
+                        size="sm"
+                        onClick={togglePasswordVisibilityNew}
+                        bg="white"
+                      >
+                        {showNewPassword ? <FaEyeSlash /> : <FaEye />}
+                      </Button>
+                    </InputRightElement>
+                  </InputGroup>
                   <ErrorMessage
                     name="newPassword"
                     component="div"
@@ -122,7 +150,23 @@ const Section2 = () => {
                 </FormControl>
                 <FormControl>
                   <FormLabel>Confirm password</FormLabel>
-                  <Field type="password" name="confirmPassword" as={Input} />
+                  <InputGroup>
+                    <Field
+                      type={showConfirmPassword ? "text" : "password"}
+                      name="confirmPassword"
+                      as={Input}
+                    />
+                    <InputRightElement width="4.5rem">
+                      <Button
+                        h="1.75rem"
+                        size="sm"
+                        onClick={togglePasswordVisibilityConfirm}
+                        bg="white"
+                      >
+                        {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                      </Button>
+                    </InputRightElement>
+                  </InputGroup>
                   <ErrorMessage
                     name="confirmPassword"
                     component="div"

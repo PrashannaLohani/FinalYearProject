@@ -144,6 +144,7 @@ export default function ChangePassword({ isOpen, onClose }) {
                           h="1.75rem"
                           size="sm"
                           onClick={togglePasswordVisibilityOld}
+                          bg="white"
                         >
                           {showOldPassword ? <FaEyeSlash /> : <FaEye />}
                         </Button>
@@ -167,6 +168,7 @@ export default function ChangePassword({ isOpen, onClose }) {
                           h="1.75rem"
                           size="sm"
                           onClick={togglePasswordVisibilityNew}
+                          bg="white"
                         >
                           {showNewPassword ? <FaEyeSlash /> : <FaEye />}
                         </Button>
@@ -190,6 +192,7 @@ export default function ChangePassword({ isOpen, onClose }) {
                           h="1.75rem"
                           size="sm"
                           onClick={togglePasswordVisibilityConfirm}
+                          bg="white"
                         >
                           {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
                         </Button>

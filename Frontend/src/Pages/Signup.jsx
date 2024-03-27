@@ -9,6 +9,8 @@ import {
   HStack,
   Heading,
   Input,
+  InputGroup,
+  InputRightElement,
   Link,
   Modal,
   ModalBody,
@@ -26,6 +28,7 @@ import { useEffect, useState } from "react";
 import Login from "./Login";
 import Privacy from "./Privacy";
 import Terms from "./terms&service";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const SignupHeader = () => {
   return (
@@ -38,6 +41,15 @@ const Signup = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [csrfToken, setCsrfToken] = useState(null);
   const apiURL = "http://127.0.0.1:8000/Signup/";
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const showPass = () => {
+    setShowPassword(!showPassword);
+  };
+  const showConfirmPass = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
 
   useEffect(() => {
     const fetchCsrfToken = async () => {
@@ -174,14 +186,26 @@ const Signup = () => {
                         <Text color="red.500">{errors.password}</Text>
                       )}
                     </Flex>
-                    <Input
-                      type="password"
-                      name="password"
-                      placeholder="Enter your password"
-                      onChange={handleChange}
-                      value={values.password}
-                      isRequired
-                    />
+                    <InputGroup>
+                      <Input
+                        type={showPassword ? "text" : "password"}
+                        name="password"
+                        placeholder="Enter your password"
+                        onChange={handleChange}
+                        value={values.password}
+                        isRequired
+                      />
+                      <InputRightElement width="4.5rem">
+                        <Button
+                          h="1.75rem"
+                          size="sm"
+                          onClick={showPass}
+                          bg="white"
+                        >
+                          {showPassword ? <FaEyeSlash /> : <FaEye />}
+                        </Button>
+                      </InputRightElement>
+                    </InputGroup>
                   </FormControl>
                   <FormControl mt={4}>
                     <Flex>
@@ -190,14 +214,26 @@ const Signup = () => {
                         <Text color="red.500">{errors.cpassword}</Text>
                       )}
                     </Flex>
-                    <Input
-                      type="password"
-                      name="cpassword"
-                      placeholder="Re-enter your password"
-                      onChange={handleChange}
-                      value={values.cpassword}
-                      isRequired
-                    />
+                    <InputGroup>
+                      <Input
+                        type={showConfirmPassword ? "text" : "password"}
+                        name="cpassword"
+                        placeholder="Re-enter your password"
+                        onChange={handleChange}
+                        value={values.cpassword}
+                        isRequired
+                      />
+                      <InputRightElement width="4.5rem">
+                        <Button
+                          h="1.75rem"
+                          size="sm"
+                          onClick={showConfirmPass}
+                          bg="white"
+                        >
+                          {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                        </Button>
+                      </InputRightElement>
+                    </InputGroup>
                   </FormControl>
 
                   <Box mt="1rem">

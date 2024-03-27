@@ -12,6 +12,8 @@ import {
   HStack,
   Heading,
   Input,
+  InputGroup,
+  InputRightElement,
   Link,
   Modal,
   ModalBody,
@@ -28,6 +30,7 @@ import { Formik } from "formik";
 import { useState } from "react";
 import Info from "./Info";
 import EmailVerification from "./Forget Password/EmailVerification";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function Login() {
   return (
@@ -53,6 +56,11 @@ const LoginForm = () => {
   const [errorOccurred, setErrorOccurred] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const showPass = () => {
+    setShowPassword(!showPassword);
+  };
+
   const apiURL = "http://127.0.0.1:8000/login/";
   return (
     <Box my="2rem" textAlign="left">
@@ -133,15 +141,22 @@ const LoginForm = () => {
 
             <FormControl mt={4} isInvalid={errors.password && touched.password}>
               <FormLabel>Password</FormLabel>
-              <Input
-                type="password"
-                placeholder="Enter password"
-                name="password"
-                onChange={handleChange}
-                onBlur={handleBlur}
-                value={values.password}
-                isRequired
-              />
+              <InputGroup>
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter password"
+                  name="password"
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  value={values.password}
+                  isRequired
+                />
+                <InputRightElement width="4.5rem">
+                  <Button h="1.75rem" size="sm" onClick={showPass} bg="white">
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </Button>
+                </InputRightElement>
+              </InputGroup>
               {errors.password && touched.password && (
                 <Text color="red">{errors.password}</Text>
               )}
