@@ -46,7 +46,7 @@ const BarGraph = () => {
       {
         label: "Number of comments",
         data: [10, 15, 20, 12, 8, 10],
-        backgroundColor: "rgba(255, 99, 132, 0.8)", // You can change the color as desired
+        backgroundColor: "rgba(128, 0, 0, 0.7)", // You can change the color as desired
       },
     ],
   };

@@ -8,7 +8,6 @@ import {
   DrawerHeader,
   DrawerOverlay,
   Flex,
-  IconButton,
   Input,
   InputGroup,
   InputRightElement,

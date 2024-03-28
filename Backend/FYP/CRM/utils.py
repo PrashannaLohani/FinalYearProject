@@ -11,4 +11,4 @@ def get_csrf_token(request, token_type):
     return JsonResponse({'csrf_token': csrf_token})
 
     
-    # {"csrf_signup_token": "n4F78ipyzjrsYrVRXyEzhP7DJejweZR9"}
+  
