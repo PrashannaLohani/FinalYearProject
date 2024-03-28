@@ -9,7 +9,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('Signup/', views.user_create ),
     path('login/', views.LoginAPI.as_view(), name='login'),
-    path('logout/', views.LogoutAPI.as_view(), name='info'),
     
     ## User information URLS
     path('verify-email/', views.VerifyAPI.as_view(), name='verify'),

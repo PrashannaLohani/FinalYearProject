@@ -122,21 +122,6 @@ class InfoAPI(APIView):
         else:
             return Response({'error': 'Authorization header not found'}, status=status.HTTP_400_BAD_REQUEST)
         
-        
-    
-class LogoutAPI(APIView):
-    def post(self, request):
-        refresh_token = request.data.get('refresh_token')
-
-        if not refresh_token:
-            return Response({'error': 'No refresh token provided'}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            token = RefreshToken(refresh_token)
-            token.blacklist()  # Add the refresh token to the blacklist
-            return Response({'message': 'Logout successful'}, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class DeleteAPI(APIView):
     def post(self, request):
