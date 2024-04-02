@@ -20,7 +20,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from FYP import settings
 from .models import Signup
-from .serializers import SignupSerializer, LoginSerializer, ForgetPasswordSerializer,ChangePasswordSerializer
+from .serializers import SignupSerializer, LoginSerializer, ForgetPasswordSerializer,ChangePasswordSerializer,DeleteSerializer
 
 
 @api_view(['POST'])
@@ -125,7 +125,35 @@ class InfoAPI(APIView):
 
 class DeleteAPI(APIView):
     def post(self, request):
-        pass
+        try:
+            access_token = request.headers.get('Authorization')
+            if access_token:
+                jwt_token = access_token.split()[1]
+
+                decoded_token = jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=['HS256'])
+                user_id = decoded_token.get('user_id')
+
+                user = Signup.objects.get(pk=user_id)
+
+                serializer = DeleteSerializer(data=request.data)
+                if serializer.is_valid():
+                    if serializer.validated_data.get('delete'):
+                        user.delete()
+
+                    return Response({"message": "Account deleted successfully."}, status=status.HTTP_200_OK)
+                else:
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({'error': 'Authorization header not found'}, status=status.HTTP_400_BAD_REQUEST)
+
+        except jwt.ExpiredSignatureError:
+            return Response({'error': 'Token has expired'}, status=status.HTTP_401_UNAUTHORIZED)
+        except jwt.InvalidTokenError:
+            return Response({'error': 'Invalid token'}, status=status.HTTP_401_UNAUTHORIZED)
+        except Signup.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 token_cache = {}

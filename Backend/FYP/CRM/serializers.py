@@ -66,3 +66,11 @@ class ChangePasswordSerializer(serializers.Serializer):
         if data['new_password'] != data['confirm_password']:
             raise serializers.ValidationError("The new passwords do not match.")
         return data
+    
+class DeleteSerializer(serializers.Serializer):
+    delete = serializers.BooleanField(default=False)
+
+    def validate (self,data):
+        if data['delete'] == False:
+            raise serializers.ValidationError ('Acoount not Deleted.')
+        return data

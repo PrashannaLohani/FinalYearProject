@@ -6,12 +6,37 @@ import {
   AlertDialogHeader,
   AlertDialogOverlay,
   Button,
+  Input,
 } from "@chakra-ui/react";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useUserInfo } from "./UserInfo";
 
 export default function Delete({ isOpen, onClose }) {
+  const userInfo = useUserInfo();
+  const { email } = userInfo || {};
+  const [inputValue, setInputValue] = useState("");
+  const [isDeleteEnabled, setIsDeleteEnabled] = useState(false);
+
+  useEffect(() => {
+    setIsDeleteEnabled(inputValue === email);
+  }, [inputValue, email]);
+
+  const handleChange = (event) => {
+    const value = event.target.value;
+    setInputValue(value);
+  };
+
+  const handleDelete = () => {
+    // Handle delete action here
+  };
+
   const cancelRef = React.useRef();
+
+  useEffect(() => {
+    setInputValue(""); // Reset input value when dialog opens
+  }, [isOpen]);
+
   return (
     <>
       <AlertDialog
@@ -27,14 +52,27 @@ export default function Delete({ isOpen, onClose }) {
             </AlertDialogHeader>
 
             <AlertDialogBody>
-              Are you sure you want to permanantly delete your account?
+              Are you sure you want to permanently delete your account? Please
+              write your email to proceed.
+              <Input
+                mt="1rem"
+                placeholder={email}
+                isRequired
+                value={inputValue}
+                onChange={handleChange}
+              />
             </AlertDialogBody>
 
             <AlertDialogFooter>
               <Button ref={cancelRef} onClick={onClose}>
                 Cancel
               </Button>
-              <Button colorScheme="red" ml={3}>
+              <Button
+                colorScheme="red"
+                ml={3}
+                onClick={handleDelete}
+                isDisabled={!isDeleteEnabled}
+              >
                 Delete
               </Button>
             </AlertDialogFooter>
