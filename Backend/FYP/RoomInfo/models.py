@@ -1,8 +1,6 @@
 from django.db import models
 from CRM.models import Signup
 
-
-
 class Room(models.Model):
     room_id = models.CharField(max_length=100)
     room_name = models.CharField(max_length=255)
