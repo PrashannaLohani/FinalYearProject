@@ -24,11 +24,11 @@ import {
   ModalOverlay,
   Text,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import { NavLink } from "react-router-dom";
 import { Formik } from "formik";
 import { useState } from "react";
-import Info from "./Info";
 import EmailVerification from "./Forget Password/EmailVerification";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
@@ -54,11 +54,27 @@ const LoginHeader = () => {
 
 const LoginForm = () => {
   const [errorOccurred, setErrorOccurred] = useState(false);
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const toast = useToast();
   const showPass = () => {
     setShowPassword(!showPassword);
+  };
+  const handleLoginClick = (targetPage) => {
+    window.location.href = targetPage;
+  };
+
+  const handleLogin = () => {
+    const successPromise = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve();
+      }, 5000);
+    });
+    toast.promise(successPromise, {
+      success: { title: "Login Successful.", description: "Welcome." },
+      loading: { title: "Logging in...", description: "Please wait" },
+      error: { title: "Login failed", description: "Something went wrong" },
+    });
   };
 
   const apiURL = "http://127.0.0.1:8000/login/";
@@ -97,12 +113,16 @@ const LoginForm = () => {
             });
 
             if (response.status === 200 && response.data.access_token) {
+              handleLogin();
               // Store tokens in local storage
               localStorage.setItem("accessToken", response.data.access_token);
               localStorage.setItem("refreshToken", response.data.refresh_token);
               // Open the modal
-              onOpen();
-              setErrorOccurred(false);
+
+              setTimeout(() => {
+                setErrorOccurred(false);
+                handleLoginClick("/info");
+              }, 3000);
             }
           } catch (error) {
             setFormSubmitted(true);
@@ -120,7 +140,6 @@ const LoginForm = () => {
           handleChange,
           handleBlur,
           handleSubmit,
-          isSubmitting,
         }) => (
           <form onSubmit={handleSubmit} method="post" action="/login/">
             <FormControl isInvalid={errors.email && touched.email}>
@@ -200,7 +219,6 @@ const LoginForm = () => {
               bgColor="black"
               mt="1rem"
               type="submit"
-              isLoading={isSubmitting}
             >
               Login
             </Button>
@@ -222,35 +240,6 @@ const LoginForm = () => {
           <Link as="b">Signup</Link>
         </NavLink>
       </Flex>
-      <Message_popup isOpen={isOpen} onClose={onClose} />
     </Box>
-  );
-};
-
-const Message_popup = ({ isOpen, onClose }) => {
-  return (
-    <>
-      <Modal isOpen={isOpen} onClose={onClose} isCentered>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Welcome!</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Text>You have successfully Logged in.</Text>
-          </ModalBody>
-
-          <ModalFooter gap="1rem">
-            <NavLink to="/Info" element={<Info />}>
-              <Button bgColor="black" colorScheme="blackAlpha">
-                Proceed
-              </Button>
-            </NavLink>
-            <Button variant="ghost" mr={3} onClick={onClose}>
-              Close
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-    </>
   );
 };
