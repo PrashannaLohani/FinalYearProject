@@ -1,3 +1,11 @@
-from django.shortcuts import render
 
-# Create your views here.
+
+
+def RoomAPI(APIView):
+    pass
+
+def ParticipantAPI(APIView):
+    pass
+
+def CommentAPI(APIView):
+    pass

@@ -126,7 +126,13 @@ const LoginForm = () => {
             }
           } catch (error) {
             setFormSubmitted(true);
-            setErrorOccurred(true);
+            toast({
+              title: "Login failed",
+              description: "Please enter correct Email or Password.",
+              status: "error",
+              duration: 5000,
+              isClosable: true,
+            });
           } finally {
             setFormSubmitted(false);
             setSubmitting(false);
@@ -140,6 +146,7 @@ const LoginForm = () => {
           handleChange,
           handleBlur,
           handleSubmit,
+          isSubmitting,
         }) => (
           <form onSubmit={handleSubmit} method="post" action="/login/">
             <FormControl isInvalid={errors.email && touched.email}>
@@ -219,21 +226,21 @@ const LoginForm = () => {
               bgColor="black"
               mt="1rem"
               type="submit"
+              isLoading={isSubmitting}
             >
               Login
             </Button>
           </form>
         )}
       </Formik>
-      {errorOccurred && (
-        <Alert status="error" mt="1rem">
-          <AlertIcon />
-          <AlertTitle>Error!</AlertTitle>
-          <AlertDescription>
-            Please enter correct Email or Password.
-          </AlertDescription>
-        </Alert>
-      )}
+      {errorOccurred &&
+        toast({
+          title: "Login failed",
+          description: "Please enter correct Email or Password.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        })}
       <Flex mt="1rem" justify="center" gap="5px">
         <Text>New User?</Text>
         <NavLink to="/Signup">

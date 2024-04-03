@@ -74,3 +74,12 @@ class DeleteSerializer(serializers.Serializer):
         if data['delete'] == False:
             raise serializers.ValidationError ('Acoount not Deleted.')
         return data
+    
+class ChangeNameSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=50)
+
+    def validate_name(self,value):
+        if not value.isalpha():
+            raise serializers.ValidationError("Name must contain only letters.")
+        
+        return value

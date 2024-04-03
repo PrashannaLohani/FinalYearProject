@@ -20,7 +20,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from FYP import settings
 from .models import Signup
-from .serializers import SignupSerializer, LoginSerializer, ForgetPasswordSerializer,ChangePasswordSerializer,DeleteSerializer
+from .serializers import SignupSerializer, LoginSerializer, ForgetPasswordSerializer,ChangePasswordSerializer,DeleteSerializer,ChangeNameSerializer
 
 
 @api_view(['POST'])
@@ -217,6 +217,7 @@ class ForgetPasswordView(APIView):
         
 
 class ChangePasswordView(APIView):
+
     def post(self, request):
         try:
             access_token = request.headers.get('Authorization')
@@ -244,6 +245,38 @@ class ChangePasswordView(APIView):
                     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response({'error': 'Authorization header not found'}, status=status.HTTP_400_BAD_REQUEST)
+
+        except jwt.ExpiredSignatureError:
+            return Response({'error': 'Token has expired'}, status=status.HTTP_401_UNAUTHORIZED)
+        except jwt.InvalidTokenError:
+            return Response({'error': 'Invalid token'}, status=status.HTTP_401_UNAUTHORIZED)
+        except Signup.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class ChangeName(APIView):
+    def post(self, request):
+        try:
+            access_token = request.headers.get('Authorization')
+            if access_token:
+                jwt_token = access_token.split()[1]
+
+                decoded_token = jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=['HS256'])
+                user_id = decoded_token.get('user_id')
+
+                user = Signup.objects.get(pk=user_id)
+                serializer = ChangeNameSerializer(data=request.data)
+                if serializer.is_valid():
+                    # Update the user's name
+                    new_name = serializer.validated_data.get('name')
+                    user.full_name = new_name
+                    user.save()
+                    
+                    return Response({'message': 'Username changed successfully'}, status=status.HTTP_200_OK)
+                else:
+                    # Return validation errors
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         except jwt.ExpiredSignatureError:
             return Response({'error': 'Token has expired'}, status=status.HTTP_401_UNAUTHORIZED)

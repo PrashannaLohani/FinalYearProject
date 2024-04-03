@@ -14,12 +14,15 @@ import {
   Link,
   Text,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import Sidebar from "../Layout/Sidebar";
 import { useUserInfo } from "../Components/UserInfo";
 import Logout from "../Components/Logout";
 import Delete from "../Components/DeleteUser";
 import ChangePassword from "../Components/ChangePassword";
+import { useState } from "react";
+import axios from "axios";
 
 export default function Setting() {
   return (
@@ -32,6 +35,67 @@ export default function Setting() {
   );
 }
 const Content = () => {
+  const [newName, setNewName] = useState("");
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const toast = useToast();
+  const SuccessToast = () => {
+    toast({
+      title: "Username Updated.",
+      description:
+        "Your username will be change after another successful login.",
+      status: "success",
+      duration: 9000,
+      isClosable: true,
+    });
+  };
+
+  const handleChange = (event) => {
+    // Update the newName state with the value entered in the input field
+    setNewName(event.target.value);
+  };
+  const handleNameChange = async () => {
+    try {
+      setIsLoading(true);
+
+      const token = localStorage.getItem("accessToken");
+
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+      // Make a POST request to update the user's name
+      const response = await axios.post(
+        "http://127.0.0.1:8000/change-name/",
+        {
+          name: newName,
+        },
+        { headers }
+      );
+
+      // Check if response is defined and has a data property
+      if (response && response.data) {
+        SuccessToast();
+
+        // Update the UI or perform any other actions after successful name change
+      } else {
+        // Handle case where response is undefined or does not have a data property
+        console.error(
+          "Response is undefined or does not have a data property:",
+          response
+        );
+      }
+
+      setIsLoading(false);
+    } catch (error) {
+      setError(
+        error.response?.data?.message ||
+          "An error occurred while processing the request"
+      );
+      setIsLoading(false);
+    }
+  };
   const userInfo = useUserInfo();
   const { full_name, email } = userInfo || {};
   const {
@@ -87,8 +151,20 @@ const Content = () => {
             </h2>
             <AccordionPanel pb={4}>
               <Flex gap="1rem" flexDir="column">
-                <Input variant="filled" placeholder={full_name} maxW="20rem" />
-                <Button colorScheme="blackAlpha" bgColor="black" maxW="10rem">
+                <Input
+                  variant="filled"
+                  placeholder="New name"
+                  value={newName}
+                  onChange={handleChange}
+                  maxW="20rem"
+                />
+                <Button
+                  colorScheme="blackAlpha"
+                  bgColor="black"
+                  onClick={handleNameChange}
+                  isLoading={isLoading}
+                  maxW="10rem"
+                >
                   Save
                 </Button>
               </Flex>
