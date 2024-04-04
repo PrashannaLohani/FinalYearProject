@@ -139,8 +139,9 @@ class DeleteAPI(APIView):
                 if serializer.is_valid():
                     if serializer.validated_data.get('delete'):
                         user.delete()
-
-                    return Response({"message": "Account deleted successfully."}, status=status.HTTP_200_OK)
+                        return Response({"message": "Account deleted successfully."}, status=status.HTTP_200_OK)
+                    else:
+                        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
                 else:
                     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             else:

@@ -1,3 +1,6 @@
+import React, { useEffect, useState } from "react";
+import { useUserInfo } from "./UserInfo";
+import axios from "axios";
 import {
   AlertDialog,
   AlertDialogBody,
@@ -7,16 +10,33 @@ import {
   AlertDialogOverlay,
   Button,
   Input,
+  useToast,
 } from "@chakra-ui/react";
-
-import React, { useEffect, useState } from "react";
-import { useUserInfo } from "./UserInfo";
 
 export default function Delete({ isOpen, onClose }) {
   const userInfo = useUserInfo();
   const { email } = userInfo || {};
   const [inputValue, setInputValue] = useState("");
   const [isDeleteEnabled, setIsDeleteEnabled] = useState(false);
+  const [error, setError] = useState(null);
+  const toast = useToast();
+
+  const handleDeleteClick = () => {
+    window.location.href = "/"; // Assuming this redirects to the homepage
+  };
+
+  const handleDeleteToast = () => {
+    const successPromise = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve();
+      }, 5000);
+    });
+    toast.promise(successPromise, {
+      success: { title: "Delete Successful.", description: "Welcome." },
+      loading: { title: "Deleting data...", description: "GOODBYE...!" },
+      error: { title: "Delete failed", description: "Something went wrong" },
+    });
+  };
 
   useEffect(() => {
     setIsDeleteEnabled(inputValue === email);
@@ -27,8 +47,45 @@ export default function Delete({ isOpen, onClose }) {
     setInputValue(value);
   };
 
-  const handleDelete = () => {
-    // Handle delete action here
+  const handleDelete = async () => {
+    try {
+      const token = localStorage.getItem("accessToken");
+
+      const response = await axios.post(
+        "http://127.0.0.1:8000/delete/",
+        {
+          delete: true,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log(response.data);
+
+      if (response.data.message === "Account deleted successfully.") {
+        // Display success toast
+        handleDeleteToast();
+
+        // Remove tokens
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+
+        // Navigate to homepage after a delay
+        setTimeout(() => {
+          handleDeleteClick();
+        }, 3000);
+      } else {
+        // Handle unsuccessful deletion
+        // You may want to display an error message here
+      }
+    } catch (error) {
+      // Handle error
+      setError(error.message);
+    }
   };
 
   const cancelRef = React.useRef();

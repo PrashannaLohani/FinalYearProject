@@ -157,6 +157,7 @@ const Content = () => {
                   value={newName}
                   onChange={handleChange}
                   maxW="20rem"
+                  isRequired
                 />
                 <Button
                   colorScheme="blackAlpha"
