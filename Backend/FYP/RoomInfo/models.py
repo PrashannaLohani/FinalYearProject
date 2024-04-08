@@ -1,5 +1,6 @@
 from django.db import models
 from CRM.models import Signup
+from django.contrib.auth.models import User
 
 class Room(models.Model):
     room_id = models.CharField(max_length=100)
@@ -21,3 +22,10 @@ class Comments(models.Model):
 
     def __str__(self):
         return f"Comment on Room {self.room_id}"
+
+# class Participant(models.Model):
+#     room = models.ForeignKey(Room, on_delete=models.CASCADE)
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+#     def __str__(self):
+#         return f"{self.user.username} in {self.room.room_name}"

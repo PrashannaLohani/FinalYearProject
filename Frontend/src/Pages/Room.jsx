@@ -3,12 +3,14 @@ import {
   Button,
   Card,
   CardBody,
+  CardFooter,
   CardHeader,
   Flex,
   Heading,
   SimpleGrid,
   Text,
 } from "@chakra-ui/react";
+import { useState } from "react";
 import { FaHeart } from "react-icons/fa6";
 
 export default function Room() {
@@ -56,18 +58,27 @@ const RoomHeading = () => {
 };
 
 const CommentSection = () => {
+  const [cardDeprecated, setCardDeprecated] = useState(false);
+  const handleReadClick = () => {
+    setCardDeprecated(true);
+  };
+
   return (
     <>
       <Box mt="2rem" minH="100vh" p="2rem">
         <SimpleGrid
           columns={3}
           spacing="1rem"
-          minChildWidth="400px"
+          minChildWidth="200px"
           autoRows="auto"
         >
-          <Card maxW="30rem" bgColor="#FFE6E6">
+          <Card variant="outline" maxW="30rem" bgColor="#FFE6E6">
             <CardHeader>
-              <Flex alignItems="center" justifyContent="space-between">
+              <Flex
+                alignItems="center"
+                justifyContent="space-between"
+                flexWrap="wrap"
+              >
                 <Heading size="lg">User918</Heading>
                 <Flex alignItems="center" gap="5px">
                   <Text as="b">Upvote:</Text>
@@ -78,13 +89,28 @@ const CommentSection = () => {
               </Flex>
             </CardHeader>
             <CardBody>
-              <Text fontSize="md">
+              <Text
+                fontSize="md"
+                style={{
+                  textDecoration: cardDeprecated ? "line-through" : "none",
+                }}
+              >
                 Lorem, ipsum dolor sit amet consectetur adipisicing elit. Cum
                 quas aliquam, officiis alias neque excepturi. Eius atque amet
                 est, nihil reiciendis sapiente blanditiis rerum a hic?
                 Distinctio optio ipsa nostrum!
               </Text>
             </CardBody>
+            <CardFooter>
+              <Button
+                colorScheme="blackALpha"
+                onClick={handleReadClick}
+                isDisabled={cardDeprecated}
+                bgColor="black"
+              >
+                Read
+              </Button>
+            </CardFooter>
           </Card>
         </SimpleGrid>
       </Box>
