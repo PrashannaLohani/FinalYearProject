@@ -17,6 +17,7 @@ import EmailVerification from "./Pages/Forget Password/EmailVerification";
 import UpdatePassword from "./Pages/Forget Password/UpdatePassword";
 import Setting from "./Pages/Setting";
 import Billing from "./Pages/Billing";
+import Room from "./Pages/Room";
 
 function App() {
   const router = createBrowserRouter(
@@ -35,6 +36,7 @@ function App() {
         <Route path="/" element={<RootLayout />}>
           <Route path="/Info" element={<Info />} />
           <Route path="/CreateRoom" element={<CreateRoom />} />
+          <Route path="/Room" element={<Room />} />
           <Route path="/Setting" element={<Setting />} />
           <Route path="/Billing" element={<Billing />} />
           <Route Component={Error} />
