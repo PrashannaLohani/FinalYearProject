@@ -6,9 +6,17 @@ import {
   FormLabel,
   Heading,
   Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  useDisclosure,
 } from "@chakra-ui/react";
-import { Field, Formik } from "formik";
-import { Form } from "react-router-dom";
+
+import { useState } from "react";
 
 export default function CreateRoom() {
   return (
@@ -29,8 +37,55 @@ export default function CreateRoom() {
     </>
   );
 }
+const RoomModal = ({ isOpen, onClose }) => {
+  const handleMenuItemClick = (targetPage) => {
+    window.location.href = targetPage;
+  };
+  return (
+    <>
+      <Modal
+        isCentered
+        closeOnOverlayClick={false}
+        isOpen={isOpen}
+        onClose={onClose}
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Room Created</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={6}>
+            <Flex alignItems="center" justifyContent="center" flexDir="column">
+              <Heading size="lg">Your Room Code:</Heading>
+              <Heading size="2xl" mt="1rem">
+                123456
+              </Heading>
+            </Flex>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button
+              colorScheme="blackAlpha"
+              bgColor="black"
+              mr={3}
+              onClick={() => handleMenuItemClick("#")}
+            >
+              Enter
+            </Button>
+            <Button onClick={onClose}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+};
 
 const RoomForm = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleCreateButtonClick = () => {
+    // Open the modal
+    setIsModalOpen(true);
+  };
   return (
     <>
       <Heading m="1rem">Create Room</Heading>
@@ -38,6 +93,8 @@ const RoomForm = () => {
         <Flex flexDir="column">
           <FormLabel>Room title:</FormLabel>
           <Input placeholder="Title" minW="10rem" maxW="20rem" isRequired />
+          <FormLabel mt="1rem">Number of participants:</FormLabel>
+          <Input type="number" minW="5rem" maxW="10rem" isRequired />
           <FormLabel mt="1rem">Room code:</FormLabel>
           <Input
             placeholder="XXXXXX"
@@ -47,6 +104,7 @@ const RoomForm = () => {
             isReadOnly
           />
           <Button
+            onClick={handleCreateButtonClick} // Open modal on button click
             mt="1rem"
             maxW="10rem"
             bgColor="black"
@@ -56,6 +114,7 @@ const RoomForm = () => {
           </Button>
         </Flex>
       </FormControl>
+      <RoomModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </>
   );
 };
@@ -67,7 +126,12 @@ const JoinRoom = () => {
       <FormControl m="1rem">
         <Flex flexDir="column">
           <FormLabel>Enter room code:</FormLabel>
-          <Input maxW="20rem" type="text" placeholder="XXXXXX" />
+          <Input
+            maxW="20rem"
+            type="number"
+            maxLength={6}
+            placeholder="XXXXXX"
+          />
           <Button
             mt="2rem"
             maxW="10rem"
