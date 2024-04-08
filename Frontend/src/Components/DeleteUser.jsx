@@ -33,7 +33,7 @@ export default function Delete({ isOpen, onClose }) {
     });
     toast.promise(successPromise, {
       success: { title: "Delete Successful.", description: "Welcome." },
-      loading: { title: "Deleting data...", description: "GOODBYE...!" },
+      loading: { title: "Deleting data...", description: "Hold on...!" },
       error: { title: "Delete failed", description: "Something went wrong" },
     });
   };

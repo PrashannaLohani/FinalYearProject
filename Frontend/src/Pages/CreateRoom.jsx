@@ -3,11 +3,9 @@ import {
   Button,
   Flex,
   FormControl,
-  FormErrorMessage,
   FormLabel,
   Heading,
   Input,
-  Text,
 } from "@chakra-ui/react";
 import { Field, Formik } from "formik";
 import { Form } from "react-router-dom";
@@ -37,14 +35,26 @@ const RoomForm = () => {
     <>
       <Heading m="1rem">Create Room</Heading>
       <FormControl m="1rem">
-        <FormLabel>Room title:</FormLabel>
-        <FormLabel>Room Type:</FormLabel>
-        <FormLabel>##:</FormLabel>
-        <FormLabel>Number of participants:</FormLabel>
-        <FormLabel>Room code:</FormLabel>
-        <Button mt="2rem" bgColor="black" colorScheme="blackAlpha">
-          Create
-        </Button>
+        <Flex flexDir="column">
+          <FormLabel>Room title:</FormLabel>
+          <Input placeholder="Title" minW="10rem" maxW="20rem" isRequired />
+          <FormLabel mt="1rem">Room code:</FormLabel>
+          <Input
+            placeholder="XXXXXX"
+            minW="10rem"
+            maxW="20rem"
+            isRequired
+            isReadOnly
+          />
+          <Button
+            mt="1rem"
+            maxW="10rem"
+            bgColor="black"
+            colorScheme="blackAlpha"
+          >
+            Create
+          </Button>
+        </Flex>
       </FormControl>
     </>
   );
@@ -55,13 +65,18 @@ const JoinRoom = () => {
     <>
       <Heading m="1rem">Join Room</Heading>
       <FormControl m="1rem">
-        <Flex alignItems="center">
+        <Flex flexDir="column">
           <FormLabel>Enter room code:</FormLabel>
           <Input maxW="20rem" type="text" placeholder="XXXXXX" />
+          <Button
+            mt="2rem"
+            maxW="10rem"
+            bgColor="black"
+            colorScheme="blackAlpha"
+          >
+            Enter
+          </Button>
         </Flex>
-        <Button mt="2rem" bgColor="black" colorScheme="blackAlpha">
-          Enter
-        </Button>
       </FormControl>
     </>
   );
