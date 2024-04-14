@@ -19,7 +19,15 @@ class RoomAPI(APIView):
                 room = Room.objects.create(room_id=room_id,room_name=room_name,limit_people_num=limit_people_num)
                 room.save()
 
-                token = jwt.encode({'room_id': room_id}, settings.SECRET_KEY, algorithm='HS256')
-                return Response({'token': token, 'ID':room_id,'name':room_name}, status=status.HTTP_201_CREATED)
+                token = jwt.encode({'room_id': room_id,'room_name':room_name,'limit_people_num':limit_people_num}, settings.SECRET_KEY, algorithm='HS256')
+                return Response({'token': token, 'ID':room_id,'name':room_name,'People Limitation':limit_people_num}, status=status.HTTP_201_CREATED)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def get(self, request, format=None):
+        if request.method == 'GET':
+            rooms = Room.objects.all()
+            room_data = [{'room_id': room.room_id, 'room_name': room.room_name} for room in rooms]
+            return Response(room_data, status=status.HTTP_200_OK)
+        else:
+            return Response( status=status.HTTP_400_BAD_REQUEST)

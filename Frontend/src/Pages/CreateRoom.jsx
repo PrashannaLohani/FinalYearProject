@@ -3,6 +3,7 @@ import {
   Button,
   Flex,
   FormControl,
+  FormHelperText,
   FormLabel,
   Heading,
   Input,
@@ -13,10 +14,11 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  useDisclosure,
 } from "@chakra-ui/react";
-
+import { Formik, Form, Field, ErrorMessage } from "formik";
 import { useState } from "react";
+import axios from "axios";
+import Room from "./Room";
 
 export default function CreateRoom() {
   return (
@@ -37,9 +39,9 @@ export default function CreateRoom() {
     </>
   );
 }
-const RoomModal = ({ isOpen, onClose }) => {
-  const handleMenuItemClick = (targetPage) => {
-    window.location.href = targetPage;
+const RoomModal = ({ isOpen, onClose, roomId, roomName }) => {
+  const handleMenuItemClick = () => {
+    window.location.href = `/Room?roomId=${roomId}&roomName=${roomName}`;
   };
   return (
     <>
@@ -57,7 +59,7 @@ const RoomModal = ({ isOpen, onClose }) => {
             <Flex alignItems="center" justifyContent="center" flexDir="column">
               <Heading size="lg">Your Room Code:</Heading>
               <Heading size="2xl" mt="1rem">
-                123456
+                {roomId}
               </Heading>
             </Flex>
           </ModalBody>
@@ -67,11 +69,10 @@ const RoomModal = ({ isOpen, onClose }) => {
               colorScheme="blackAlpha"
               bgColor="black"
               mr={3}
-              onClick={() => handleMenuItemClick("#")}
+              onClick={() => handleMenuItemClick("/Room")}
             >
               Enter
             </Button>
-            <Button onClick={onClose}>Cancel</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -80,41 +81,106 @@ const RoomModal = ({ isOpen, onClose }) => {
 };
 
 const RoomForm = () => {
+  const [roomId, setRoomId] = useState(null);
+  const [roomName, setRoomName] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleCreateButtonClick = () => {
-    // Open the modal
-    setIsModalOpen(true);
-  };
   return (
     <>
       <Heading m="1rem">Create Room</Heading>
-      <FormControl m="1rem">
-        <Flex flexDir="column">
-          <FormLabel>Room title:</FormLabel>
-          <Input placeholder="Title" minW="10rem" maxW="20rem" isRequired />
-          <FormLabel mt="1rem">Number of participants:</FormLabel>
-          <Input type="number" minW="5rem" maxW="10rem" isRequired />
-          <FormLabel mt="1rem">Room code:</FormLabel>
-          <Input
-            placeholder="XXXXXX"
-            minW="10rem"
-            maxW="20rem"
-            isRequired
-            isReadOnly
-          />
-          <Button
-            onClick={handleCreateButtonClick} // Open modal on button click
-            mt="1rem"
-            maxW="10rem"
-            bgColor="black"
-            colorScheme="blackAlpha"
-          >
-            Create
-          </Button>
-        </Flex>
-      </FormControl>
-      <RoomModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <Formik
+        initialValues={{
+          roomTitle: "",
+          numOfParticipants: "",
+        }}
+        validate={(values) => {
+          const errors = {};
+          if (!values.roomTitle) {
+            errors.roomTitle = "Required";
+          }
+          return errors;
+        }}
+        onSubmit={async (values, { setSubmitting }) => {
+          try {
+            const response = await axios.post(
+              "http://127.0.0.1:8000/room/createroom/",
+              {
+                room_name: values.roomTitle,
+                limit_people_num: values.numOfParticipants,
+              }
+            );
+            // Save JWT token to localStorage
+            localStorage.setItem("Roomtoken", response.data.token);
+            setRoomId(response.data.ID);
+            setRoomName(response.data.name);
+            setIsModalOpen(true);
+            console.log("Room created:", response.data);
+          } catch (error) {
+            console.error("Error creating room:", error);
+          } finally {
+            setSubmitting(false);
+          }
+        }}
+      >
+        {({ isSubmitting }) => (
+          <Form>
+            <FormControl m="1rem">
+              <Flex flexDir="column">
+                <FormLabel>Room title:</FormLabel>
+                <Field name="roomTitle">
+                  {({ field }) => (
+                    <Input
+                      {...field}
+                      placeholder="Title"
+                      minW="10rem"
+                      maxW="20rem"
+                    />
+                  )}
+                </Field>
+                <ErrorMessage
+                  name="roomTitle"
+                  component="div"
+                  style={{ color: "red" }}
+                />
+
+                <FormLabel mt="1rem">Number of participants:</FormLabel>
+                <Field name="numOfParticipants">
+                  {({ field }) => (
+                    <>
+                      <Input
+                        {...field}
+                        type="number"
+                        minW="5rem"
+                        maxW="10rem"
+                      />
+                      <FormHelperText>
+                        If you don't want to put a limitation, leave it blank.
+                      </FormHelperText>
+                    </>
+                  )}
+                </Field>
+
+                <Button
+                  type="submit"
+                  mt="1rem"
+                  maxW="10rem"
+                  bgColor="black"
+                  colorScheme="blackAlpha"
+                  isLoading={isSubmitting}
+                >
+                  Create
+                </Button>
+              </Flex>
+            </FormControl>
+          </Form>
+        )}
+      </Formik>
+      <RoomModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        roomId={roomId}
+        roomName={roomName}
+      />
     </>
   );
 };
