@@ -1,12 +1,12 @@
-# from rest_framework import serializers
-# from .models import Room, Participant
-# class RoomSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Room
-#         fields = ['room_id', 'room_name', 'num_of_people', 'created_at', 'created_by']
+from rest_framework import serializers
+from .models import Room
 
 
-# class ParticipantSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Participant
-#         fields = ['room', 'user']
+class RoomSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Room
+        fields = ['room_id', 'room_name', 'limit_people_num']  
+        read_only_fields = ['room_id']  # Make 'room_id' read-only
+
+    def create(self, validated_data):
+        return Room.objects.create(**validated_data)

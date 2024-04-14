@@ -21,5 +21,7 @@ urlpatterns = [
     ## Account handling
     path('get-csrf-token/<str:token_type>/', utils.get_csrf_token, name='get_csrf_token'),
     path('accounts/', include('django.contrib.auth.urls')),
+
+    path('room/', include('RoomInfo.urls'))
 ]
 

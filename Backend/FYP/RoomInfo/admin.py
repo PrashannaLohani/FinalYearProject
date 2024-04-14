@@ -3,8 +3,9 @@ from .models import Room
 from .models import Comments
 
 class RoomAdmin(admin.ModelAdmin):
-    list_display = ('room_id', 'room_name', 'num_of_people', 'num_of_comments', 'created_at','created_by')
+    list_display = ('room_id', 'room_name', 'num_of_people','limit_people_num', 'num_of_comments', 'created_at')
     search_fields = ('room_id', 'room_name')  # Enable searching by these fields
+    readonly_fields = ('room_id',)
 
 admin.site.register(Room, RoomAdmin)
 
