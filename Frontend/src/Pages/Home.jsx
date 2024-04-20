@@ -9,6 +9,7 @@ import {
   Input,
   SimpleGrid,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 
 import { Formik, useFormik } from "formik";
@@ -16,7 +17,7 @@ import ContactForm from "../Components/Contact";
 import HomepageNav from "../Layout/Homepage/HomepageNavbar";
 import HomepageFooter from "../Layout/Homepage/HomepageFooter";
 import { FaUserGroup, FaChartLine, FaStairs } from "react-icons/fa6";
-import { useEffect, useRef } from "react";
+import axios from "axios";
 
 export default function Home() {
   // const textRef = useRef(null);
@@ -46,6 +47,22 @@ export default function Home() {
 }
 
 const Section1 = () => {
+  const toast = useToast();
+  const handleEntry = () => {
+    const successPromise = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve();
+      }, 5000);
+    });
+    toast.promise(successPromise, {
+      success: { title: "Room Entered", description: "Welcome." },
+      loading: { title: "Entering room...", description: "Please wait" },
+      error: { title: "Login failed", description: "Something went wrong" },
+    });
+  };
+  const handleEnterClick = (targetPage) => {
+    window.location.href = targetPage;
+  };
   const initialValues = {
     roomCode: "",
   };
@@ -59,9 +76,27 @@ const Section1 = () => {
       }
       return errors;
     },
-    onSubmit: (values) => {
-      // Handle form submission with validated values
-      console.log(values); // Example: { roomCode: 12345 }
+    onSubmit: async (values) => {
+      try {
+        const response = await axios.post(
+          "http://127.0.0.1:8000/room/joinroom/",
+          {
+            room_code: values.roomCode,
+          }
+        );
+        handleEntry();
+        setTimeout(() => {
+          handleEnterClick("/ParticipantRoom");
+        }, 5500);
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: error.response.data.error,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      }
     },
   });
   return (
@@ -116,7 +151,8 @@ const Section1 = () => {
                     bg="white"
                     mx="2rem"
                     minW="15rem"
-                    onChange={handleChange}
+                    onChange={formik.handleChange}
+                    name="roomCode" // Add the name attribute
                     style={
                       errors.roomCode && touched.roomCode
                         ? { borderColor: "red" }
@@ -131,8 +167,8 @@ const Section1 = () => {
                   <Button
                     minW="5rem"
                     colorScheme="whiteAlpha"
-                    onClick={handleSubmit}
-                    disabled={formik.isSubmitting} // Disable button while submitting
+                    onClick={formik.handleSubmit}
+                    isLoading={formik.isSubmitting} // Disable button while submitting
                   >
                     Join
                   </Button>
