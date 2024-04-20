@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Room
+from .models import Room,Comments
 
 
 class RoomSerializer(serializers.ModelSerializer):
@@ -13,3 +13,8 @@ class RoomSerializer(serializers.ModelSerializer):
     
 class JoinSerializer(serializers.Serializer):
     room_code = serializers.IntegerField()
+
+class CommentSerializer(serializers.Serializer):
+    room = serializers.IntegerField()
+    user = serializers.CharField(max_length=255)
+    message = serializers.CharField(max_length=500)

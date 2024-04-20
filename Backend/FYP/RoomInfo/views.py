@@ -2,11 +2,12 @@
 import jwt
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import RoomSerializer, JoinSerializer
+from .serializers import RoomSerializer, JoinSerializer,CommentSerializer
 from rest_framework import status
 from FYP import settings
 import random
-from .models import Room
+import string
+from .models import Room,Comments
 
 
 
@@ -43,12 +44,60 @@ class JoinAPI(APIView):
                 room_code = serializer.validated_data.get('room_code')
                 try:
                     room = Room.objects.get(room_id=room_code)
+                    username = self.generate_random_username()
                     # Room exists, do something with the room
-                    return Response({'message': 'Room exists'}, status=status.HTTP_200_OK)
+                    token = jwt.encode({'username': username,'room':room_code}, settings.SECRET_KEY, algorithm='HS256')
+                    return Response({'token': token, 'username':username,'room':room_code}, status=status.HTTP_201_CREATED)
                 except Room.DoesNotExist:
                     # Room does not exist
                     return Response({'error': 'Room does not exist'}, status=status.HTTP_404_NOT_FOUND)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
     
+    def generate_random_username(self):
+        # Generate a random string of 3 digits
+        random_suffix = ''.join(random.choices(string.digits, k=4))
+        # Combine with a base string 'user'
+        return f"User{random_suffix}"
+    
+class DecodeUserTokenAPI(APIView):
+    def post(self, request):
+        if request.method == 'POST':
+            token = request.data.get('token')
+            if not token:
+                return Response({'error': 'Token not provided'}, status=status.HTTP_400_BAD_REQUEST)
+            try:
+                decoded_token = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
+                username = decoded_token.get('username')
+                room_code = decoded_token.get('room')
+                # Additional information from the token can be extracted here
+                return Response({'username': username, 'room': room_code}, status=status.HTTP_200_OK)
+            except jwt.ExpiredSignatureError:
+                return Response({'error': 'Token has expired'}, status=status.HTTP_401_UNAUTHORIZED)
+            except jwt.InvalidTokenError:
+                return Response({'error': 'Invalid token'}, status=status.HTTP_401_UNAUTHORIZED)
+            
+
+class CommentAPI(APIView):
+    def post(self, request):
+        if request.method == 'POST':
+            serializer = CommentSerializer(data=request.data)
+            if serializer.is_valid():
+                room = serializer.validated_data['room']  # Use square brackets to access dictionary key
+                user = serializer.validated_data.get('user')
+                message = serializer.validated_data['message']  # Use square brackets to access dictionary key
+                
+                # Save the comment to the database
+                comment = Comments.objects.create(user=user, room=room, message=message)  # Added 'room' field
+                
+                # Return a success response
+                return Response({'message': 'Comment posted successfully'}, status=status.HTTP_201_CREATED)
+            else:
+                # Return validation errors
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+    def get(self, request):
+        if request.method == 'GET':
+            comments = Comments.objects.all()
+            serializer = CommentSerializer(comments, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)

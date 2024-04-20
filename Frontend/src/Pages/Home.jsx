@@ -84,6 +84,8 @@ const Section1 = () => {
             room_code: values.roomCode,
           }
         );
+        localStorage.setItem("username", response.data.username);
+        localStorage.setItem("User-Token", response.data.token);
         handleEntry();
         setTimeout(() => {
           handleEnterClick("/ParticipantRoom");

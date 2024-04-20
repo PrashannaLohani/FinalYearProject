@@ -10,7 +10,10 @@ class RoomAdmin(admin.ModelAdmin):
 admin.site.register(Room, RoomAdmin)
 
 class CommentsAdmin(admin.ModelAdmin):
-    list_display = ('room', 'no_of_comment', 'comments','upvoted_comments')
-    search_fields = ('room','comments','upvoted_comments',)
+    list_display = ('room','user','message')
+    search_fields = ('room',)
+
+    def Read(self, obj):
+        return obj.read
 
 admin.site.register(Comments, CommentsAdmin) 

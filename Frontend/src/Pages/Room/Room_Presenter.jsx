@@ -11,8 +11,8 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { FaHeart } from "react-icons/fa6";
 import { useLocation } from "react-router-dom";
+import axios from "axios";
 
 export default function RoomPresenter() {
   const location = useLocation();
@@ -44,6 +44,7 @@ export default function RoomPresenter() {
 const RoomCode = ({ roomId }) => {
   const handleClick = () => {
     localStorage.removeItem("Roomtoken");
+    localStorage.removeItem("username");
     window.location.href = "/info";
   };
   return (
@@ -73,34 +74,50 @@ const RoomHeading = () => {
 };
 
 const CommentSection = () => {
-  const [cardDeprecated, setCardDeprecated] = useState(false);
-  const handleReadClick = () => {
-    setCardDeprecated(true);
+  const [comments, setComments] = useState([]);
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const response = await axios.get(
+          "http://127.0.0.1:8000/room/comments/"
+        );
+        setComments(response.data); // Assuming the response is an array of comments
+      } catch (error) {
+        console.error("Error fetching comments:", error);
+      }
+    };
+
+    fetchComments();
+  }, []); // Fetch comments when the component mounts
+
+  const handleReadClick = (index) => {
+    const updatedComments = [...comments];
+    updatedComments[index].isRead = !updatedComments[index].isRead;
+    setComments(updatedComments);
   };
 
   return (
-    <>
-      <Box mt="2rem" minH="100vh" p="2rem">
-        <SimpleGrid
-          columns={3}
-          spacing="1rem"
-          minChildWidth="200px"
-          autoRows="auto"
-        >
-          <Card variant="outline" maxW="30rem" bgColor="#FFE6E6">
+    <Box mt="2rem" minH="100vh" p="2rem">
+      <SimpleGrid
+        columns={3}
+        spacing="1rem"
+        minChildWidth="400px"
+        autoRows="auto"
+      >
+        {comments.map((comment, index) => (
+          <Card key={index} variant="outline" maxW="30rem" bgColor="#FFE6E6">
             <CardHeader>
               <Flex
                 alignItems="center"
                 justifyContent="space-between"
                 flexWrap="wrap"
               >
-                <Heading size="lg">User918</Heading>
+                <Heading size="lg">{comment.user}</Heading>
                 <Flex alignItems="center" gap="5px">
                   <Text as="b">Upvote:</Text>
-                  <Text>3</Text>
-                  {/* <Button bgColor="black">
-                    <FaHeart style={{ color: "white" }} />
-                  </Button> */}
+                  <Text>#</Text>{" "}
+                  {/* Assuming each comment has an 'upvotes' property */}
                 </Flex>
               </Flex>
             </CardHeader>
@@ -108,28 +125,24 @@ const CommentSection = () => {
               <Text
                 fontSize="md"
                 style={{
-                  textDecoration: cardDeprecated ? "line-through" : "none",
+                  textDecoration: comment.isRead ? "line-through" : "none",
                 }}
               >
-                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Cum
-                quas aliquam, officiis alias neque excepturi. Eius atque amet
-                est, nihil reiciendis sapiente blanditiis rerum a hic?
-                Distinctio optio ipsa nostrum!
+                {comment.message}
               </Text>
             </CardBody>
             <CardFooter>
               <Button
-                colorScheme="blackALpha"
-                onClick={handleReadClick}
-                isDisabled={cardDeprecated}
+                colorScheme="blackAlpha"
+                onClick={() => handleReadClick(index)}
                 bgColor="black"
               >
-                Read
+                {comment.isRead ? "Unread" : "Read"}
               </Button>
             </CardFooter>
           </Card>
-        </SimpleGrid>
-      </Box>
-    </>
+        ))}
+      </SimpleGrid>
+    </Box>
   );
 };

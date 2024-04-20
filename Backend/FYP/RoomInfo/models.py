@@ -15,11 +15,9 @@ class Room(models.Model):
         return self.room_name
     
 class Comments(models.Model):
-    room = models.ForeignKey('RoomInfo.Room', on_delete=models.CASCADE, default= None)
-    no_of_comment = models.IntegerField(default=0)
-    comments = models.CharField(max_length = 255)
-    no_upvoted_comments = models.IntegerField(default=0)
-    upvoted_comments = models.CharField(max_length = 225, default ='')
+    room = models.CharField(default=None)
+    user = models.CharField(default=None,max_length=255)
+    message = models.CharField(max_length=500, default=None)
 
     def __str__(self):
-        return f"Comment on Room {self.room_id}"
+        return self.room
