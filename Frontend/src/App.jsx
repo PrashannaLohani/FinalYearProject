@@ -3,6 +3,8 @@ import {
   RouterProvider,
   createBrowserRouter,
   createRoutesFromElements,
+  useLocation,
+  useNavigate,
 } from "react-router-dom";
 import RootLayout from "./Layout/RootLayout";
 import Home from "./Pages/Home";
@@ -12,12 +14,14 @@ import Error from "./Pages/Error";
 import Info from "./Pages/Info";
 import Privacy from "./Pages/Privacy";
 import Terms from "./Pages/terms&service";
-import CreateRoom from "./Pages/CreateRoom";
+import CreateRoom from "./Pages/Room/CreateRoom";
 import EmailVerification from "./Pages/Forget Password/EmailVerification";
 import UpdatePassword from "./Pages/Forget Password/UpdatePassword";
 import Setting from "./Pages/Setting";
 import Billing from "./Pages/Billing";
-import Room from "./Pages/Room";
+import ParticipantRoom from "./Pages/Room/Room_Participants";
+import RoomPresenter from "./Pages/Room/Room_Presenter";
+import { useState } from "react";
 
 function App() {
   const router = createBrowserRouter(
@@ -36,7 +40,8 @@ function App() {
         <Route path="/" element={<RootLayout />}>
           <Route path="/Info" element={<Info />} />
           <Route path="/CreateRoom" element={<CreateRoom />} />
-          <Route path="/Room" element={<Room />} />
+          <Route path="/RoomPresenter" element={<RoomPresenter />} />
+          <Route path="/ParticipantRoom" element={<ParticipantRoom />} />
           <Route path="/Setting" element={<Setting />} />
           <Route path="/Billing" element={<Billing />} />
           <Route Component={Error} />

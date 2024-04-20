@@ -7,6 +7,8 @@ from rest_framework import status
 from FYP import settings
 import random
 from .models import Room
+from django.contrib.auth.decorators import login_required
+
 
 class RoomAPI(APIView):
     def post(self, request, format=None):
@@ -18,9 +20,10 @@ class RoomAPI(APIView):
                 room_id = ''.join([str(random.randint(0, 9)) for _ in range(6)])  # Generate room ID
                 room = Room.objects.create(room_id=room_id,room_name=room_name,limit_people_num=limit_people_num)
                 room.save()
+                total_rooms = Room.objects.count()
 
                 token = jwt.encode({'room_id': room_id,'room_name':room_name,'limit_people_num':limit_people_num}, settings.SECRET_KEY, algorithm='HS256')
-                return Response({'token': token, 'ID':room_id,'name':room_name,'People Limitation':limit_people_num}, status=status.HTTP_201_CREATED)
+                return Response({'token': token, 'ID':room_id,'name':room_name,'People Limitation':limit_people_num, 'total_rooms': total_rooms}, status=status.HTTP_201_CREATED)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
@@ -31,3 +34,6 @@ class RoomAPI(APIView):
             return Response(room_data, status=status.HTTP_200_OK)
         else:
             return Response( status=status.HTTP_400_BAD_REQUEST)
+        
+class JoinAPI(APIView):
+    pass

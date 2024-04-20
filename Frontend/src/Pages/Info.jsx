@@ -17,7 +17,7 @@ import { FaPlus } from "react-icons/fa6";
 import BarGraph from "../Components/BarGraph";
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
-import CreateRoom from "./CreateRoom";
+import CreateRoom from "./Room/CreateRoom";
 
 export default function Info() {
   const userInfo = useUserInfo();

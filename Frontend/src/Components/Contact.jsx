@@ -10,7 +10,9 @@ import {
   Box,
   Heading,
   FormErrorMessage,
+  useToast,
 } from "@chakra-ui/react";
+import axios from "axios";
 
 const ContactForm = () => {
   const initialValues = {
@@ -18,10 +20,31 @@ const ContactForm = () => {
     email: "",
     message: "",
   };
+  const toast = useToast();
+  const SuccessToast = () => {
+    toast({
+      title: "Email sent.",
+      description: "Thank you for the feedback!",
+      status: "success",
+      duration: 9000,
+      isClosable: true,
+    });
+  };
 
-  const handleSubmit = (values, actions) => {
-    console.log(values);
-    actions.setSubmitting(false);
+  const handleSubmit = async (values, actions) => {
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:8000/contact-us/",
+        values
+      );
+      actions.resetForm();
+      SuccessToast();
+
+      actions.setSubmitting(false);
+    } catch (error) {
+      console.error("Error:", error); // Handle error
+      actions.setSubmitting(false);
+    }
   };
 
   const validateForm = (values) => {

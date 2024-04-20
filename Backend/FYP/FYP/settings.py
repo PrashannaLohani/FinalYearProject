@@ -180,3 +180,4 @@ EMAIL_HOST_USER = 'reactrise23@gmail.com'
 DEFAULT_FROM_EMAIL = 'reactrise23@gmail.com'
 EMAIL_HOST_PASSWORD = 'kgjy wquv ojjk lnye'
 EMAIL_DEBUG = True
+CONTACT_EMAIL ='reactrise23@gmail.com'

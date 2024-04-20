@@ -1,6 +1,6 @@
 from django.db import models
 from CRM.models import Signup
-from django.contrib.auth.models import User
+
 
 class Room(models.Model):
     room_id = models.CharField(editable=False)
@@ -8,7 +8,7 @@ class Room(models.Model):
     limit_people_num =  models.IntegerField(default=9999)
     num_of_people = models.IntegerField(default=0)
     num_of_comments = models.IntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True) 
     
 
     def __str__(self):

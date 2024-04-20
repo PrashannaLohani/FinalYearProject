@@ -76,6 +76,7 @@ class DeleteSerializer(serializers.Serializer):
         return data
     
 class ChangeNameSerializer(serializers.Serializer):
+
     name = serializers.CharField(max_length=50)
 
     def validate_name(self,value):
@@ -83,3 +84,11 @@ class ChangeNameSerializer(serializers.Serializer):
             raise serializers.ValidationError("Name must contain only letters.")
         
         return value
+    
+class ContactSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length = 255)
+    email = serializers.EmailField(max_length = 100)
+    message = serializers.CharField(max_length = 500)
+
+    def validate(self, attrs):
+        return attrs

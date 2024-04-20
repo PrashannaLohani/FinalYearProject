@@ -20,7 +20,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from FYP import settings
 from .models import Signup
-from .serializers import SignupSerializer, LoginSerializer, ForgetPasswordSerializer,ChangePasswordSerializer,DeleteSerializer,ChangeNameSerializer
+from .serializers import SignupSerializer, LoginSerializer, ForgetPasswordSerializer,ChangePasswordSerializer,DeleteSerializer,ChangeNameSerializer,ContactSerializer
 
 
 @api_view(['POST'])
@@ -86,6 +86,8 @@ class LoginAPI(APIView):
         else:
             # Invalid serializer data
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 class InfoAPI(APIView):
      def get(self, request):
         access_token = request.headers.get('Authorization')
@@ -287,3 +289,26 @@ class ChangeName(APIView):
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class Contactus(APIView):
+        def post(self, request):
+            try:
+                serializer = ContactSerializer(data=request.data)
+                if serializer.is_valid():
+                    validated_data = serializer.validated_data
+                    name = validated_data.get('name')
+                    email = validated_data.get('email')
+                    message = validated_data.get('message')
+                    
+                    subject = 'Contact Form Submission'
+                    message_body = f'Name: {name}\nEmail: {email}\nMessage: {message}'
+                    sender_email = email
+                    recipient_email = [settings.CONTACT_EMAIL]  # Assuming you have a setting for your contact email
+                    
+                    send_mail(subject, message_body, sender_email, recipient_email)
+                    
+                    return Response({'message': 'Contact form submitted successfully'}, status=status.HTTP_200_OK)
+                else:
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            except Exception as e:
+                return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

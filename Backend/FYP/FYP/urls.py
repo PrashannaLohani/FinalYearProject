@@ -16,6 +16,7 @@ urlpatterns = [
     path('update-password/<uidb64>/<token>/', views.ForgetPasswordView.as_view(), name='password'),
     path('change-password/', views.ChangePasswordView.as_view(), name='change_password'),
     path('change-name/', views.ChangeName.as_view(), name='change_name'),
+    path('contact-us/', views.Contactus.as_view(), name='contact_us'),
     path('info/', views.InfoAPI.as_view(), name='info'),
 
     ## Account handling

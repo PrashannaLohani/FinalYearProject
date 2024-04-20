@@ -18,7 +18,7 @@ import {
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { useState } from "react";
 import axios from "axios";
-import Room from "./Room";
+import RoomPresenter from "./Room_Presenter";
 
 export default function CreateRoom() {
   return (
@@ -41,7 +41,7 @@ export default function CreateRoom() {
 }
 const RoomModal = ({ isOpen, onClose, roomId, roomName }) => {
   const handleMenuItemClick = () => {
-    window.location.href = `/Room?roomId=${roomId}&roomName=${roomName}`;
+    window.location.href = `/RoomPresenter?roomId=${roomId}&roomName=${roomName}`;
   };
   return (
     <>
@@ -69,7 +69,7 @@ const RoomModal = ({ isOpen, onClose, roomId, roomName }) => {
               colorScheme="blackAlpha"
               bgColor="black"
               mr={3}
-              onClick={() => handleMenuItemClick("/Room")}
+              onClick={() => handleMenuItemClick(<RoomPresenter />)}
             >
               Enter
             </Button>
@@ -186,6 +186,9 @@ const RoomForm = () => {
 };
 
 const JoinRoom = () => {
+  const handleJoinClick = () => {
+    window.location.href = "/ParticipantRoom";
+  };
   return (
     <>
       <Heading m="1rem">Join Room</Heading>
@@ -203,6 +206,7 @@ const JoinRoom = () => {
             maxW="10rem"
             bgColor="black"
             colorScheme="blackAlpha"
+            onClick={handleJoinClick}
           >
             Enter
           </Button>

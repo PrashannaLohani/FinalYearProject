@@ -14,7 +14,7 @@ import { useEffect, useState } from "react";
 import { FaHeart } from "react-icons/fa6";
 import { useLocation } from "react-router-dom";
 
-export default function Room() {
+export default function RoomPresenter() {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const roomIdWithRoomName = searchParams.get("roomId");
