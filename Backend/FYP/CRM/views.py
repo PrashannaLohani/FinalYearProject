@@ -301,11 +301,11 @@ class Contactus(APIView):
                     message = validated_data.get('message')
                     
                     subject = 'Contact Form Submission'
-                    message_body = f'Name: {name}\nEmail: {email}\nMessage: {message}'
+                    message_body = f'{message}\nName: {name}\nEmail: {email}'
                     sender_email = email
                     recipient_email = [settings.CONTACT_EMAIL]  # Assuming you have a setting for your contact email
                     
-                    send_mail(subject, message_body, sender_email, recipient_email)
+                    send_mail(subject, message_body, sender_email, recipient_email, fail_silently=False)
                     
                     return Response({'message': 'Contact form submitted successfully'}, status=status.HTTP_200_OK)
                 else:

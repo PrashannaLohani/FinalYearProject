@@ -132,7 +132,7 @@ const ContactForm = () => {
                   colorScheme="blackAlpha"
                   bgColor="black"
                   isLoading={isSubmitting}
-                  loadingText="Submitting"
+                  loadingText="Sending"
                 >
                   Send
                 </Button>

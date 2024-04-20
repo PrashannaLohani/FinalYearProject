@@ -2,16 +2,16 @@
 import jwt
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import RoomSerializer
+from .serializers import RoomSerializer, JoinSerializer
 from rest_framework import status
 from FYP import settings
 import random
 from .models import Room
-from django.contrib.auth.decorators import login_required
+
 
 
 class RoomAPI(APIView):
-    def post(self, request, format=None):
+    def post(self, request):
         if request.method == 'POST':
             serializer = RoomSerializer(data=request.data)
             if serializer.is_valid():
@@ -27,7 +27,7 @@ class RoomAPI(APIView):
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    def get(self, request, format=None):
+    def get(self, request):
         if request.method == 'GET':
             rooms = Room.objects.all()
             room_data = [{'room_id': room.room_id, 'room_name': room.room_name} for room in rooms]
@@ -36,4 +36,19 @@ class RoomAPI(APIView):
             return Response( status=status.HTTP_400_BAD_REQUEST)
         
 class JoinAPI(APIView):
-    pass
+    def post(self, request):
+        if request.method == 'POST':
+            serializer = JoinSerializer(data=request.data)
+            if serializer.is_valid():
+                room_code = serializer.validated_data.get('room_code')
+                try:
+                    room = Room.objects.get(room_id=room_code)
+                    # Room exists, do something with the room
+                    return Response({'message': 'Room exists'}, status=status.HTTP_200_OK)
+                except Room.DoesNotExist:
+                    # Room does not exist
+                    return Response({'error': 'Room does not exist'}, status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    

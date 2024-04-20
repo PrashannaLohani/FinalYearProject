@@ -11,5 +11,5 @@ class RoomSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         return Room.objects.create(**validated_data)
     
-class JoinSerializer(serializers.ModelSerializer):
+class JoinSerializer(serializers.Serializer):
     room_code = serializers.IntegerField()
