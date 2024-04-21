@@ -29,12 +29,10 @@ class RoomAPI(APIView):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def get(self, request):
-        if request.method == 'GET':
-            rooms = Room.objects.all()
-            room_data = [{'room_id': room.room_id, 'room_name': room.room_name} for room in rooms]
-            return Response(room_data, status=status.HTTP_200_OK)
-        else:
-            return Response( status=status.HTTP_400_BAD_REQUEST)
+        rooms = Room.objects.all()
+        room_data = [{'room_id': room.room_id, 'room_name': room.room_name, 'num_of_comments': room.num_of_comments} for room in rooms]
+        return Response(room_data, status=status.HTTP_200_OK)
+
         
 class JoinAPI(APIView):
     def post(self, request):
@@ -46,8 +44,8 @@ class JoinAPI(APIView):
                     room = Room.objects.get(room_id=room_code)
                     username = self.generate_random_username()
                     # Room exists, do something with the room
-                    token = jwt.encode({'username': username,'room':room_code}, settings.SECRET_KEY, algorithm='HS256')
-                    return Response({'token': token, 'username':username,'room':room_code}, status=status.HTTP_201_CREATED)
+                    Roomtoken = jwt.encode({'username': username,'room':room_code}, settings.SECRET_KEY, algorithm='HS256')
+                    return Response({'token': Roomtoken, 'username':username,'room':room_code}, status=status.HTTP_201_CREATED)
                 except Room.DoesNotExist:
                     # Room does not exist
                     return Response({'error': 'Room does not exist'}, status=status.HTTP_404_NOT_FOUND)
@@ -89,6 +87,10 @@ class CommentAPI(APIView):
                 
                 # Save the comment to the database
                 comment = Comments.objects.create(user=user, room=room, message=message)  # Added 'room' field
+
+                room_obj = Room.objects.get(room_id=room)
+                room_obj.num_of_comments += 1
+                room_obj.save()
                 
                 # Return a success response
                 return Response({'message': 'Comment posted successfully'}, status=status.HTTP_201_CREATED)
@@ -98,6 +100,11 @@ class CommentAPI(APIView):
             
     def get(self, request):
         if request.method == 'GET':
-            comments = Comments.objects.all()
-            serializer = CommentSerializer(comments, many=True)
+            if request.method == 'GET':
+                room_code = request.query_params.get('room_code')
+            if room_code:
+                comments = Comments.objects.filter(room=room_code)
+            else:
+                comments = Comments.objects.all()
+                serializer = CommentSerializer(comments, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)

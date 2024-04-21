@@ -20,9 +20,7 @@ export default function RoomPresenter() {
   const roomIdWithRoomName = searchParams.get("roomId");
   const roomId = roomIdWithRoomName.split("&")[0]; // Check if roomIdWithRoomName is not null
 
-  useEffect(() => {
-    console.log("Room ID:", roomId);
-  }, [roomId]);
+  useEffect(() => {}, [roomId]);
 
   return (
     <Box minH="100vh" p={{ base: "1rem", md: "3rem", lg: "3rem" }}>
@@ -35,7 +33,7 @@ export default function RoomPresenter() {
         p="2rem"
       >
         <RoomHeading />
-        <CommentSection />
+        <CommentSection roomId={roomId} />
       </Box>
     </Box>
   );
@@ -73,7 +71,7 @@ const RoomHeading = () => {
   );
 };
 
-const CommentSection = () => {
+const CommentSection = ({ roomId }) => {
   const [comments, setComments] = useState([]);
 
   useEffect(() => {
@@ -91,9 +89,22 @@ const CommentSection = () => {
     fetchComments();
   }, []); // Fetch comments when the component mounts
 
+  const roomIdNumber = parseInt(roomId);
+
+  // Filter comments based on roomId
+  const filteredComments = comments.filter(
+    (comment) => comment.room === roomIdNumber
+  );
+
   const handleReadClick = (index) => {
-    const updatedComments = [...comments];
-    updatedComments[index].isRead = !updatedComments[index].isRead;
+    // Create a copy of the comments array
+    const updatedComments = [...filteredComments];
+    // Toggle the isRead property of the clicked comment
+    updatedComments[index] = {
+      ...updatedComments[index],
+      isRead: !updatedComments[index].isRead,
+    };
+    // Update the state with the modified array
     setComments(updatedComments);
   };
 
@@ -105,7 +116,7 @@ const CommentSection = () => {
         minChildWidth="400px"
         autoRows="auto"
       >
-        {comments.map((comment, index) => (
+        {filteredComments.map((comment, index) => (
           <Card key={index} variant="outline" maxW="30rem" bgColor="#FFE6E6">
             <CardHeader>
               <Flex
@@ -116,8 +127,7 @@ const CommentSection = () => {
                 <Heading size="lg">{comment.user}</Heading>
                 <Flex alignItems="center" gap="5px">
                   <Text as="b">Upvote:</Text>
-                  <Text>#</Text>{" "}
-                  {/* Assuming each comment has an 'upvotes' property */}
+                  <Text>#</Text>
                 </Flex>
               </Flex>
             </CardHeader>

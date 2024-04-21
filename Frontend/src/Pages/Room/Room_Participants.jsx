@@ -47,7 +47,7 @@ export default function ParticipantRoom() {
         p="2rem"
       >
         <RoomHeading />
-        <CommentSection />
+        <CommentSection roomCode={roomCode} />
         <CommentInput roomCode={roomCode} />
       </Box>
     </Box>
@@ -78,6 +78,7 @@ const RoomHeading = () => {
 
 const CommentSection = ({ roomCode }) => {
   const [comments, setComments] = useState([]);
+
   useEffect(() => {
     const fetchComments = async () => {
       try {
@@ -85,6 +86,7 @@ const CommentSection = ({ roomCode }) => {
           "http://127.0.0.1:8000/room/comments/"
         );
         setComments(response.data); // Assuming the response is an array of comments
+        console.log(comments);
       } catch (error) {
         console.error("Error fetching comments:", error);
       }
@@ -92,8 +94,10 @@ const CommentSection = ({ roomCode }) => {
 
     fetchComments();
   }, []); // Fetch comments when the component mounts
+
+  // Filter comments based on roomCode
   const filteredComments = comments.filter(
-    (comment) => comment.roomCode === roomCode
+    (comment) => comment.room === roomCode
   );
   return (
     <Box mt="2rem" minH="100vh" p="2rem">
@@ -129,7 +133,6 @@ const CommentSection = ({ roomCode }) => {
     </Box>
   );
 };
-
 const CommentInput = ({ roomCode }) => {
   const [comment, setComment] = useState("");
   const username = localStorage.getItem("username");
