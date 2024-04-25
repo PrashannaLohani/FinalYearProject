@@ -108,3 +108,12 @@ class CommentAPI(APIView):
                 comments = Comments.objects.all()
                 serializer = CommentSerializer(comments, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
+        
+class RoomCommentsCountAPI(APIView):
+    def post(self, request):
+        try:
+            room_id = request.data.get('room_id')
+            room = Room.objects.get(room_id=room_id)
+            return Response({'num_of_comments': room.num_of_comments}, status=status.HTTP_200_OK)
+        except Room.DoesNotExist:
+            return Response({'error': 'Room not found'}, status=status.HTTP_404_NOT_FOUND)

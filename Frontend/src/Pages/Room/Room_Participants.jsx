@@ -9,10 +9,13 @@ import {
   Input,
   SimpleGrid,
   Text,
+  Spacer,
+  Image,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { FaHeart } from "react-icons/fa6";
+import Navbar from "../../Layout/Navbar";
 
 export default function ParticipantRoom() {
   const [roomCode, setRoomCode] = useState("");
@@ -36,23 +39,59 @@ export default function ParticipantRoom() {
     sendComment(); // Call the function to send the comment when the component mounts
   }, []);
 
+  const accessToken = localStorage.getItem("accessToken");
   return (
-    <Box minH="100vh" p={{ base: "1rem", md: "3rem", lg: "3rem" }}>
-      <RoomCode roomCode={roomCode} />
-      <Box
-        minH="100vh"
-        borderRadius="2rem"
-        boxShadow="rgba(255, 255, 255, 0.1) 0px 1px 1px 0px inset, rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px"
-        minW="20rem"
-        p="2rem"
-      >
-        <RoomHeading />
-        <CommentSection roomCode={roomCode} />
-        <CommentInput roomCode={roomCode} />
+    <>
+      {accessToken ? <Navbar /> : <NavbarWithoutLogin />}
+      <Box minH="100vh" p={{ base: "1rem", md: "3rem", lg: "3rem" }}>
+        <RoomCode roomCode={roomCode} />
+        <Box
+          minH="100vh"
+          borderRadius="2rem"
+          boxShadow="rgba(255, 255, 255, 0.1) 0px 1px 1px 0px inset, rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px"
+          minW="20rem"
+          p="2rem"
+        >
+          <RoomHeading />
+          <CommentSection roomCode={roomCode} />
+          <CommentInput roomCode={roomCode} />
+        </Box>
       </Box>
-    </Box>
+    </>
   );
 }
+
+const NavbarWithoutLogin = () => {
+  const userName = localStorage.getItem("username");
+  return (
+    <>
+      <Box px="1rem">
+        <Flex margin="1rem" flexWrap="wrap" alignItems="center">
+          <Box display="flex" alignItems="center">
+            <Image
+              width="100%"
+              height="50px"
+              objectFit="cover"
+              src="./Image/React&Rise_Logo.png"
+            />
+            <Image
+              width="100%"
+              height="40px"
+              objectFit="cover"
+              src="./Image/React&Rise_Text.png"
+            />
+          </Box>
+
+          <Spacer />
+          <Flex gap="1rem" flexWrap="wrap">
+            <Text fontSize="lg">Your Name for this session : {userName}</Text>
+          </Flex>
+        </Flex>
+      </Box>
+      <hr />
+    </>
+  );
+};
 
 const RoomCode = ({ roomCode }) => {
   // Receive roomCode as a prop

@@ -41,11 +41,11 @@ function App() {
           <Route path="/Info" element={<Info />} />
           <Route path="/CreateRoom" element={<CreateRoom />} />
           <Route path="/RoomPresenter" element={<RoomPresenter />} />
-          <Route path="/ParticipantRoom" element={<ParticipantRoom />} />
           <Route path="/Setting" element={<Setting />} />
           <Route path="/Billing" element={<Billing />} />
           <Route Component={Error} />
         </Route>
+        <Route path="/ParticipantRoom" element={<ParticipantRoom />} />
       </>
     )
   );

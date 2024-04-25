@@ -52,7 +52,7 @@ const Section1 = () => {
     const successPromise = new Promise((resolve, reject) => {
       setTimeout(() => {
         resolve();
-      }, 5000);
+      }, 2000);
     });
     toast.promise(successPromise, {
       success: { title: "Room Entered", description: "Welcome." },
@@ -89,7 +89,7 @@ const Section1 = () => {
         handleEntry();
         setTimeout(() => {
           handleEnterClick("/ParticipantRoom");
-        }, 5500);
+        }, 2100);
       } catch (error) {
         toast({
           title: "Error",
@@ -144,7 +144,7 @@ const Section1 = () => {
           </Text>
           <Flex justifyContent="flex-start">
             <Formik form={formik}>
-              {({ handleSubmit, handleChange, errors, touched }) => (
+              {({ errors, touched }) => (
                 <>
                   <Input
                     textAlign="center"

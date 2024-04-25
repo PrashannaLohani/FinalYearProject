@@ -32,7 +32,7 @@ export default function RoomPresenter() {
         minW="20rem"
         p="2rem"
       >
-        <RoomHeading />
+        <RoomHeading roomId={roomId} />
         <CommentSection roomId={roomId} />
       </Box>
     </Box>
@@ -57,14 +57,35 @@ const RoomCode = ({ roomId }) => {
   );
 };
 
-const RoomHeading = () => {
+const RoomHeading = ({ roomId }) => {
+  const [numOfComments, setNumOfComments] = useState(0);
+
+  useEffect(() => {
+    const fetchCommentsCount = async () => {
+      try {
+        const response = await axios.post(
+          "http://127.0.0.1:8000/room/comments-count/",
+          { room_id: roomId }
+        );
+        setNumOfComments(response.data.num_of_comments);
+      } catch (error) {
+        console.error("Error fetching comments count:", error);
+      }
+    };
+
+    fetchCommentsCount();
+
+    return () => {
+      // Cleanup if needed
+    };
+  }, [roomId]);
+
   return (
     <>
       <Flex alignItems="center" justifyContent="space-between" flexWrap="wrap">
         <Heading size="lg">Comments and Questions</Heading>
         <Flex flexDir="column">
-          <Text>Number of people Joined: 100</Text>
-          <Text>Number of comments: 20</Text>
+          <Text>Number of comments: {numOfComments}</Text>
         </Flex>
       </Flex>
     </>

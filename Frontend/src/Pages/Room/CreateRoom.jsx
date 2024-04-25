@@ -14,6 +14,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  useToast,
 } from "@chakra-ui/react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { useState } from "react";
@@ -186,9 +187,51 @@ const RoomForm = () => {
 };
 
 const JoinRoom = () => {
-  const handleJoinClick = () => {
-    window.location.href = "/ParticipantRoom";
+  const [roomCode, setRoomCode] = useState("");
+  const toast = useToast();
+
+  const handleEntry = () => {
+    const successPromise = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve();
+      }, 2000);
+    });
+    toast.promise(successPromise, {
+      success: { title: "Room Entered", description: "Welcome." },
+      loading: { title: "Entering room...", description: "Please wait" },
+      error: { title: "Login failed", description: "Something went wrong" },
+    });
   };
+  const handleInputChange = (event) => {
+    setRoomCode(event.target.value);
+  };
+
+  const handleJoinClick = async () => {
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:8000/room/joinroom/",
+        {
+          room_code: roomCode,
+        }
+      );
+      localStorage.setItem("username", response.data.username);
+      localStorage.setItem("User-Token", response.data.token);
+      // Call handleEntry function or any other logic here if needed
+      handleEntry();
+      setTimeout(() => {
+        window.location.href = "/ParticipantRoom";
+      }, 2000);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.response.data.error,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+
   return (
     <>
       <Heading m="1rem">Join Room</Heading>
@@ -200,6 +243,8 @@ const JoinRoom = () => {
             type="number"
             maxLength={6}
             placeholder="XXXXXX"
+            value={roomCode}
+            onChange={handleInputChange}
           />
           <Button
             mt="2rem"
