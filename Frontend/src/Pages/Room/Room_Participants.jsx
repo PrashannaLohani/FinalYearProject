@@ -148,7 +148,7 @@ const CommentSection = ({ roomCode }) => {
         autoRows="auto"
       >
         {filteredComments.map((comment, index) => (
-          <Card key={index} variant="outline" maxW="30rem" bgColor="#FFE6E6">
+          <Card key={index} variant="outline" maxW="30rem" bgColor="#A0A0A0">
             <CardHeader>
               <Flex
                 alignItems="center"
@@ -205,7 +205,12 @@ const CommentInput = ({ roomCode }) => {
         onChange={(e) => setComment(e.target.value)}
         required
       />
-      <Button colorScheme="blackAlpha" bgColor="black" onClick={handleSubmit}>
+      <Button
+        colorScheme="blackAlpha"
+        bgColor="black"
+        onClick={handleSubmit}
+        color="white"
+      >
         Submit
       </Button>
     </Flex>

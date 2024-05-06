@@ -64,6 +64,7 @@ export default function Logout({ isOpen, onClose }) {
                 bgColor="black"
                 onClick={handleLogout}
                 ml={3}
+                color="white"
               >
                 Logout
               </Button>

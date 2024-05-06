@@ -133,6 +133,7 @@ const ContactForm = () => {
                   bgColor="black"
                   isLoading={isSubmitting}
                   loadingText="Sending"
+                  color="white"
                 >
                   Send
                 </Button>

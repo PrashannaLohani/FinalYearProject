@@ -24,6 +24,7 @@ import Delete from "../Components/DeleteUser";
 import ChangePassword from "../Components/ChangePassword";
 import { useState } from "react";
 import axios from "axios";
+import { FaRegLightbulb, FaMoon } from "react-icons/fa6";
 
 export default function Setting() {
   return (
@@ -126,11 +127,13 @@ const Content = () => {
 
   const { colorMode, toggleColorMode } = useColorMode();
   const [theme, setTheme] = useState(colorMode);
+  const [icon, setIcon] = useState(<FaRegLightbulb />);
 
   const handleThemeChange = () => {
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
     toggleColorMode();
+    setIcon(colorMode === "light" ? <FaRegLightbulb /> : <FaMoon />);
   };
 
   return (
@@ -175,6 +178,7 @@ const Content = () => {
                   onClick={handleNameChange}
                   isLoading={isLoading}
                   maxW="10rem"
+                  color="white"
                 >
                   Save
                 </Button>
@@ -246,16 +250,14 @@ const Content = () => {
             </h2>
             <AccordionPanel pb={4}>
               <Flex gap="1rem">
-                <Text>Light</Text>
-                <Switch
-                  id="isInvalid"
-                  isInvalid
-                  size="lg"
-                  colorScheme="green"
-                  isChecked={theme === "light"}
-                  onChange={handleThemeChange}
-                />
-                <Text>Dark</Text>
+                <Button
+                  height="5rem"
+                  leftIcon={icon}
+                  onClick={handleThemeChange} // Use onClick instead of onChange
+                  isClick={colorMode === "light"} // Adjust to use colorMode directly
+                >
+                  {colorMode === "light" ? "Light" : "Dark"}
+                </Button>
               </Flex>
             </AccordionPanel>
           </AccordionItem>

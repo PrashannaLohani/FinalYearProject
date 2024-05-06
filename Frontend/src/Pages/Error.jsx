@@ -22,7 +22,12 @@ const Heading = () => {
       </Text>
       <Text>You can try it after logining</Text>
       <NavLink to="/Login">
-        <Button colorScheme="blackAlpha" bgColor="black" mt="1rem">
+        <Button
+          colorScheme="blackAlpha"
+          bgColor="black"
+          mt="1rem"
+          color="white"
+        >
           Login
         </Button>
       </NavLink>

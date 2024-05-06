@@ -136,7 +136,6 @@ const Section2 = () => {
                         h="1.75rem"
                         size="sm"
                         onClick={togglePasswordVisibilityNew}
-                        bg="white"
                       >
                         {showNewPassword ? <FaEyeSlash /> : <FaEye />}
                       </Button>
@@ -161,7 +160,6 @@ const Section2 = () => {
                         h="1.75rem"
                         size="sm"
                         onClick={togglePasswordVisibilityConfirm}
-                        bg="white"
                       >
                         {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
                       </Button>
@@ -179,6 +177,7 @@ const Section2 = () => {
                   colorScheme="blackAlpha"
                   mt="1rem"
                   isLoading={isSubmitting}
+                  color="white"
                 >
                   Confirm
                 </Button>

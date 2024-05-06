@@ -166,7 +166,7 @@ const LoginForm = () => {
                   isRequired
                 />
                 <InputRightElement width="4.5rem">
-                  <Button h="1.75rem" size="sm" onClick={showPass} bg="white">
+                  <Button h="1.75rem" size="sm" onClick={showPass}>
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </Button>
                 </InputRightElement>
@@ -215,6 +215,7 @@ const LoginForm = () => {
               mt="1rem"
               type="submit"
               isLoading={isSubmitting}
+              color="white"
             >
               Login
             </Button>

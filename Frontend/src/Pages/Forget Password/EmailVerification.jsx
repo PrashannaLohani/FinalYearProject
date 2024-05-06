@@ -127,6 +127,7 @@ const Section2 = () => {
                   bgColor="black"
                   colorScheme="blackAlpha"
                   disabled={isSubmitting}
+                  color="white"
                 >
                   {isSubmitting ? "Sending..." : "Send"}
                 </Button>

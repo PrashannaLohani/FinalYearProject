@@ -153,6 +153,7 @@ const Section1 = () => {
                     bg="white"
                     mx="2rem"
                     minW="15rem"
+                    color="black"
                     onChange={formik.handleChange}
                     name="roomCode" // Add the name attribute
                     style={
@@ -171,6 +172,7 @@ const Section1 = () => {
                     colorScheme="whiteAlpha"
                     onClick={formik.handleSubmit}
                     isLoading={formik.isSubmitting} // Disable button while submitting
+                    color="white"
                   >
                     Join
                   </Button>

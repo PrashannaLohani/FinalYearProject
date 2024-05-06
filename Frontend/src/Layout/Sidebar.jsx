@@ -44,7 +44,7 @@ const Elements = () => {
         </NavLink>
       </Flex>
 
-      <Heading size="md" mt="1.5rem">
+      {/* <Heading size="md" mt="1.5rem">
         My Team{" "}
         <span>
           <Badge colorScheme="blue">Beta</Badge>
@@ -57,7 +57,7 @@ const Elements = () => {
         <Text fontSize="lg" as="a" cursor="pointer">
           Manage member
         </Text>
-      </Flex>
+      </Flex> */}
     </>
   );
 };
