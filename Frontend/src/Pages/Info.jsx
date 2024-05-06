@@ -80,7 +80,12 @@ const Welcome = ({ full_name }) => {
         </Box>
         <Flex gap="1rem" flexWrap="wrap">
           <NavLink to="/CreateRoom" element={<CreateRoom />}>
-            <Button mt="2rem" leftIcon={<FaPlus />} colorScheme="whiteAlpha">
+            <Button
+              mt="2rem"
+              leftIcon={<FaPlus />}
+              colorScheme="whiteAlpha"
+              color="white"
+            >
               Create room
             </Button>
           </NavLink>
@@ -89,6 +94,7 @@ const Welcome = ({ full_name }) => {
               mt="2rem"
               leftIcon={<FaChartSimple />}
               colorScheme="whiteAlpha"
+              color="white"
             >
               Create Poll
             </Button>

@@ -4,7 +4,6 @@ import {
   AccordionIcon,
   AccordionItem,
   AccordionPanel,
-  Badge,
   Box,
   Button,
   Flex,
@@ -12,7 +11,9 @@ import {
   Heading,
   Input,
   Link,
+  Switch,
   Text,
+  useColorMode,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
@@ -123,6 +124,15 @@ const Content = () => {
     drawerOnOpen();
   };
 
+  const { colorMode, toggleColorMode } = useColorMode();
+  const [theme, setTheme] = useState(colorMode);
+
+  const handleThemeChange = () => {
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    toggleColorMode();
+  };
+
   return (
     <>
       <Box minH="100vh" padding="3rem">
@@ -225,7 +235,7 @@ const Content = () => {
               <AccordionButton>
                 <Flex flexDir="column">
                   <Box as="span" textAlign="left" fontWeight="bold">
-                    Background <Badge colorScheme="blue">Beta</Badge>
+                    Background
                   </Box>
                   <Text display="flex" alignItems="center">
                     You are using light background{" "}
@@ -234,7 +244,20 @@ const Content = () => {
                 <AccordionIcon />
               </AccordionButton>
             </h2>
-            <AccordionPanel pb={4}>{/* #### */}</AccordionPanel>
+            <AccordionPanel pb={4}>
+              <Flex gap="1rem">
+                <Text>Light</Text>
+                <Switch
+                  id="isInvalid"
+                  isInvalid
+                  size="lg"
+                  colorScheme="green"
+                  isChecked={theme === "light"}
+                  onChange={handleThemeChange}
+                />
+                <Text>Dark</Text>
+              </Flex>
+            </AccordionPanel>
           </AccordionItem>
           <hr />
           <AccordionItem sx={{ border: "none" }} mt="2rem" pl="1rem">
@@ -251,6 +274,7 @@ const Content = () => {
                 <Button
                   colorScheme="blackAlpha"
                   bgColor="black"
+                  color="white"
                   maxW="5rem"
                   my="1rem"
                   onClick={handleLogout}

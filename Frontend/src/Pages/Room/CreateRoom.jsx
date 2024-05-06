@@ -71,6 +71,7 @@ const RoomModal = ({ isOpen, onClose, roomId, roomName }) => {
               bgColor="black"
               mr={3}
               onClick={() => handleMenuItemClick(<RoomPresenter />)}
+              color="white"
             >
               Enter
             </Button>
@@ -168,6 +169,7 @@ const RoomForm = () => {
                   bgColor="black"
                   colorScheme="blackAlpha"
                   isLoading={isSubmitting}
+                  color="white"
                 >
                   Create
                 </Button>
@@ -252,6 +254,7 @@ const JoinRoom = () => {
             bgColor="black"
             colorScheme="blackAlpha"
             onClick={handleJoinClick}
+            color="white"
           >
             Enter
           </Button>
