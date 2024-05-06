@@ -86,6 +86,7 @@ const RoomForm = () => {
   const [roomId, setRoomId] = useState(null);
   const [roomName, setRoomName] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const UserToken = localStorage.getItem("accessToken");
 
   return (
     <>
@@ -109,6 +110,11 @@ const RoomForm = () => {
               {
                 room_name: values.roomTitle,
                 limit_people_num: values.numOfParticipants,
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${UserToken}`,
+                },
               }
             );
             // Save JWT token to localStorage

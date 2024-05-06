@@ -2,7 +2,7 @@ from django.db import models
 from CRM.models import Signup
 
 class Room(models.Model):
-    # user = models.ForeignKey(Signup,on_delete=models.CASCADE,default=None)
+    user = models.ForeignKey(Signup,on_delete=models.CASCADE,default=None)
     room_id = models.CharField(editable=False)
     room_name = models.CharField(max_length=255)
     limit_people_num =  models.IntegerField(default=9999)
@@ -13,6 +13,15 @@ class Room(models.Model):
 
     def __str__(self):
         return self.room_name
+    
+    def to_dict(self):
+        return {
+            'room_id': self.room_id,
+            'room_name': self.room_name,
+            'limit_people_num': self.limit_people_num,
+            'num_of_people': self.num_of_people,
+            'num_of_comments': self.num_of_comments
+        }
     
 class Comment(models.Model):
     room = models.IntegerField(default=None)

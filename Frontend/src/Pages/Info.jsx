@@ -19,6 +19,7 @@ import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import CreateRoom from "./Room/CreateRoom";
 import CreatePoll from "./Poll/CreatePoll";
+import axios from "axios";
 
 export default function Info() {
   const userInfo = useUserInfo();
@@ -117,8 +118,11 @@ const Dashboard = () => {
     },
   };
   const [totalRooms, setTotalRooms] = useState(0);
-  const [totalParticipants, setTotalParticipants] = useState(0);
+  const [roomData, setRoomData] = useState(null);
+  const [participantsData, setParticipantsData] = useState(0);
   const [totalComments, setTotalComments] = useState(0);
+
+  const token = localStorage.getItem("accessToken");
 
   useEffect(() => {
     fetchData();
@@ -126,15 +130,20 @@ const Dashboard = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:8000/room/room/");
-      const data = response.data;
-      setTotalRooms(data.totalRooms);
-      setTotalParticipants(data.totalParticipants);
-      setTotalComments(data.totalComments);
+      const response = await axios.get("http://127.0.0.1:8000/room/stats/", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setTotalRooms(response.data.total_rooms);
+      setRoomData(response.data.room_data);
+      setParticipantsData(response.data.total_participants);
+      setTotalComments(response.data.total_comments);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
+
   return (
     <Box
       minH="100vh"
@@ -147,7 +156,7 @@ const Dashboard = () => {
       <SimpleGrid minChildWidth="300px" Columns={{ base: 1, md: 2 }} gap={4}>
         <Box key={1} {...boxStyle}>
           <Flex justifyItems="center" alignItems="center" flexDir="column">
-            <Heading size="lg">Total Rooms created:</Heading>
+            <Heading size="lg">Total Rooms </Heading>
             <Text fontSize="2xl" mt="1rem">
               {totalRooms}
             </Text>
@@ -155,15 +164,15 @@ const Dashboard = () => {
         </Box>
         <Box key={2} {...boxStyle}>
           <Flex justifyItems="center" alignItems="center" flexDir="column">
-            <Heading size="lg">Total participants:</Heading>
+            <Heading size="lg">Total participants</Heading>
             <Text fontSize="2xl" mt="1rem">
-              {totalParticipants}
+              {participantsData}
             </Text>
           </Flex>
         </Box>
         <Box key={3} {...boxStyle}>
           <Flex justifyItems="center" alignItems="center" flexDir="column">
-            <Heading size="lg">Total Comments:</Heading>
+            <Heading size="lg">Total Comments</Heading>
             <Text fontSize="2xl" mt="1rem">
               {totalComments}
             </Text>
@@ -184,27 +193,34 @@ const Dashboard = () => {
           </Flex>
         </Box>
         <Box key={5} gridColumn={{ base: "auto", md: "span 1" }} {...boxStyle}>
-          <Heading size="lg">Recent Rooms:</Heading>
+          <Heading size="lg">Recent Rooms</Heading>
           <Accordion
             allowToggle
             mt="1rem"
             style={{ maxHeight: "300px", overflow: "auto" }}
           >
-            <AccordionItem>
-              <h2>
-                <AccordionButton>
-                  <Box as="span" flex="1" textAlign="left">
-                    Room Title:
-                  </Box>
-                  <AccordionIcon />
-                </AccordionButton>
-              </h2>
-              <AccordionPanel pb={4} gap="1rem">
-                <p> Room ID:</p>
-                <p> No. of People joined:</p>
-                <p> No. of comments:</p>
-              </AccordionPanel>
-            </AccordionItem>
+            {roomData &&
+              roomData
+                .slice(-6)
+                .reverse()
+                .map((room, index) => (
+                  <AccordionItem key={index}>
+                    <h2>
+                      <AccordionButton>
+                        <Box as="b" flex="1" textAlign="left">
+                          {room.room_name}
+                        </Box>
+                        <AccordionIcon />
+                      </AccordionButton>
+                    </h2>
+                    <AccordionPanel pb={4}>
+                      <p>Room ID: {room.room_id}</p>
+                      <p>No. of People joined: {room.num_of_people}</p>
+
+                      <p>No. of comments: {room.num_of_comments}</p>
+                    </AccordionPanel>
+                  </AccordionItem>
+                ))}
           </Accordion>
         </Box>
       </SimpleGrid>

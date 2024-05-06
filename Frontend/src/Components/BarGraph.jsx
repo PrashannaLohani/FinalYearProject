@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import axios from "axios";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -22,9 +23,13 @@ const BarGraph = () => {
 
   // State to hold the current color mode
   const [colorMode, setColorMode] = useState("light");
+  // State to hold room data
+  const [roomData, setRoomData] = useState(null);
 
   // Chart reference to access the underlying Chart.js instance
   const chartRef = useRef();
+
+  const token = localStorage.getItem("accessToken");
 
   // Retrieve color mode from local storage
   useEffect(() => {
@@ -32,6 +37,23 @@ const BarGraph = () => {
     if (storedColorMode) {
       setColorMode(storedColorMode);
     }
+  }, []);
+
+  // Fetch room data when component mounts
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("http://127.0.0.1:8000/room/stats/", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setRoomData(response.data.room_data); // Set roomData to response.data.room_data
+      } catch (error) {
+        console.error("Error fetching room data:", error);
+      }
+    };
+    fetchData();
   }, []);
 
   // Define color schemes for light and dark modes
@@ -76,19 +98,28 @@ const BarGraph = () => {
     }
   }, [colorMode]);
 
-  const labels = ["Room1", "Room2", "Room3", "Room4", "Room5", "Room6"];
+  // Render loading indicator while fetching data
+  if (!roomData) {
+    return <div>Loading...</div>;
+  }
+
+  // Extract labels and data from roomData
+  const recentRoomData = roomData.slice(-6).reverse();
+  const labels = recentRoomData.map((room) => room.room_name);
+  const numPeopleData = recentRoomData.map((room) => room.num_of_people);
+  const numCommentsData = recentRoomData.map((room) => room.num_of_comments);
 
   const data = {
     labels,
     datasets: [
       {
         label: "Number of people joined",
-        data: [20, 30, 40, 30, 20, 10, 25],
+        data: numPeopleData,
         backgroundColor: colors[colorMode].label,
       },
       {
         label: "Number of comments",
-        data: [10, 15, 20, 12, 8, 10],
+        data: numCommentsData,
         backgroundColor: colors[colorMode].comment,
       },
     ],

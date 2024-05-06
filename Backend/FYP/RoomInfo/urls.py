@@ -3,6 +3,7 @@ from . import views
 
 urlpatterns = [
     path('room/',views.RoomAPI.as_view(), name='CreateRoom'),
+    path('stats/',views.Stats.as_view(), name='Stats'),
     path('joinroom/',views.JoinAPI.as_view(), name='JoinRoom'),
     path('Userinfo/',views.DecodeUserTokenAPI.as_view(), name='userInfo'),
     path('comments-count/', views.RoomCommentsCountAPI.as_view(), name='room-comments-count'),

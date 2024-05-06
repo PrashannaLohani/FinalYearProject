@@ -62,6 +62,7 @@ export default function HomepageNav() {
           </NavLink>
           <NavLink to="/Signup" element={<Signup />}>
             <Button
+              colorScheme="blackAlpha"
               borderRadius="8"
               mt={{ base: "1rem", md: "0" }}
               color="white"

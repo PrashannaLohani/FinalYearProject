@@ -8,8 +8,7 @@ from FYP import settings
 import random
 import string
 from .models import Room,Comment,Upvote
-
-
+from CRM.models import Signup
 
 class RoomAPI(APIView):
     def post(self, request):
@@ -21,10 +20,10 @@ class RoomAPI(APIView):
                 room_id = ''.join([str(random.randint(1, 9)) for _ in range(6)])  # Generate room ID
                 room = Room.objects.create(room_id=room_id, room_name=room_name, limit_people_num=limit_people_num)
                 room.save()
-                total_rooms = Room.objects.count()  # Count the total number of rooms
+                
 
                 token = jwt.encode({'room_id': room_id, 'room_name': room_name, 'limit_people_num': limit_people_num}, settings.SECRET_KEY, algorithm='HS256')
-                return Response({'token': token, 'ID': room_id, 'name': room_name, 'People Limitation': limit_people_num, 'total_rooms': total_rooms}, status=status.HTTP_201_CREATED)
+                return Response({'token': token, 'ID': room_id, 'name': room_name, 'People Limitation': limit_people_num, }, status=status.HTTP_201_CREATED)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             
@@ -33,6 +32,45 @@ class RoomAPI(APIView):
         room_data = [{'room_id': room.room_id, 'room_name': room.room_name, 'limit_people_num': room.limit_people_num, 'num_of_people': room.num_of_people, 'num_of_comments': room.num_of_comments} for room in rooms]
         return Response(room_data, status=status.HTTP_200_OK)
 
+class Stats(APIView):
+    def get(self, request):
+        token = request.headers.get('Authorization')
+        if token:
+            try:
+                # Extract the token from the Authorization header
+                token = token.split()[1]
+                decoded_token = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
+
+                # Extract user_id from the token
+                full_name = decoded_token.get('full_name')
+
+                # Fetch the user associated with the token
+                user = Signup.objects.get(full_name=full_name)
+
+                # Fetch the rooms associated with the user
+                rooms = Room.objects.filter(user=user)
+
+                # Count the total number of rooms created by the user
+                total_rooms = rooms.count()
+                
+                # Serialize the room data
+                room_data = [room.to_dict() for room in rooms]
+
+                total_participants = sum(room.num_of_people for room in rooms)
+
+                total_comments = sum(room.num_of_comments for room in rooms)
+
+                return Response({'room_data': room_data, 'total_rooms': total_rooms,"total_participants":total_participants,"total_comments":total_comments}, status=status.HTTP_200_OK)
+            except jwt.ExpiredSignatureError:
+                return Response({'error': 'Token has expired'}, status=status.HTTP_401_UNAUTHORIZED)
+            except jwt.InvalidTokenError:
+                return Response({'error': 'Invalid token'}, status=status.HTTP_401_UNAUTHORIZED)
+            except Signup.DoesNotExist:
+                return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+            except Exception as e:
+                return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response({'error': 'Authorization header not found'}, status=status.HTTP_400_BAD_REQUEST)
         
 class JoinAPI(APIView):
     def post(self, request):
