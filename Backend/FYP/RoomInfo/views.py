@@ -7,7 +7,7 @@ from rest_framework import status
 from FYP import settings
 import random
 import string
-from .models import Room,Comments
+from .models import Room,Comment,Upvote
 
 
 
@@ -18,19 +18,19 @@ class RoomAPI(APIView):
             if serializer.is_valid():
                 room_name = serializer.validated_data.get('room_name')
                 limit_people_num=serializer.validated_data.get('limit_people_num')
-                room_id = ''.join([str(random.randint(0, 9)) for _ in range(6)])  # Generate room ID
-                room = Room.objects.create(room_id=room_id,room_name=room_name,limit_people_num=limit_people_num)
+                room_id = ''.join([str(random.randint(1, 9)) for _ in range(6)])  # Generate room ID
+                room = Room.objects.create(room_id=room_id, room_name=room_name, limit_people_num=limit_people_num)
                 room.save()
-                total_rooms = Room.objects.count()
+                total_rooms = Room.objects.count()  # Count the total number of rooms
 
-                token = jwt.encode({'room_id': room_id,'room_name':room_name,'limit_people_num':limit_people_num}, settings.SECRET_KEY, algorithm='HS256')
-                return Response({'token': token, 'ID':room_id,'name':room_name,'People Limitation':limit_people_num, 'total_rooms': total_rooms}, status=status.HTTP_201_CREATED)
+                token = jwt.encode({'room_id': room_id, 'room_name': room_name, 'limit_people_num': limit_people_num}, settings.SECRET_KEY, algorithm='HS256')
+                return Response({'token': token, 'ID': room_id, 'name': room_name, 'People Limitation': limit_people_num, 'total_rooms': total_rooms}, status=status.HTTP_201_CREATED)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+            
     def get(self, request):
         rooms = Room.objects.all()
-        room_data = [{'room_id': room.room_id, 'room_name': room.room_name, 'num_of_comments': room.num_of_comments} for room in rooms]
+        room_data = [{'room_id': room.room_id, 'room_name': room.room_name, 'limit_people_num': room.limit_people_num, 'num_of_people': room.num_of_people, 'num_of_comments': room.num_of_comments} for room in rooms]
         return Response(room_data, status=status.HTTP_200_OK)
 
         
@@ -43,19 +43,22 @@ class JoinAPI(APIView):
                 try:
                     room = Room.objects.get(room_id=room_code)
                     username = self.generate_random_username()
-                    # Room exists, do something with the room
-                    Roomtoken = jwt.encode({'username': username,'room':room_code}, settings.SECRET_KEY, algorithm='HS256')
-                    return Response({'token': Roomtoken, 'username':username,'room':room_code}, status=status.HTTP_201_CREATED)
+                    
+                    # Increment num_of_people
+                    room.num_of_people += 1
+                    room.save()
+                    
+                    # Generate token
+                    Roomtoken = jwt.encode({'username': username, 'room': room_code}, settings.SECRET_KEY, algorithm='HS256')
+                    
+                    return Response({'token': Roomtoken, 'username': username, 'room': room_code}, status=status.HTTP_201_CREATED)
                 except Room.DoesNotExist:
-                    # Room does not exist
                     return Response({'error': 'Room does not exist'}, status=status.HTTP_404_NOT_FOUND)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def generate_random_username(self):
-        # Generate a random string of 3 digits
         random_suffix = ''.join(random.choices(string.digits, k=4))
-        # Combine with a base string 'user'
         return f"User{random_suffix}"
     
 class DecodeUserTokenAPI(APIView):
@@ -86,7 +89,7 @@ class CommentAPI(APIView):
                 message = serializer.validated_data['message']  # Use square brackets to access dictionary key
                 
                 # Save the comment to the database
-                comment = Comments.objects.create(user=user, room=room, message=message)  # Added 'room' field
+                comment = Comment.objects.create(user=user, room=room, message=message)  # Added 'room' field
 
                 room_obj = Room.objects.get(room_id=room)
                 room_obj.num_of_comments += 1
@@ -103,9 +106,9 @@ class CommentAPI(APIView):
             if request.method == 'GET':
                 room_code = request.query_params.get('room_code')
             if room_code:
-                comments = Comments.objects.filter(room=room_code)
+                comments = Comment.objects.filter(room=room_code)
             else:
-                comments = Comments.objects.all()
+                comments = Comment.objects.all()
                 serializer = CommentSerializer(comments, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         
@@ -114,6 +117,31 @@ class RoomCommentsCountAPI(APIView):
         try:
             room_id = request.data.get('room_id')
             room = Room.objects.get(room_id=room_id)
-            return Response({'num_of_comments': room.num_of_comments}, status=status.HTTP_200_OK)
+            return Response({
+                'num_of_comments': room.num_of_comments,
+                'num_of_people': room.num_of_people
+            }, status=status.HTTP_200_OK)
         except Room.DoesNotExist:
             return Response({'error': 'Room not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+class UpvoteCommentAPI(APIView):
+    def post(self, request):
+        # Assuming 'room' and 'message' are provided in the request data
+        room = request.data.get('room')
+        message = request.data.get('message')
+        user = request.data.get('user')  # Assuming 'user' is provided in the request data
+        
+        try:
+            comment = Comment.objects.get(room=room, message=message)
+            
+            # Check if the user has already upvoted this comment
+            if Upvote.objects.filter(user=user, comment=comment).exists():
+                return Response({'error': 'User has already upvoted this comment'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Create the upvote
+            upvote = Upvote.objects.create(user=user, comment=comment, comment_identifier=comment.get_unique_identifier())
+            
+            return Response({'success': 'Upvote created successfully'}, status=status.HTTP_201_CREATED)
+        
+        except Comment.DoesNotExist:
+            return Response({'error': 'Comment does not exist'}, status=status.HTTP_404_NOT_FOUND)

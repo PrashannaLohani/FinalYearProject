@@ -138,12 +138,13 @@ const CommentSection = ({ roomCode }) => {
   const filteredComments = comments.filter(
     (comment) => comment.room === roomCode
   );
+
   return (
     <Box mt="2rem" minH="100vh" p="2rem">
       <SimpleGrid
         columns={3}
         spacing="1rem"
-        minChildWidth="400px"
+        minChildWidth={{ base: "200px", md: "400px" }}
         autoRows="auto"
       >
         {filteredComments.map((comment, index) => (

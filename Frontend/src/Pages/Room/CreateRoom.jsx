@@ -18,8 +18,8 @@ import {
 } from "@chakra-ui/react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { useState } from "react";
-import axios from "axios";
 import RoomPresenter from "./Room_Presenter";
+import axios from "axios";
 
 export default function CreateRoom() {
   return (
@@ -104,7 +104,7 @@ const RoomForm = () => {
         onSubmit={async (values, { setSubmitting }) => {
           try {
             const response = await axios.post(
-              "http://127.0.0.1:8000/room/createroom/",
+              "http://127.0.0.1:8000/room/room/",
               {
                 room_name: values.roomTitle,
                 limit_people_num: values.numOfParticipants,

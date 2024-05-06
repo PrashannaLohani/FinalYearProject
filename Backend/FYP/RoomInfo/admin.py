@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import Room
-from .models import Comments
+from .models import Comment,Upvote
 
 class RoomAdmin(admin.ModelAdmin):
     list_display = ('room_id', 'room_name', 'num_of_people','limit_people_num', 'num_of_comments', 'created_at')
@@ -16,4 +16,6 @@ class CommentsAdmin(admin.ModelAdmin):
     def Read(self, obj):
         return obj.read
 
-admin.site.register(Comments, CommentsAdmin) 
+admin.site.register(Comment, CommentsAdmin) 
+
+admin.site.register(Upvote)

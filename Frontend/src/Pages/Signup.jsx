@@ -17,10 +17,11 @@ import {
 } from "@chakra-ui/react";
 import { NavLink } from "react-router-dom";
 import { Formik } from "formik";
-import { useEffect, useState } from "react";
 import Privacy from "./Privacy";
-import Terms from "./terms&service";
+import { useEffect, useState } from "react";
+import { useDisclosure } from "@chakra-ui/react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import Terms from "./Terms&service";
 
 const SignupHeader = () => {
   return (
@@ -34,6 +35,17 @@ const Signup = () => {
   const apiURL = "http://127.0.0.1:8000/Signup/";
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const {
+    isOpen: PrivacyIsOpen,
+    onOpen: PrivacyOnOpen,
+    onClose: PrivacyOnClose,
+  } = useDisclosure();
+  const {
+    isOpen: TermIsOpen,
+    onOpen: TermOnOpen,
+    onClose: TermOnClose,
+  } = useDisclosure();
 
   const showPass = () => {
     setShowPassword(!showPassword);
@@ -249,28 +261,27 @@ const Signup = () => {
                       ></Checkbox>
                       <Text>
                         I accept the{" "}
-                        <NavLink
-                          to="/Privacy-Policy"
-                          element={<Privacy />}
+                        <a
                           style={{
                             fontWeight: "bold",
                             textDecoration: "underline",
+                            cursor: "pointer",
                           }}
+                          onClick={PrivacyOnOpen}
                         >
-                          Privacy Policy
-                        </NavLink>{" "}
-                        and
-                        <NavLink
-                          to="/Terms&Services"
-                          element={<Terms />}
+                          Privacy Policy{" "}
+                        </a>
+                        and{" "}
+                        <a
                           style={{
                             fontWeight: "bold",
                             textDecoration: "underline",
+                            cursor: "pointer",
                           }}
+                          onClick={TermOnOpen}
                         >
-                          {" "}
                           Terms of service
-                        </NavLink>
+                        </a>
                       </Text>
                     </HStack>
                   </Box>
@@ -294,6 +305,16 @@ const Signup = () => {
                 <Link as="b">Login</Link>
               </NavLink>
             </Flex>
+            <Privacy
+              isOpen={PrivacyIsOpen}
+              onClose={PrivacyOnClose}
+              onOpen={PrivacyOnOpen}
+            />
+            <Terms
+              isOpen={TermIsOpen}
+              onClose={TermOnClose}
+              onOpen={TermOnOpen}
+            />
           </Box>
         </Box>
       </Flex>

@@ -18,7 +18,7 @@ export default function RoomPresenter() {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const roomIdWithRoomName = searchParams.get("roomId");
-  const roomId = roomIdWithRoomName.split("&")[0]; // Check if roomIdWithRoomName is not null
+  const roomId = roomIdWithRoomName.split("&")[0];
 
   useEffect(() => {}, [roomId]);
 
@@ -59,6 +59,7 @@ const RoomCode = ({ roomId }) => {
 
 const RoomHeading = ({ roomId }) => {
   const [numOfComments, setNumOfComments] = useState(0);
+  const [numOfPeople, setNumOfPeople] = useState(0);
 
   useEffect(() => {
     const fetchCommentsCount = async () => {
@@ -68,6 +69,7 @@ const RoomHeading = ({ roomId }) => {
           { room_id: roomId }
         );
         setNumOfComments(response.data.num_of_comments);
+        setNumOfPeople(response.data.num_of_people);
       } catch (error) {
         console.error("Error fetching comments count:", error);
       }
@@ -85,6 +87,7 @@ const RoomHeading = ({ roomId }) => {
       <Flex alignItems="center" justifyContent="space-between" flexWrap="wrap">
         <Heading size="lg">Comments and Questions</Heading>
         <Flex flexDir="column">
+          <Text>Number of People joined: {numOfPeople}</Text>
           <Text>Number of comments: {numOfComments}</Text>
         </Flex>
       </Flex>
@@ -134,7 +137,7 @@ const CommentSection = ({ roomId }) => {
       <SimpleGrid
         columns={3}
         spacing="1rem"
-        minChildWidth="400px"
+        minChildWidth={{ base: "200px", md: "400px" }}
         autoRows="auto"
       >
         {filteredComments.map((comment, index) => (

@@ -13,11 +13,12 @@ import {
 } from "@chakra-ui/react";
 
 import { useUserInfo } from "../Components/UserInfo";
-import { FaPlus } from "react-icons/fa6";
+import { FaPlus, FaChartSimple } from "react-icons/fa6";
 import BarGraph from "../Components/BarGraph";
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import CreateRoom from "./Room/CreateRoom";
+import CreatePoll from "./Poll/CreatePoll";
 
 export default function Info() {
   const userInfo = useUserInfo();
@@ -77,11 +78,22 @@ const Welcome = ({ full_name }) => {
         <Box mt="1rem" maxW="25%">
           <p>{quote}</p>
         </Box>
-        <NavLink to="/CreateRoom" element={<CreateRoom />}>
-          <Button mt="2rem" leftIcon={<FaPlus />} colorScheme="whiteAlpha">
-            Create room
-          </Button>
-        </NavLink>
+        <Flex gap="1rem" flexWrap="wrap">
+          <NavLink to="/CreateRoom" element={<CreateRoom />}>
+            <Button mt="2rem" leftIcon={<FaPlus />} colorScheme="whiteAlpha">
+              Create room
+            </Button>
+          </NavLink>
+          <NavLink to="/CreatePoll" element={<CreatePoll />}>
+            <Button
+              mt="2rem"
+              leftIcon={<FaChartSimple />}
+              colorScheme="whiteAlpha"
+            >
+              Create Poll
+            </Button>
+          </NavLink>
+        </Flex>
       </Box>
     </Box>
   );
@@ -98,6 +110,25 @@ const Dashboard = () => {
       boxShadow: "rgba(100, 100, 111, 0.2) 0px 7px 29px 0px",
     },
   };
+  const [totalRooms, setTotalRooms] = useState(0);
+  const [totalParticipants, setTotalParticipants] = useState(0);
+  const [totalComments, setTotalComments] = useState(0);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get("http://127.0.0.1:8000/room/room/");
+      const data = response.data;
+      setTotalRooms(data.totalRooms);
+      setTotalParticipants(data.totalParticipants);
+      setTotalComments(data.totalComments);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
   return (
     <Box
       minH="100vh"
@@ -112,7 +143,7 @@ const Dashboard = () => {
           <Flex justifyItems="center" alignItems="center" flexDir="column">
             <Heading size="lg">Total Rooms created:</Heading>
             <Text fontSize="2xl" mt="1rem">
-              24
+              {totalRooms}
             </Text>
           </Flex>
         </Box>
@@ -120,7 +151,7 @@ const Dashboard = () => {
           <Flex justifyItems="center" alignItems="center" flexDir="column">
             <Heading size="lg">Total participants:</Heading>
             <Text fontSize="2xl" mt="1rem">
-              300
+              {totalParticipants}
             </Text>
           </Flex>
         </Box>
@@ -128,7 +159,7 @@ const Dashboard = () => {
           <Flex justifyItems="center" alignItems="center" flexDir="column">
             <Heading size="lg">Total Comments:</Heading>
             <Text fontSize="2xl" mt="1rem">
-              246
+              {totalComments}
             </Text>
           </Flex>
         </Box>

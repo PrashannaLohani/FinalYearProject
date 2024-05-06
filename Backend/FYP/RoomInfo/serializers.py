@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Room,Comments
+from .models import Room,Comment
 
 
 class RoomSerializer(serializers.ModelSerializer):
