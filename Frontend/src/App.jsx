@@ -20,6 +20,7 @@ import Billing from "./Pages/Billing";
 import ParticipantRoom from "./Pages/Room/Room_Participants";
 import RoomPresenter from "./Pages/Room/Room_Presenter";
 import CreatePoll from "./Pages/Poll/CreatePoll";
+import PollPresent from "./Pages/Poll/PollPresent";
 import PrivateRoute from "./Layout/PrivateRoute";
 
 function App() {
@@ -46,6 +47,7 @@ function App() {
         </Route>
         <Route path="/Error" element={<Error />} />
 
+        <Route path="/PollPresent" element={<PollPresent />} />
         <Route path="/ParticipantRoom" element={<ParticipantRoom />} />
       </>
     )

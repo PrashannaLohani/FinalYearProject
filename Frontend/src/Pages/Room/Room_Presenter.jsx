@@ -49,7 +49,12 @@ const RoomCode = ({ roomId }) => {
     <Box>
       <Flex alignItems="center" justifyContent="space-between" px="2rem">
         <Heading mb="1rem">Room Code: {roomId} </Heading>
-        <Button bgColor="black" colorScheme="blackAlpha" onClick={handleClick}>
+        <Button
+          bgColor="black"
+          colorScheme="blackAlpha"
+          color="white"
+          onClick={handleClick}
+        >
           End session
         </Button>
       </Flex>

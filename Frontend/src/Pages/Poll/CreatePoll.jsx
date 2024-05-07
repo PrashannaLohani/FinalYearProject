@@ -12,11 +12,14 @@ import {
 import { FaChartBar } from "react-icons/fa6";
 import { useEffect, useState } from "react";
 import { FaPlus, FaTrashCan, FaTv } from "react-icons/fa6";
+import { NavLink } from "react-router-dom";
+import PollPresent from "./PollPresent";
 
 export default function CreatePoll() {
   return (
     <>
       <Box minH="100vh" p={{ base: "1rem", md: "3rem", lg: "3rem" }}>
+        <PollCode />
         <Box
           minH="100vh"
           borderRadius="2rem"
@@ -32,6 +35,19 @@ export default function CreatePoll() {
     </>
   );
 }
+
+const PollCode = () => {
+  return (
+    <Box>
+      <Flex alignItems="center" justifyContent="space-between" px="2rem">
+        <Heading mb="1rem">Poll Code: </Heading>
+        <Button bgColor="black" colorScheme="blackAlpha" color="white">
+          End session
+        </Button>
+      </Flex>
+    </Box>
+  );
+};
 
 const RoomID = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -55,17 +71,16 @@ const RoomID = () => {
   return (
     <>
       <Flex alignItems="center" justifyContent="space-between" flexWrap="wrap">
-        <Flex flexDir="column">
-          <Heading size="lg">
-            <Flex alignItems="center">
-              <FaChartBar /> Ranking
-            </Flex>
-          </Heading>
-          <Text>Vote:</Text>
-        </Flex>
-        <Button leftIcon={<FaTv />} onClick={handlePresentClick}>
-          Present
-        </Button>
+        <Heading size="lg">
+          <Flex alignItems="center" gap="1rem">
+            <FaChartBar /> <Text>Ranking</Text>
+          </Flex>
+        </Heading>
+        <NavLink to="/PollPresent">
+          <Button leftIcon={<FaTv />} onClick={handlePresentClick}>
+            Present
+          </Button>
+        </NavLink>
       </Flex>
     </>
   );
