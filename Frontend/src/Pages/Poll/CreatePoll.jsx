@@ -37,11 +37,21 @@ export default function CreatePoll() {
 }
 
 const PollCode = () => {
+  const handleEndSession = () => {
+    localStorage.removeItem("question");
+    localStorage.removeItem("pollOptions");
+    window.location.href = "/info";
+  };
   return (
     <Box>
       <Flex alignItems="center" justifyContent="space-between" px="2rem">
         <Heading mb="1rem">Poll Code: </Heading>
-        <Button bgColor="black" colorScheme="blackAlpha" color="white">
+        <Button
+          bgColor="black"
+          colorScheme="blackAlpha"
+          color="white"
+          onClick={handleEndSession}
+        >
           End session
         </Button>
       </Flex>

@@ -1,18 +1,23 @@
 import {
   Box,
   Button,
-  Divider,
   Flex,
   Grid,
   GridItem,
   Heading,
-  Progress,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
   Text,
   useColorMode,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { FaArrowLeft, FaChartBar, FaUserGroup, FaTv } from "react-icons/fa6";
 import { NavLink } from "react-router-dom";
+import PollProgressBar from "./Components/PollProgressBar";
+import PollBargraph from "./Components/PollBargraph";
 
 export default function PollPresent() {
   return (
@@ -75,10 +80,16 @@ const Headline = () => {
 };
 
 const Sidebar = () => {
+  const handleBackButtonClick = () => {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+      setIsFullscreen(false);
+    }
+  };
   return (
     <Box minH="100vh" borderRadius="2rem 0 0 2rem">
       <NavLink to="/Createpoll">
-        <Button borderRadius="10rem">
+        <Button borderRadius="10rem" onClick={handleBackButtonClick}>
           <FaArrowLeft />
         </Button>
       </NavLink>
@@ -105,25 +116,22 @@ const Main = () => {
     <>
       <Box bgColor={bgColor} minH="100vh" borderRadius="0 2rem 2rem 0">
         <Heading p="2rem">What you doing Today?</Heading>
-        <Divider />
-        <Box p="2rem">
-          <Flex alignItems="center" justifyContent="space-between">
-            <Flex gap="1rem" alignItems="center">
-              <Text fontSize="3xl">1.</Text>
-              <Text fontSize="3xl">Option 1</Text>
-            </Flex>
-            <Text fontSize="3xl">80%</Text>
-          </Flex>
 
-          <Progress
-            colorScheme="green"
-            value={80}
-            mx="2rem"
-            my="1rem"
-            borderRadius="10px"
-            h="1rem"
-          />
-        </Box>
+        <Tabs>
+          <TabList>
+            <Tab>Bar Graph</Tab>
+            <Tab>Progress Bar</Tab>
+          </TabList>
+
+          <TabPanels>
+            <TabPanel>
+              <PollBargraph />
+            </TabPanel>
+            <TabPanel>
+              <PollProgressBar />
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
       </Box>
     </>
   );
