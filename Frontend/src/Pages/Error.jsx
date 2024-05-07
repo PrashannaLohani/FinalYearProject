@@ -20,7 +20,7 @@ const Heading = () => {
       <Text fontSize="lg" mt="2">
         We couldn't find the page you're looking for.
       </Text>
-      <Text>You can try it after logining</Text>
+      <Text>You can try it after logining in</Text>
       <NavLink to="/Login">
         <Button
           colorScheme="blackAlpha"

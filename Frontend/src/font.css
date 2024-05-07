@@ -3,3 +3,25 @@ body #root {
   font-family: "Poppins", sans-serif;
   font-optical-sizing: auto;
 }
+
+::-webkit-scrollbar {
+  width: 10px; /* width of the scrollbar */
+  background-color: transparent;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555; /* color of the scrollbar handle when hovered */
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: gray; /* color of the scrollbar handle */
+  border-radius: 10px; /* roundness of the scrollbar handle */
+  box-shadow: rgba(0, 2, 0, 0.8);
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* color of the scrollbar track */
+}
