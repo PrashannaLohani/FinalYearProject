@@ -9,6 +9,11 @@ import {
   Flex,
   Heading,
   SimpleGrid,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
   Text,
 } from "@chakra-ui/react";
 
@@ -107,6 +112,35 @@ const Welcome = ({ full_name }) => {
 };
 
 const Dashboard = () => {
+  return (
+    <Box
+      minH="100vh"
+      minW="10rem"
+      mt="2rem"
+      borderRadius="0 5rem 2rem 2rem"
+      p={{ base: "1rem", md: "2rem" }}
+      boxShadow="rgba(0, 0, 0, 0.25) 0px 14px 28px"
+    >
+      <Tabs>
+        <TabList>
+          <Tab>Room Dashboard</Tab>
+          <Tab>Poll Dashboard</Tab>
+        </TabList>
+
+        <TabPanels>
+          <TabPanel>
+            <RoomDashboard />
+          </TabPanel>
+          <TabPanel>
+            <PollDashboard />
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
+    </Box>
+  );
+};
+
+const RoomDashboard = () => {
   const boxStyle = {
     style: {
       maxHeight: "auto",
@@ -145,14 +179,7 @@ const Dashboard = () => {
   };
 
   return (
-    <Box
-      minH="100vh"
-      minW="10rem"
-      mt="2rem"
-      borderRadius="0 5rem 2rem 2rem"
-      p={{ base: "1rem", md: "3rem" }}
-      boxShadow="rgba(0, 0, 0, 0.25) 0px 14px 28px"
-    >
+    <>
       <SimpleGrid minChildWidth="300px" Columns={{ base: 1, md: 2 }} gap={4}>
         <Box key={1} {...boxStyle}>
           <Flex justifyItems="center" alignItems="center" flexDir="column">
@@ -224,6 +251,80 @@ const Dashboard = () => {
           </Accordion>
         </Box>
       </SimpleGrid>
-    </Box>
+    </>
+  );
+};
+
+const PollDashboard = () => {
+  const boxStyle = {
+    style: {
+      maxHeight: "auto",
+      minHeight: "10rem",
+      borderRadius: "2rem",
+      bgColor: "white",
+      padding: "2rem",
+      boxShadow: "rgba(100, 100, 111, 0.2) 0px 7px 29px 0px",
+    },
+  };
+  return (
+    <SimpleGrid
+      minChildWidth={{ base: "120px", md: "200px", lg: "300px" }}
+      Columns={2}
+      gap={4}
+    >
+      <Box key={1} {...boxStyle} gridColumn="span 2">
+        <Flex justifyItems="center" alignItems="center" flexDir="column">
+          <Heading size="lg">Total Poll Rooms </Heading>
+          <Text fontSize="2xl" mt="1rem">
+            20
+          </Text>
+        </Flex>
+      </Box>
+      <Box key={2} {...boxStyle} gridColumn="span 2">
+        <Flex justifyItems="center" alignItems="center" flexDir="column">
+          <Heading size="lg">Total Voting</Heading>
+          <Text fontSize="2xl" mt="1rem">
+            20
+          </Text>
+        </Flex>
+      </Box>
+      <Box
+        key={3}
+        maxH="auto"
+        minH="25rem"
+        bgColor="white"
+        borderRadius="2rem"
+        boxShadow="rgba(100, 100, 111, 0.2) 0px 7px 29px 0px"
+        gridColumn="span 4"
+        p="2rem"
+      >
+        <Flex justifyItems="center" flexDir="column">
+          <Heading size="lg">History</Heading>
+          <Accordion
+            allowToggle
+            mt="1rem"
+            style={{ maxHeight: "300px", overflow: "auto" }}
+          >
+            <AccordionItem>
+              <h2>
+                <AccordionButton>
+                  <Box as="b" flex="1" textAlign="left">
+                    Room ID:
+                  </Box>
+                  <AccordionIcon />
+                </AccordionButton>
+              </h2>
+              <AccordionPanel pb={4}>
+                <p>Question: </p>
+                <p>Total vote: </p>
+                <p>Option 1: </p>
+                <p>Option 2: </p>
+                <p>Option 3: </p>
+              </AccordionPanel>
+            </AccordionItem>
+          </Accordion>
+        </Flex>
+      </Box>
+    </SimpleGrid>
   );
 };
