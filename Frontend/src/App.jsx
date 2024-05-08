@@ -22,6 +22,7 @@ import RoomPresenter from "./Pages/Room/Room_Presenter";
 import CreatePoll from "./Pages/Poll/CreatePoll";
 import PollPresent from "./Pages/Poll/PollPresent";
 import PrivateRoute from "./Layout/PrivateRoute";
+import PollParticipant from "./Pages/Poll/PollParticipant";
 
 function App() {
   const router = createBrowserRouter(
@@ -40,6 +41,7 @@ function App() {
             <Route path="/Info" element={<Info />} />
             <Route path="/CreateRoom" element={<CreateRoom />} />
             <Route path="/CreatePoll" element={<CreatePoll />} />
+            <Route path="/PollParticipant" element={<PollParticipant />} />
             <Route path="/RoomPresenter" element={<RoomPresenter />} />
             <Route path="/Setting" element={<Setting />} />
             <Route path="/Billing" element={<Billing />} />
