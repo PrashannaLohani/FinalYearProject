@@ -4,7 +4,7 @@ from .models import Poll
 
 
 class PollAdmin(admin.ModelAdmin):
-    list_display = ('poll_id','user', 'question', 'num_of_people','option', 'num_of_vote', 'created_at')
+    list_display = ('poll_id','user', 'question','options', 'num_of_people', 'num_of_vote', 'created_at')
     search_fields = ('poll_id', 'question')  # Enable searching by these fields
     readonly_fields = ('poll_id',)
 

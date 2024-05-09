@@ -17,6 +17,7 @@ class Room(models.Model):
     def to_dict(self):
         return {
             'room_id': self.room_id,
+            'user':self.user.full_name,
             'room_name': self.room_name,
             'limit_people_num': self.limit_people_num,
             'num_of_people': self.num_of_people,

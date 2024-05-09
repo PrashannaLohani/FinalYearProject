@@ -10,28 +10,6 @@ import string
 from .models import Room,Comment,Upvote
 from CRM.models import Signup
 
-class RoomAPI(APIView):
-    def post(self, request):
-        if request.method == 'POST':
-            serializer = RoomSerializer(data=request.data)
-            if serializer.is_valid():
-                room_name = serializer.validated_data.get('room_name')
-                limit_people_num=serializer.validated_data.get('limit_people_num')
-                room_id = ''.join([str(random.randint(1, 9)) for _ in range(6)])  # Generate room ID
-                room = Room.objects.create(room_id=room_id, room_name=room_name, limit_people_num=limit_people_num)
-                room.save()
-                
-
-                token = jwt.encode({'room_id': room_id, 'room_name': room_name, 'limit_people_num': limit_people_num}, settings.SECRET_KEY, algorithm='HS256')
-                return Response({'token': token, 'ID': room_id, 'name': room_name, 'People Limitation': limit_people_num, }, status=status.HTTP_201_CREATED)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            
-    def get(self, request):
-        rooms = Room.objects.all()
-        room_data = [{'room_id': room.room_id, 'room_name': room.room_name, 'limit_people_num': room.limit_people_num, 'num_of_people': room.num_of_people, 'num_of_comments': room.num_of_comments} for room in rooms]
-        return Response(room_data, status=status.HTTP_200_OK)
-
 class Stats(APIView):
     def get(self, request):
         token = request.headers.get('Authorization')
@@ -71,6 +49,37 @@ class Stats(APIView):
                 return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             return Response({'error': 'Authorization header not found'}, status=status.HTTP_400_BAD_REQUEST)
+class RoomAPI(APIView):
+    def post(self, request):
+        token = request.headers.get('Authorization')
+        if request.method == 'POST':
+            serializer = RoomSerializer(data=request.data)
+            if serializer.is_valid():
+                room_name = serializer.validated_data.get('room_name')
+                limit_people_num=serializer.validated_data.get('limit_people_num')
+                token = token.split()[1]
+                decoded_token = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
+
+                # Extract user_id from the token
+                full_name = decoded_token.get('full_name')
+
+                # Fetch the user associated with the token
+                user = Signup.objects.get(full_name=full_name)
+
+                room_id = ''.join([str(random.randint(1, 9)) for _ in range(6)])  # Generate room ID
+                room = Room.objects.create(room_id=room_id,user=user, room_name=room_name, limit_people_num=limit_people_num)
+                room.save()
+                
+
+                token = jwt.encode({'room_id': room_id, 'room_name': room_name, 'limit_people_num': limit_people_num}, settings.SECRET_KEY, algorithm='HS256')
+                return Response({'token': token, 'ID': room_id, 'name': room_name, 'People Limitation': limit_people_num, }, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+    def get(self, request):
+        rooms = Room.objects.all()
+        room_data = [{'room_id': room.room_id, 'room_name': room.room_name, 'limit_people_num': room.limit_people_num, 'num_of_people': room.num_of_people, 'num_of_comments': room.num_of_comments} for room in rooms]
+        return Response(room_data, status=status.HTTP_200_OK)
         
 class JoinAPI(APIView):
     def post(self, request):

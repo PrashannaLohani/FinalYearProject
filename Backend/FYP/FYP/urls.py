@@ -23,6 +23,7 @@ urlpatterns = [
     path('get-csrf-token/<str:token_type>/', utils.get_csrf_token, name='get_csrf_token'),
     path('accounts/', include('django.contrib.auth.urls')),
 
-    path('room/', include('RoomInfo.urls'))
+    path('room/', include('RoomInfo.urls')),
+    path('Poll/', include('Poll.urls'))
 ]
 
