@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -10,7 +9,6 @@ from FYP import settings
 from CRM.models import Signup
 
 # Create your views here.
-
 class PollCodeCreateAPI(APIView):
     def post(self, request):
         # Get the authorization token from the header
@@ -44,8 +42,6 @@ class PollCodeCreateAPI(APIView):
     
 class PollCreateAPI(APIView):
     def post(self, request):
-        
-
         serializer = PollSerializer(data=request.data)
         if serializer.is_valid():
             question = serializer.validated_data.get('question')
