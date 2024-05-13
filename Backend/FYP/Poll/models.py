@@ -12,7 +12,7 @@ class PollCode(models.Model):
 
 
 class Option(models.Model):
-    poll = models.ForeignKey(PollCode, on_delete=models.CASCADE, related_name='options')
+    poll = models.CharField(max_length=255,default=None)
     question = models.CharField(max_length=255)
     option = models.CharField(max_length=255, blank=True, null=True)
     vote = models.IntegerField(default=0)
@@ -22,7 +22,7 @@ class Option(models.Model):
 
 
 class Poll(models.Model):
-    poll_id = models.OneToOneField(PollCode, on_delete=models.CASCADE)
+    poll_id = models.CharField(max_length=255, default=None)
     question = models.CharField(max_length=255)
     option = models.CharField(max_length=255, default=None)
     num_of_people = models.IntegerField(default=0)

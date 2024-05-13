@@ -15,6 +15,7 @@ import {
   TabPanels,
   Tabs,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 
 import { useUserInfo } from "../Components/UserInfo";
@@ -50,6 +51,7 @@ export default function Info() {
 }
 
 const Welcome = ({ full_name }) => {
+  const toast = useToast();
   const [quote, setQuote] = useState("");
   useEffect(() => {
     const fetchQuote = async () => {
@@ -64,6 +66,42 @@ const Welcome = ({ full_name }) => {
 
     fetchQuote();
   }, []);
+  const handlePoll = () => {
+    const successPromise = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve();
+      }, 2500);
+    });
+    toast.promise(successPromise, {
+      success: { title: "Room Entered.", description: "Welcome." },
+      loading: { title: "Validating Room...", description: "Please wait" },
+      error: { title: "Failed", description: "Something went wrong" },
+    });
+  };
+  const createPollCode = async () => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      const response = await axios.post(
+        "http://127.0.0.1:8000/Poll/createcode/",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      handlePoll();
+      localStorage.setItem("Poll_Code", response.data.poll_id);
+      setTimeout(() => {
+        window.location.href = "/CreatePoll";
+      }, 3000);
+
+      console.log("Poll ID:", response.data.poll_id);
+    } catch (error) {
+      console.error("Error creating poll code:", error);
+    }
+  };
+
   return (
     <Box>
       <Box
@@ -95,16 +133,16 @@ const Welcome = ({ full_name }) => {
               Create room
             </Button>
           </NavLink>
-          <NavLink to="/CreatePoll" element={<CreatePoll />}>
-            <Button
-              mt="2rem"
-              leftIcon={<FaChartSimple />}
-              colorScheme="whiteAlpha"
-              color="white"
-            >
-              Create Poll
-            </Button>
-          </NavLink>
+
+          <Button
+            mt="2rem"
+            leftIcon={<FaChartSimple />}
+            colorScheme="whiteAlpha"
+            color="white"
+            onClick={createPollCode}
+          >
+            Create Poll
+          </Button>
         </Flex>
       </Box>
     </Box>

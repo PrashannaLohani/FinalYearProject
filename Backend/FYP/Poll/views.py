@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializers import PollSerializer
 import random
-from .models import Poll
+from .models import Poll, PollCode
 import jwt
 from FYP import settings
 from CRM.models import Signup
@@ -24,8 +24,8 @@ class PollCodeCreateAPI(APIView):
         try:
             # Decode the token to get user information
             decoded_token = jwt.decode(usertoken, settings.SECRET_KEY, algorithms=['HS256'])
-            full_name = decoded_token.get('full_name')
-            user = Signup.objects.get(full_name=full_name)
+            email = decoded_token.get('email')
+            user = Signup.objects.get(email=email)
         except jwt.ExpiredSignatureError:
             return Response({'error': 'Token has expired.'}, status=status.HTTP_401_UNAUTHORIZED)
         except jwt.InvalidTokenError:
@@ -35,7 +35,7 @@ class PollCodeCreateAPI(APIView):
         poll_id = ''.join([str(random.randint(1, 9)) for _ in range(6)])
         
         # Create the poll object with only poll_id
-        poll = Poll.objects.create(poll_id=poll_id,user=user)
+        poll = PollCode.objects.create(poll_id=poll_id,user=user)
         
         # Return the poll_id
         return Response({'poll_id': poll_id}, status=status.HTTP_201_CREATED)

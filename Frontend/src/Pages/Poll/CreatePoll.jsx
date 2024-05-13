@@ -27,7 +27,6 @@ export default function CreatePoll() {
           p="2rem"
         >
           <RoomID />
-          <Question />
           <Polling />
         </Box>
       </Box>
@@ -39,12 +38,14 @@ const PollCode = () => {
   const handleEndSession = () => {
     localStorage.removeItem("question");
     localStorage.removeItem("pollOptions");
+    localStorage.removeItem("Poll_ID");
     window.location.href = "/info";
   };
+  const Poll_code = localStorage.getItem("Poll_Code");
   return (
     <Box>
       <Flex alignItems="center" justifyContent="space-between" px="2rem">
-        <Heading mb="1rem">Poll Code: </Heading>
+        <Heading mb="1rem">Poll Code: {Poll_code} </Heading>
         <Button
           bgColor="black"
           colorScheme="blackAlpha"
@@ -95,35 +96,6 @@ const RoomID = () => {
   );
 };
 
-const Question = () => {
-  const [question, setQuestion] = useState(
-    localStorage.getItem("question") || ""
-  );
-
-  useEffect(() => {
-    localStorage.setItem("question", question);
-  }, [question]);
-
-  const handleQuestionChange = (newValue) => {
-    setQuestion(newValue);
-  };
-
-  return (
-    <>
-      <Editable
-        placeholder="Write your question"
-        value={question}
-        style={{ fontSize: "2.5rem" }}
-        mt="2rem"
-        onChange={handleQuestionChange}
-      >
-        <EditablePreview />
-        <EditableInput />
-      </Editable>
-    </>
-  );
-};
-
 const Polling = () => {
   const maxOptions = 8;
   const [options, setOptions] = useState(
@@ -150,9 +122,30 @@ const Polling = () => {
       setIsAddOptionDisabled(false); // Re-enable the Add option button after deletion
     }
   };
+  const [question, setQuestion] = useState(
+    localStorage.getItem("question") || ""
+  );
+
+  useEffect(() => {
+    localStorage.setItem("question", question);
+  }, [question]);
+
+  const handleQuestionChange = (newValue) => {
+    setQuestion(newValue);
+  };
   return (
     <>
-      <Box minHeight="100vh">
+      <Editable
+        placeholder="Write your question"
+        value={question}
+        style={{ fontSize: "2.5rem" }}
+        mt="2rem"
+        onChange={handleQuestionChange}
+      >
+        <EditablePreview />
+        <EditableInput />
+      </Editable>
+      <Box minHeight="auto">
         {options.map((option, index) => (
           <Flex alignItems="center" gap="1rem" mt="2rem" key={index}>
             <Text>{index + 1}.</Text>
