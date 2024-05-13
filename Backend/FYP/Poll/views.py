@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializers import PollSerializer
 import random
-from .models import Poll, PollCode
+from .models import Poll, PollCode,Option
 import jwt
 from FYP import settings
 from CRM.models import Signup
@@ -45,20 +45,30 @@ class PollCreateAPI(APIView):
         serializer = PollSerializer(data=request.data)
         if serializer.is_valid():
             question = serializer.validated_data.get('question')
-            options = serializer.validated_data.get('options')
-            
-            poll_id = request.data.get('poll_id') 
-            user = request.data.get('user') 
+            options_str = serializer.validated_data.get('options')
+            poll = serializer.validated_data.get('poll')
 
-            # Create the poll object
-            poll = Poll.objects.create(poll_id=poll_id, user=user, question=question, options=options)
-            
-            # Generate JWT token
-            token = jwt.encode({'poll_id': poll_id, 'question': question, 'options': options}, settings.SECRET_KEY, algorithm='HS256')
+            if not question or not options_str:
+                return Response({'error': 'Question and options are required'}, status=status.HTTP_400_BAD_REQUEST)
+
+            options = options_str.split(",")  # Split options by comma
+
+            # List to store tokens for each option
+            tokens = []
+
+            for option in options:
+                # Create the poll object for each option
+                new_option = Option.objects.create(poll=poll, question=question, options=option)
+                
+                # Generate JWT token for each option
+                token = jwt.encode({'poll': poll, 'question': question, 'option': option}, settings.SECRET_KEY, algorithm='HS256')
+                
+                # Append token to list
+                tokens.append(token)
             
             # Serialize response
             response_data = {
-                'token': token,
+                'tokens': tokens,
             }
             
             return Response(response_data, status=status.HTTP_201_CREATED)

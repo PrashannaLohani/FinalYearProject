@@ -22,7 +22,7 @@ import PollBargraph from "./Components/PollBargraph";
 export default function PollPresent() {
   return (
     <>
-      <Box p={{ base: "1rem", md: "3rem", lg: "3rem" }} minHeight="100vh">
+      <Box p={{ base: "1rem", md: "2rem", lg: "2rem" }} minHeight="auto">
         <Grid templateColumns="1fr 3fr" templateRows="auto 1fr">
           {/* Sidebar and Main in the second row */}
           <GridItem colSpan={1} colStart={2}>
@@ -86,6 +86,7 @@ const Sidebar = () => {
       setIsFullscreen(false);
     }
   };
+  const PollCode = localStorage.getItem("Poll_Code");
   return (
     <Box minH="100vh" borderRadius="2rem 0 0 2rem">
       <NavLink to="/Createpoll">
@@ -102,7 +103,7 @@ const Sidebar = () => {
       >
         <Text>Join at</Text>
         <Heading>React&Rise.com</Heading>
-        <Heading>123456</Heading>
+        <Heading>{PollCode}</Heading>
       </Flex>
     </Box>
   );
@@ -112,10 +113,12 @@ const Main = () => {
   const { colorMode } = useColorMode();
   const bgColor = colorMode === "light" ? "#FFF9D0" : "#333333";
 
+  const Question = localStorage.getItem("question");
+
   return (
     <>
       <Box bgColor={bgColor} minH="100vh" borderRadius="0 2rem 2rem 0">
-        <Heading p="2rem">What you doing Today?</Heading>
+        <Heading p="2rem">{Question}</Heading>
 
         <Tabs>
           <TabList>

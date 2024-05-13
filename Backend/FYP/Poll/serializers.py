@@ -1,12 +1,12 @@
 from rest_framework import serializers
-from .models import Poll
+from .models import Option
 
 # Serializers define the API representation.
 
 class PollSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Poll
-        fields = ['question', 'options']  
+        model = Option
+        fields = ['poll','question', 'options']  
 
     def create(self, validated_data):
-        return Poll.objects.create(**validated_data)
+        return Option.objects.create(**validated_data)

@@ -13,39 +13,41 @@ import { FaChartBar } from "react-icons/fa6";
 import { useEffect, useState } from "react";
 import { FaPlus, FaTrashCan, FaTv } from "react-icons/fa6";
 import { NavLink } from "react-router-dom";
+import axios from "axios";
 import PollPresent from "./PollPresent";
 
 export default function CreatePoll() {
+  const Poll_code = localStorage.getItem("Poll_Code");
   return (
     <>
       <Box minH="100vh" p={{ base: "1rem", md: "3rem", lg: "3rem" }}>
-        <PollCode />
+        <PollCode Pollid={Poll_code} />
         <Box
           borderRadius="2rem"
           boxShadow="rgba(255, 255, 255, 0.1) 0px 1px 1px 0px inset, rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px"
           minW="20rem"
           p="2rem"
         >
-          <RoomID />
-          <Polling />
+          <Headline />
+          <Polling Pollid={Poll_code} />
         </Box>
       </Box>
     </>
   );
 }
 
-const PollCode = () => {
+const PollCode = ({ Pollid }) => {
   const handleEndSession = () => {
     localStorage.removeItem("question");
     localStorage.removeItem("pollOptions");
     localStorage.removeItem("Poll_ID");
     window.location.href = "/info";
   };
-  const Poll_code = localStorage.getItem("Poll_Code");
+
   return (
     <Box>
       <Flex alignItems="center" justifyContent="space-between" px="2rem">
-        <Heading mb="1rem">Poll Code: {Poll_code} </Heading>
+        <Heading mb="1rem">Poll Code: {Pollid} </Heading>
         <Button
           bgColor="black"
           colorScheme="blackAlpha"
@@ -59,7 +61,7 @@ const PollCode = () => {
   );
 };
 
-const RoomID = () => {
+const Headline = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const handlePresentClick = () => {
     if (!isFullscreen) {
@@ -96,15 +98,17 @@ const RoomID = () => {
   );
 };
 
-const Polling = () => {
+const Polling = ({ Pollid }) => {
   const maxOptions = 8;
-  const [options, setOptions] = useState(
-    JSON.parse(localStorage.getItem("pollOptions")) || ["Option 1", "Option 2"]
-  );
   const [isAddOptionDisabled, setIsAddOptionDisabled] = useState(false);
+  const [options, setOptions] = useState(
+    localStorage.getItem("pollOptions")
+      ? localStorage.getItem("pollOptions").split(",")
+      : ["Option 1", "Option 2"]
+  );
 
   useEffect(() => {
-    localStorage.setItem("pollOptions", JSON.stringify(options));
+    localStorage.setItem("pollOptions", options.join(","));
   }, [options]);
 
   const addOption = () => {
@@ -122,6 +126,7 @@ const Polling = () => {
       setIsAddOptionDisabled(false); // Re-enable the Add option button after deletion
     }
   };
+
   const [question, setQuestion] = useState(
     localStorage.getItem("question") || ""
   );
@@ -133,6 +138,42 @@ const Polling = () => {
   const handleQuestionChange = (newValue) => {
     setQuestion(newValue);
   };
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const PresentationClick = () => {
+    if (!isFullscreen) {
+      if (document.fullscreenEnabled) {
+        document.documentElement.requestFullscreen();
+        setIsFullscreen(true);
+      } else {
+        // Full-screen mode is not supported
+        console.error("Full-screen mode is not supported.");
+      }
+    } else {
+      // Exit full-screen mode
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+        setIsFullscreen(false);
+      }
+    }
+  };
+
+  const submitPoll = async () => {
+    try {
+      const Option = localStorage.getItem("pollOptions");
+      const Question = localStorage.getItem("question");
+      const response = await axios.post("http://127.0.0.1:8000/Poll/create/", {
+        poll: Pollid,
+        question: Question,
+        options: Option,
+      });
+      PresentationClick();
+
+      console.log(response.data); // Optionally, handle the response data
+    } catch (error) {
+      console.error("Error submitting poll:", error);
+    }
+  };
+
   return (
     <>
       <Editable
@@ -177,14 +218,18 @@ const Polling = () => {
           </Flex>
         ))}
         <Flex gap="1rem">
-          <Button
-            colorScheme="blackAlpha"
-            color="white"
-            mt="1rem"
-            bgColor="black"
-          >
-            Submit
-          </Button>
+          <NavLink to="/PollPresent">
+            <Button
+              colorScheme="blackAlpha"
+              color="white"
+              mt="1rem"
+              bgColor="black"
+              onClick={submitPoll}
+            >
+              Submit
+            </Button>
+          </NavLink>
+
           <Button
             leftIcon={<FaPlus />}
             variant="ghost"
