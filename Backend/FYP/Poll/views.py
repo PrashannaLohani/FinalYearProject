@@ -74,3 +74,16 @@ class PollCreateAPI(APIView):
             return Response(response_data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self,request):
+        poll_id = request.query_params.get('poll_id')
+        question = request.query_params.get('question')
+        
+        if not poll_id or not question:
+            return Response({'error': 'Poll ID and question are required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            poll_options = Option.objects.filter(poll=poll_id, question=question).values('options', 'votes')
+            return Response({'poll_options': list(poll_options)}, status=status.HTTP_200_OK)
+        except Option.DoesNotExist:
+            return Response({'error': 'Poll options not found'}, status=status.HTTP_404_NOT_FOUND)
