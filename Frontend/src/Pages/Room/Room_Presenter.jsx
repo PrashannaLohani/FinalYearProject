@@ -141,12 +141,12 @@ const CommentSection = ({ roomId }) => {
     <Box mt="2rem" minH="100vh" p="2rem">
       <SimpleGrid
         columns={3}
-        spacing="1rem"
+        spacing="5px"
         minChildWidth={{ base: "200px", md: "400px" }}
         autoRows="auto"
       >
         {filteredComments.map((comment, index) => (
-          <Card key={index} variant="outline" maxW="30rem" bgColor=" #CCBABA">
+          <Card key={index} variant="outline" maxW="30rem" bgColor=" #A94D4A">
             <CardHeader>
               <Flex
                 alignItems="center"
@@ -175,6 +175,7 @@ const CommentSection = ({ roomId }) => {
                 colorScheme="blackAlpha"
                 onClick={() => handleReadClick(index)}
                 bgColor="black"
+                color="white"
               >
                 {comment.isRead ? "Unread" : "Read"}
               </Button>

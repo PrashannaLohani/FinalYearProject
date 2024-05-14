@@ -8,7 +8,7 @@ class OptionAdmin(admin.ModelAdmin):
 admin.site.register(Option, OptionAdmin)
 
 class PollCodeAdmin(admin.ModelAdmin):
-    list_display = ('poll_id', 'user')
+    list_display = ('poll_id', 'user','num_of_people','session')
     search_fields = ('poll_id',)  
 
 admin.site.register(PollCode, PollCodeAdmin)

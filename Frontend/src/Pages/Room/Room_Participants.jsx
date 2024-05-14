@@ -148,7 +148,7 @@ const CommentSection = ({ roomCode }) => {
         autoRows="auto"
       >
         {filteredComments.map((comment, index) => (
-          <Card key={index} variant="outline" maxW="30rem" bgColor="#A0A0A0">
+          <Card key={index} variant="outline" maxW="30rem" bgColor="#A94D4A">
             <CardHeader>
               <Flex
                 alignItems="center"

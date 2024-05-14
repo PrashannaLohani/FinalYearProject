@@ -83,7 +83,6 @@ const Sidebar = () => {
   const handleBackButtonClick = () => {
     if (document.exitFullscreen) {
       document.exitFullscreen();
-      setIsFullscreen(false);
     }
   };
   const PollCode = localStorage.getItem("Poll_Code");

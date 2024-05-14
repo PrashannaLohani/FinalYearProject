@@ -48,6 +48,7 @@ export default function Home() {
 
 const Section1 = () => {
   const toast = useToast();
+
   const handleEntry = () => {
     const successPromise = new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -60,9 +61,11 @@ const Section1 = () => {
       error: { title: "Login failed", description: "Something went wrong" },
     });
   };
+
   const handleEnterClick = (targetPage) => {
     window.location.href = targetPage;
   };
+
   const initialValues = {
     roomCode: "",
   };
@@ -78,29 +81,54 @@ const Section1 = () => {
     },
     onSubmit: async (values) => {
       try {
-        const response = await axios.post(
+        // First API call to join room
+        const roomResponse = await axios.post(
           "http://127.0.0.1:8000/room/joinroom/",
           {
-            room_code: values.roomCode,
+            room_code: values.roomCode, // Use roomCode for the room API call
           }
         );
-        localStorage.setItem("username", response.data.username);
-        localStorage.setItem("User-Token", response.data.token);
-        handleEntry();
+
+        // Store room details in localStorage
+        localStorage.setItem("username", roomResponse.data.username);
+        localStorage.setItem("User-Token", roomResponse.data.token);
+        handleEntry(); // Display success message
         setTimeout(() => {
-          handleEnterClick("/ParticipantRoom");
+          handleEnterClick("/ParticipantRoom"); // Redirect to ParticipantRoom
         }, 2100);
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: error.response.data.error,
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-        });
+      } catch (roomError) {
+        try {
+          // Second API call to join poll if room joining fails
+          const pollResponse = await axios.post(
+            "http://127.0.0.1:8000/Poll/joinpoll/",
+            {
+              poll_id: values.roomCode, // Use roomCode for the poll API call
+            }
+          );
+
+          // Store poll details in localStorage
+          localStorage.setItem("Poll_Id", pollResponse.data.poll_id);
+          handleEntry(); // Display success message
+          setTimeout(() => {
+            handleEnterClick("/PollParticipant"); // Redirect to PollParticipant
+          }, 2100);
+        } catch (pollError) {
+          // Handle error for second API call (join poll)
+
+          // Handle error for first API call (join room)
+          toast({
+            title: "Error",
+            description:
+              roomError.response.data.error || pollError.response.data.error,
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+          });
+        }
       }
     },
   });
+
   return (
     <Flex justifyContent="center">
       <Box

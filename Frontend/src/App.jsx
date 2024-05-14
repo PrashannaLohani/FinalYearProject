@@ -41,7 +41,6 @@ function App() {
             <Route path="/Info" element={<Info />} />
             <Route path="/CreateRoom" element={<CreateRoom />} />
             <Route path="/CreatePoll" element={<CreatePoll />} />
-            <Route path="/PollParticipant" element={<PollParticipant />} />
             <Route path="/RoomPresenter" element={<RoomPresenter />} />
             <Route path="/Setting" element={<Setting />} />
             <Route path="/Billing" element={<Billing />} />
@@ -49,6 +48,7 @@ function App() {
         </Route>
         <Route path="/Error" element={<Error />} />
 
+        <Route path="/PollParticipant" element={<PollParticipant />} />
         <Route path="/PollPresent" element={<PollPresent />} />
         <Route path="/ParticipantRoom" element={<ParticipantRoom />} />
       </>

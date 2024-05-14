@@ -1,9 +1,9 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import PollSerializer
+from .serializers import PollSerializer,PollJoinSerializer
 import random
-from .models import Poll, PollCode,Option
+from .models import  PollCode,Option
 import jwt
 from FYP import settings
 from CRM.models import Signup
@@ -87,3 +87,27 @@ class PollCreateAPI(APIView):
             return Response({'poll_options': list(poll_options)}, status=status.HTTP_200_OK)
         except Option.DoesNotExist:
             return Response({'error': 'Poll options not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+
+class JoinPollApi(APIView):
+    def post(self, request):
+        if request.method == 'POST':
+            serializer = PollJoinSerializer(data=request.data)
+            if serializer.is_valid():
+                poll_id = serializer.validated_data.get('poll_id')
+                try:
+                    poll = PollCode.objects.get(poll_id=poll_id)
+                    
+                    if poll.session:
+                        return Response({'error': 'Session already ended'}, status=status.HTTP_403_FORBIDDEN)
+                    
+                    # Increment num_of_people
+                    poll.num_of_people += 1
+                    poll.save()
+                    
+                    return Response({'poll_id': poll.poll_id, 'num_of_people': poll.num_of_people}, status=status.HTTP_201_CREATED)
+                
+                except PollCode.DoesNotExist:
+                    return Response({'error': 'Room does not exist'}, status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

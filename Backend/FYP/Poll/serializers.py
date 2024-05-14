@@ -10,3 +10,6 @@ class PollSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return Option.objects.create(**validated_data)
+
+class PollJoinSerializer(serializers.Serializer):
+    poll_id = serializers.IntegerField()

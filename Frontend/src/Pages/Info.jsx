@@ -247,7 +247,6 @@ const RoomDashboard = () => {
         <Box
           maxH="auto"
           minH="25rem"
-          bgColor="white"
           borderRadius="2rem"
           boxShadow="rgba(100, 100, 111, 0.2) 0px 7px 29px 0px"
           key={4}
@@ -330,7 +329,6 @@ const PollDashboard = () => {
         key={3}
         maxH="auto"
         minH="25rem"
-        bgColor="white"
         borderRadius="2rem"
         boxShadow="rgba(100, 100, 111, 0.2) 0px 7px 29px 0px"
         gridColumn="span 4"
