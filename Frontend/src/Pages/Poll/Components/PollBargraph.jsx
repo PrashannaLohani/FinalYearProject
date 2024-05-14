@@ -26,12 +26,10 @@ const options = {
   responsive: true,
   plugins: {
     legend: {
-      display: true,
-      position: "top",
+      display: false,
     },
-    title: {
-      display: true,
-      text: "Poll Result",
+    label: {
+      color: "white",
     },
   },
   scales: {

@@ -78,6 +78,7 @@ class PollCreateAPI(APIView):
     def get(self,request):
         poll_id = request.query_params.get('poll_id')
         question = request.query_params.get('question')
+        selected_option = request.data.get('selected_option')
         
         if not poll_id or not question:
             return Response({'error': 'Poll ID and question are required'}, status=status.HTTP_400_BAD_REQUEST)
@@ -87,6 +88,25 @@ class PollCreateAPI(APIView):
             return Response({'poll_options': list(poll_options)}, status=status.HTTP_200_OK)
         except Option.DoesNotExist:
             return Response({'error': 'Poll options not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+class VoteOption(APIView):
+    def post(self, request):
+        poll_id = request.data.get('poll_id')
+        question = request.data.get('question')
+        selected_option = request.data.get('selected_option')
+        
+        if not poll_id or not question or not selected_option:
+            return Response({'error': 'Poll ID, question, and selected_option are required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            # Get the selected option from the database
+            option = Option.objects.get(poll=poll_id, question=question, options=selected_option)
+            # Increment the vote count for the selected option
+            option.votes += 1
+            option.save()
+            return Response({'message': 'Vote registered successfully'}, status=status.HTTP_200_OK)
+        except Option.DoesNotExist:
+            return Response({'error': 'Option not found'}, status=status.HTTP_404_NOT_FOUND)
         
 
 class JoinPollApi(APIView):
@@ -104,8 +124,14 @@ class JoinPollApi(APIView):
                     # Increment num_of_people
                     poll.num_of_people += 1
                     poll.save()
-                    
-                    return Response({'poll_id': poll.poll_id, 'num_of_people': poll.num_of_people}, status=status.HTTP_201_CREATED)
+                    option = Option.objects.filter(poll=poll_id).first()
+                    if option:
+                        question = option.question
+                        return Response({
+                            'poll_id': poll.poll_id, 
+                            'num_of_people': poll.num_of_people,
+                            'question': question  
+                        }, status=status.HTTP_201_CREATED)
                 
                 except PollCode.DoesNotExist:
                     return Response({'error': 'Room does not exist'}, status=status.HTTP_404_NOT_FOUND)

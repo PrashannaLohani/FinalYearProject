@@ -108,6 +108,7 @@ const Section1 = () => {
 
           // Store poll details in localStorage
           localStorage.setItem("Poll_Id", pollResponse.data.poll_id);
+          localStorage.setItem("question", pollResponse.data.question);
           handleEntry(); // Display success message
           setTimeout(() => {
             handleEnterClick("/PollParticipant"); // Redirect to PollParticipant
