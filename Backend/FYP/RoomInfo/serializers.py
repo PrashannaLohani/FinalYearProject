@@ -18,3 +18,4 @@ class CommentSerializer(serializers.Serializer):
     room = serializers.IntegerField()
     user = serializers.CharField(max_length=255)
     message = serializers.CharField(max_length=500)
+    

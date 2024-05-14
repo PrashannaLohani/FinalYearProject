@@ -94,12 +94,26 @@ const NavbarWithoutLogin = () => {
 };
 
 const RoomCode = ({ roomCode }) => {
-  // Receive roomCode as a prop
+  const handleEndSession = () => {
+    const accessToken = localStorage.getItem("accessToken");
+    if (accessToken) {
+      window.location.href = "/info";
+    } else {
+      window.location.href = "/";
+    }
+  };
   return (
     <Box>
       <Flex alignItems="center" justifyContent="space-between" px="2rem">
         <Heading mb="1rem">Room Code: {roomCode}</Heading>{" "}
-        {/* Display the room code */}
+        <Button
+          bgColor="black"
+          colorScheme="blackAlpha"
+          color="white"
+          onClick={handleEndSession}
+        >
+          Exit
+        </Button>
       </Flex>
     </Box>
   );
@@ -125,7 +139,6 @@ const CommentSection = ({ roomCode }) => {
           "http://127.0.0.1:8000/room/comments/"
         );
         setComments(response.data); // Assuming the response is an array of comments
-        console.log(comments);
       } catch (error) {
         console.error("Error fetching comments:", error);
       }
@@ -138,6 +151,16 @@ const CommentSection = ({ roomCode }) => {
   const filteredComments = comments.filter(
     (comment) => comment.room === roomCode
   );
+  const handleUpvote = async (roomId, message) => {
+    try {
+      await axios.post("http://127.0.0.1:8000/room/upvote/", {
+        room_id: roomId,
+        message: message,
+      });
+    } catch (error) {
+      console.error("Error upvoting comment:", error);
+    }
+  };
 
   return (
     <Box mt="2rem" minH="100vh" p="2rem">
@@ -159,7 +182,12 @@ const CommentSection = ({ roomCode }) => {
                 <Flex alignItems="center" gap="5px">
                   <Text as="b">Upvote:</Text>
                   <Button bgColor="black">
-                    <FaHeart style={{ color: "white" }} />
+                    <FaHeart
+                      style={{ color: "white" }}
+                      onClick={() =>
+                        handleUpvote(comment.room, comment.message)
+                      }
+                    />
                   </Button>
                 </Flex>
               </Flex>

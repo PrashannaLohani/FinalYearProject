@@ -8,4 +8,6 @@ urlpatterns = [
     path('Userinfo/',views.DecodeUserTokenAPI.as_view(), name='userInfo'),
     path('comments-count/', views.RoomCommentsCountAPI.as_view(), name='room-comments-count'),
     path('comments/',views.CommentAPI.as_view(), name='Comment'),
+    path('upvote/',views.CommentUpVote.as_view(), name='Vote'),
+    path('deactivate/',views.DeactivateRoomAPI.as_view(), name='Room-end'),
 ]

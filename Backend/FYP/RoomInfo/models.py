@@ -9,6 +9,7 @@ class Room(models.Model):
     num_of_people = models.IntegerField(default=0)
     num_of_comments = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True) 
+    active = models.BooleanField(default=True)
     
 
     def __str__(self):
@@ -21,13 +22,15 @@ class Room(models.Model):
             'room_name': self.room_name,
             'limit_people_num': self.limit_people_num,
             'num_of_people': self.num_of_people,
-            'num_of_comments': self.num_of_comments
+            'num_of_comments': self.num_of_comments,
+            'active':self.active
         }
     
 class Comment(models.Model):
     room = models.IntegerField(default=None)
     user = models.CharField(default=None, max_length=255)
     message = models.CharField(max_length=500, default=None)
+    vote= models.IntegerField(default=0)
 
     def __str__(self):
         return self.message  # Returning message as a string representation
@@ -35,10 +38,3 @@ class Comment(models.Model):
     def get_unique_identifier(self):
         return f"{self.room}-{self.message}"  # Creating a unique identifier
 
-class Upvote(models.Model):
-    user = models.CharField(max_length=255)
-    comment_identifier = models.CharField(max_length=255,default=None)  # Storing the composite key
-    comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.Upvote

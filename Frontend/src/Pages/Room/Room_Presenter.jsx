@@ -40,10 +40,20 @@ export default function RoomPresenter() {
 }
 
 const RoomCode = ({ roomId }) => {
-  const handleClick = () => {
-    localStorage.removeItem("Roomtoken");
-    localStorage.removeItem("username");
-    window.location.href = "/info";
+  const handleClick = async () => {
+    try {
+      await axios.post("http://127.0.0.1:8000/room/deactivate/", {
+        room_id: roomId,
+        active: false,
+      });
+
+      // After successfully setting the session to true, remove items from localStorage and redirect
+      localStorage.removeItem("Roomtoken");
+      localStorage.removeItem("username");
+      window.location.href = "/info";
+    } catch (error) {
+      console.error("Error ending session:", error);
+    }
   };
   return (
     <Box>
@@ -117,7 +127,6 @@ const CommentSection = ({ roomId }) => {
 
     fetchComments();
   }, []); // Fetch comments when the component mounts
-
   const roomIdNumber = parseInt(roomId);
 
   // Filter comments based on roomId
@@ -156,7 +165,7 @@ const CommentSection = ({ roomId }) => {
                 <Heading size="lg">{comment.user}</Heading>
                 <Flex alignItems="center" gap="5px">
                   <Text as="b">Upvote:</Text>
-                  <Text>#</Text>
+                  <Text>{comment.vote}</Text>
                 </Flex>
               </Flex>
             </CardHeader>
