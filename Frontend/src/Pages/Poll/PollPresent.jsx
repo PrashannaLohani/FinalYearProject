@@ -13,11 +13,12 @@ import {
   Text,
   useColorMode,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaArrowLeft, FaChartBar, FaUserGroup, FaTv } from "react-icons/fa6";
 import { NavLink } from "react-router-dom";
 import PollProgressBar from "./Components/PollProgressBar";
 import PollBargraph from "./Components/PollBargraph";
+import axios from "axios";
 
 export default function PollPresent() {
   return (
@@ -60,15 +61,37 @@ const Headline = () => {
       }
     }
   };
+  const [pollData, setPollData] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const pollCode = localStorage.getItem("Poll_Code");
+        const response = await axios.get(
+          "http://127.0.0.1:8000/Poll/totaluser/",
+          {
+            params: {
+              poll_id: pollCode,
+            },
+          }
+        );
+        setPollData(response.data.num_of_people);
+      } catch (error) {
+        console.error("Error fetching poll data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
   return (
-    <Box p="1rem">
+    <Box p={{ base: "1rem", lg: "2rem" }}>
       <Flex alignItems="center" justifyContent="space-between" fontSize="xl">
         <Flex gap="5px" alignItems="center">
           <FaChartBar />
           <Text>Active Poll</Text>
         </Flex>
         <Flex gap="5px" alignItems="center">
-          <Text>2</Text>
+          <Text>{pollData}</Text>
           <FaUserGroup />
           <Button ml="2rem" onClick={handlePresentClick}>
             <FaTv />

@@ -37,11 +37,21 @@ export default function CreatePoll() {
 }
 
 const PollCode = ({ Pollid }) => {
-  const handleEndSession = () => {
-    localStorage.removeItem("question");
-    localStorage.removeItem("pollOptions");
-    localStorage.removeItem("Poll_ID");
-    window.location.href = "/info";
+  const handleClick = async () => {
+    const poll_id = localStorage.getItem("Poll_Code");
+    try {
+      await axios.post("http://127.0.0.1:8000/Poll/deactivate/", {
+        poll_id: poll_id,
+        active: false,
+      });
+
+      localStorage.removeItem("question");
+      localStorage.removeItem("pollOptions");
+      localStorage.removeItem("Poll_ID");
+      window.location.href = "/info";
+    } catch (error) {
+      console.error("Error ending session:", error);
+    }
   };
 
   return (
@@ -52,7 +62,7 @@ const PollCode = ({ Pollid }) => {
           bgColor="black"
           colorScheme="blackAlpha"
           color="white"
-          onClick={handleEndSession}
+          onClick={handleClick}
         >
           End session
         </Button>

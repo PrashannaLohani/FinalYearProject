@@ -7,6 +7,7 @@ from .models import  PollCode,Option
 import jwt
 from FYP import settings
 from CRM.models import Signup
+from django.db.models import Sum
 
 # Create your views here.
 class PollCodeCreateAPI(APIView):
@@ -78,7 +79,6 @@ class PollCreateAPI(APIView):
     def get(self,request):
         poll_id = request.query_params.get('poll_id')
         question = request.query_params.get('question')
-        selected_option = request.data.get('selected_option')
         
         if not poll_id or not question:
             return Response({'error': 'Poll ID and question are required'}, status=status.HTTP_400_BAD_REQUEST)
@@ -86,6 +86,24 @@ class PollCreateAPI(APIView):
         try:
             poll_options = Option.objects.filter(poll=poll_id, question=question).values('options', 'votes')
             return Response({'poll_options': list(poll_options)}, status=status.HTTP_200_OK)
+        except Option.DoesNotExist:
+            return Response({'error': 'Poll options not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+class ParticipantOption(APIView):
+    def get(self, request):
+        try:
+            poll_id = request.query_params.get('poll_id')
+            if not poll_id:
+                return Response({'error': 'Poll ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Get the most recent question and its options for the specified poll ID
+            most_recent_question = Option.objects.filter(poll=poll_id).order_by('-id').first()
+            if not most_recent_question:
+                return Response({'error': 'No questions found for this poll ID'}, status=status.HTTP_404_NOT_FOUND)
+
+            poll_options = Option.objects.filter(poll=poll_id, question=most_recent_question.question).values('options', 'votes')
+
+            return Response({'question': most_recent_question.question, 'poll_options': list(poll_options)}, status=status.HTTP_200_OK)
         except Option.DoesNotExist:
             return Response({'error': 'Poll options not found'}, status=status.HTTP_404_NOT_FOUND)
         
@@ -118,12 +136,13 @@ class JoinPollApi(APIView):
                 try:
                     poll = PollCode.objects.get(poll_id=poll_id)
                     
-                    if poll.session:
+                    if not poll.active:
                         return Response({'error': 'Session already ended'}, status=status.HTTP_403_FORBIDDEN)
                     
                     # Increment num_of_people
                     poll.num_of_people += 1
                     poll.save()
+                    
                     option = Option.objects.filter(poll=poll_id).first()
                     if option:
                         question = option.question
@@ -132,8 +151,47 @@ class JoinPollApi(APIView):
                             'num_of_people': poll.num_of_people,
                             'question': question  
                         }, status=status.HTTP_201_CREATED)
+                    else:
+                        return Response({'error': 'No options found for this poll. Please wait for the presenter to set up options.'}, status=status.HTTP_400_BAD_REQUEST)
                 
                 except PollCode.DoesNotExist:
                     return Response({'error': 'Room does not exist'}, status=status.HTTP_404_NOT_FOUND)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'error': 'Invalid HTTP method'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        
+
+class UserJoin(APIView):
+    def get(self, request):
+        try:
+            poll_id = request.query_params.get('poll_id')
+            if not poll_id:
+                return Response({'error': 'Poll ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Query to get the number of people for the specific poll ID
+            num_of_people = PollCode.objects.filter(poll_id=poll_id).aggregate(total_people=Sum('num_of_people'))['total_people']
+
+            # If no people found, return 0
+            if num_of_people is None:
+                num_of_people = 0
+
+            return Response({'num_of_people': num_of_people}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class DeactivatePollAPI(APIView):
+    def post(self, request):
+        if request.method == 'POST':
+            poll_id = request.data.get('poll_id')  # Assuming 'room_id' is passed in the request data
+
+            try:
+                poll = PollCode.objects.get(poll_id=poll_id)
+            except poll.DoesNotExist:
+                return Response({'error': 'Room not found'}, status=status.HTTP_404_NOT_FOUND)
+
+            # Deactivate the room
+            poll.active = False
+            poll.save()
+
+            return Response({'message': 'Room deactivated successfully', 'poll_id': poll_id}, status=status.HTTP_200_OK)

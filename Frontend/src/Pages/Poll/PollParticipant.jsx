@@ -57,6 +57,7 @@ const PollCode = () => {
 
 const Main = () => {
   const [pollData, setPollData] = useState(null);
+  const [question, setQuestion] = useState("");
   const [selectedOption, setSelectedOption] = useState(null);
   const backgroundColor = [
     "rgba(255, 99, 132, 1)",
@@ -69,22 +70,20 @@ const Main = () => {
     "rgba(255, 0, 255, 1)",
   ];
 
-  const question = localStorage.getItem("question");
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const question = localStorage.getItem("question");
         const pollCode = localStorage.getItem("Poll_Id");
         const response = await axios.get(
-          "http://127.0.0.1:8000/Poll/options/",
+          "http://127.0.0.1:8000/Poll/participantoption/",
           {
             params: {
               poll_id: pollCode,
-              question: question,
             },
           }
         );
         setPollData(response.data.poll_options);
+        setQuestion(response.data.question);
       } catch (error) {
         console.error("Error fetching poll data:", error);
       }
