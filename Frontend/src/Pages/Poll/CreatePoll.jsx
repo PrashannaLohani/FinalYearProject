@@ -45,9 +45,8 @@ const PollCode = ({ Pollid }) => {
         active: false,
       });
 
-      localStorage.removeItem("question");
-      localStorage.removeItem("pollOptions");
-      localStorage.removeItem("Poll_ID");
+      localStorage.removeItem("pollQuestions");
+      localStorage.removeItem("Poll_Code");
       window.location.href = "/info";
     } catch (error) {
       console.error("Error ending session:", error);
@@ -110,44 +109,51 @@ const Headline = () => {
 
 const Polling = ({ Pollid }) => {
   const maxOptions = 8;
-  const [isAddOptionDisabled, setIsAddOptionDisabled] = useState(false);
-  const [options, setOptions] = useState(
-    localStorage.getItem("pollOptions")
-      ? localStorage.getItem("pollOptions").split(",")
-      : ["Option 1", "Option 2"]
+  const [questions, setQuestions] = useState(
+    JSON.parse(localStorage.getItem("pollQuestions")) || [
+      { question: "", options: ["Option 1", "Option 2"] },
+    ]
   );
 
   useEffect(() => {
-    localStorage.setItem("pollOptions", options.join(","));
-  }, [options]);
+    localStorage.setItem("pollQuestions", JSON.stringify(questions));
+  }, [questions]);
 
-  const addOption = () => {
-    if (options.length < maxOptions) {
-      const newIndex = options.length + 1;
-      setOptions([...options, `Option ${newIndex}`]);
-    } else {
-      setIsAddOptionDisabled(true);
+  const handleQuestionChange = (newValue, questionIndex) => {
+    const newQuestions = [...questions];
+    newQuestions[questionIndex].question = newValue;
+    setQuestions(newQuestions);
+  };
+
+  const handleOptionChange = (newValue, questionIndex, optionIndex) => {
+    const newQuestions = [...questions];
+    newQuestions[questionIndex].options[optionIndex] = newValue;
+    setQuestions(newQuestions);
+  };
+
+  const addOption = (questionIndex) => {
+    const newQuestions = [...questions];
+    if (newQuestions[questionIndex].options.length < maxOptions) {
+      newQuestions[questionIndex].options.push(
+        `Option ${newQuestions[questionIndex].options.length + 1}`
+      );
+      setQuestions(newQuestions);
     }
   };
 
-  const deleteOption = (indexToDelete) => {
-    setOptions(options.filter((_, index) => index !== indexToDelete));
-    if (options.length === maxOptions) {
-      setIsAddOptionDisabled(false); // Re-enable the Add option button after deletion
-    }
+  const deleteOption = (questionIndex, optionIndex) => {
+    const newQuestions = [...questions];
+    newQuestions[questionIndex].options.splice(optionIndex, 1);
+    setQuestions(newQuestions);
   };
 
-  const [question, setQuestion] = useState(
-    localStorage.getItem("question") || ""
-  );
-
-  useEffect(() => {
-    localStorage.setItem("question", question);
-  }, [question]);
-
-  const handleQuestionChange = (newValue) => {
-    setQuestion(newValue);
+  const addQuestion = () => {
+    setQuestions([
+      ...questions,
+      { question: "", options: ["Option 1", "Option 2"] },
+    ]);
   };
+
   const [isFullscreen, setIsFullscreen] = useState(false);
   const PresentationClick = () => {
     if (!isFullscreen) {
@@ -155,30 +161,29 @@ const Polling = ({ Pollid }) => {
         document.documentElement.requestFullscreen();
         setIsFullscreen(true);
       } else {
-        // Full-screen mode is not supported
         console.error("Full-screen mode is not supported.");
       }
     } else {
-      // Exit full-screen mode
       if (document.exitFullscreen) {
         document.exitFullscreen();
         setIsFullscreen(false);
       }
     }
   };
+  console.log(questions.options);
 
   const submitPoll = async () => {
     try {
-      const Option = localStorage.getItem("pollOptions");
-      const Question = localStorage.getItem("question");
       const response = await axios.post("http://127.0.0.1:8000/Poll/create/", {
         poll: Pollid,
-        question: Question,
-        options: Option,
+        questions: questions.map((q) => ({
+          questions: q.question,
+          options: q.options,
+        })),
       });
       PresentationClick();
 
-      console.log(response.data); // Optionally, handle the response data
+      console.log(response.data);
     } catch (error) {
       console.error("Error submitting poll:", error);
     }
@@ -186,46 +191,61 @@ const Polling = ({ Pollid }) => {
 
   return (
     <>
-      <Editable
-        placeholder="Write your question"
-        value={question}
-        style={{ fontSize: "2.5rem" }}
-        mt="2rem"
-        onChange={handleQuestionChange}
-      >
-        <EditablePreview />
-        <EditableInput />
-      </Editable>
       <Box minHeight="auto">
-        {options.map((option, index) => (
-          <Flex alignItems="center" gap="1rem" mt="2rem" key={index}>
-            <Text>{index + 1}.</Text>
+        {questions.map((q, questionIndex) => (
+          <Box key={questionIndex} mb="2rem">
             <Editable
-              placeholder={`Option ${index + 1}`}
-              defaultValue={option}
-              onChange={(newValue) => {
-                const newOptions = [...options];
-                newOptions[index] = newValue;
-                setOptions(newOptions);
-              }}
-              minW="80%"
-              border="1px"
-              borderRadius="9px"
-              borderColor="gray.200"
+              placeholder="Write your question"
+              value={q.question}
+              style={{ fontSize: "2.5rem" }}
+              mt="2rem"
+              onChange={(newValue) =>
+                handleQuestionChange(newValue, questionIndex)
+              }
             >
-              <EditablePreview p="1rem" />
-              <EditableInput p="1rem" />
+              <EditablePreview />
+              <EditableInput />
             </Editable>
-            {index >= 2 && ( // Only render icon for options added dynamically after initial two options
-              <Button
-                variant="unstyled"
-                ml="1rem"
-                onClick={() => deleteOption(index)}
-              >
-                <FaTrashCan />
-              </Button>
-            )}
-          </Flex>
+            {q.options.map((option, optionIndex) => (
+              <Flex alignItems="center" gap="1rem" mt="2rem" key={optionIndex}>
+                <Text>{optionIndex + 1}.</Text>
+                <Editable
+                  placeholder={`Option ${optionIndex + 1}`}
+                  defaultValue={option}
+                  onChange={(newValue) =>
+                    handleOptionChange(newValue, questionIndex, optionIndex)
+                  }
+                  minW="80%"
+                  border="1px"
+                  borderRadius="9px"
+                  borderColor="gray.200"
+                >
+                  <EditablePreview p="1rem" />
+                  <EditableInput p="1rem" />
+                </Editable>
+                {optionIndex >= 2 && (
+                  <Button
+                    variant="unstyled"
+                    ml="1rem"
+                    onClick={() => deleteOption(questionIndex, optionIndex)}
+                  >
+                    <FaTrashCan />
+                  </Button>
+                )}
+              </Flex>
+            ))}
+            <Button
+              leftIcon={<FaPlus />}
+              variant="ghost"
+              border="1px"
+              borderColor="green.500"
+              color="gray"
+              mt="1rem"
+              onClick={() => addOption(questionIndex)}
+            >
+              <Flex justifyContent="flex-start">Add option</Flex>
+            </Button>
+          </Box>
         ))}
         <Flex gap="1rem">
           <NavLink to="/PollPresent">
@@ -239,7 +259,6 @@ const Polling = ({ Pollid }) => {
               Submit
             </Button>
           </NavLink>
-
           <Button
             leftIcon={<FaPlus />}
             variant="ghost"
@@ -247,10 +266,9 @@ const Polling = ({ Pollid }) => {
             borderColor="green.500"
             color="gray"
             mt="1rem"
-            onClick={addOption}
-            isDisabled={isAddOptionDisabled}
+            onClick={addQuestion}
           >
-            <Flex justifyContent="flex-start">Add option</Flex>
+            Add Question
           </Button>
         </Flex>
       </Box>

@@ -42,39 +42,15 @@ class PollCodeCreateAPI(APIView):
         return Response({'poll_id': poll_id}, status=status.HTTP_201_CREATED)
     
 class PollCreateAPI(APIView):
+    
     def post(self, request):
-        serializer = PollSerializer(data=request.data)
-        if serializer.is_valid():
-            question = serializer.validated_data.get('question')
-            options_str = serializer.validated_data.get('options')
-            poll = serializer.validated_data.get('poll')
-
-            if not question or not options_str:
-                return Response({'error': 'Question and options are required'}, status=status.HTTP_400_BAD_REQUEST)
-
-            options = options_str.split(",")  # Split options by comma
-
-            # List to store tokens for each option
-            tokens = []
-
-            for option in options:
-                # Create the poll object for each option
-                new_option = Option.objects.create(poll=poll, question=question, options=option)
-                
-                # Generate JWT token for each option
-                token = jwt.encode({'poll': poll, 'question': question, 'option': option}, settings.SECRET_KEY, algorithm='HS256')
-                
-                # Append token to list
-                tokens.append(token)
-            
-            # Serialize response
-            response_data = {
-                'tokens': tokens,
-            }
-            
-            return Response(response_data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            serializer = PollSerializer(data=request.data)
+        
+            if serializer.is_valid():
+                created_data = serializer.save()
+                return Response(created_data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self,request):
         poll_id = request.query_params.get('poll_id')

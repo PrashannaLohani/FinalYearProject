@@ -44,20 +44,19 @@ const options = {
   },
 };
 
-export default function PollBargraph() {
+export default function PollBargraph({ question }) {
   const [pollData, setPollData] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
+      const pollCode = localStorage.getItem("Poll_Code");
       try {
-        const pollCode = localStorage.getItem("Poll_Code");
-        const question = localStorage.getItem("question");
         const response = await axios.get(
           "http://127.0.0.1:8000/Poll/options/",
           {
             params: {
-              poll_id: pollCode,
               question: question,
+              poll_id: pollCode,
             },
           }
         );
@@ -68,7 +67,7 @@ export default function PollBargraph() {
     };
 
     fetchData();
-  }, []);
+  }, [question]);
 
   if (!pollData) {
     return <div>Loading...</div>;

@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Divider,
   Flex,
   Grid,
   GridItem,
@@ -13,29 +14,45 @@ import {
   Text,
   useColorMode,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaArrowLeft, FaChartBar, FaUserGroup, FaTv } from "react-icons/fa6";
 import { NavLink } from "react-router-dom";
-import PollProgressBar from "./Components/PollProgressBar";
+
 import PollBargraph from "./Components/PollBargraph";
 import axios from "axios";
 
 export default function PollPresent() {
+  const [questions, setQuestions] = useState([]);
+  const [selectedQuestion, setSelectedQuestion] = useState("");
+
+  useEffect(() => {
+    const storedQuestions = localStorage.getItem("pollQuestions");
+    const parsedQuestions = storedQuestions ? JSON.parse(storedQuestions) : [];
+    setQuestions(parsedQuestions);
+
+    if (parsedQuestions.length > 0) {
+      setSelectedQuestion(parsedQuestions[0].question);
+    }
+  }, []);
+
   return (
     <>
       <Box p={{ base: "1rem", md: "2rem", lg: "2rem" }} minHeight="auto">
         <Grid templateColumns="1fr 3fr" templateRows="auto 1fr">
-          {/* Sidebar and Main in the second row */}
+          {/* Headline in the first row and second column */}
           <GridItem colSpan={1} colStart={2}>
             <Headline />
           </GridItem>
+          {/* Sidebar and Main in the second row */}
           <GridItem>
-            <Sidebar />
+            <Sidebar
+              questions={questions}
+              onQuestionSelect={setSelectedQuestion}
+            />
           </GridItem>
           <GridItem>
-            <Main />
+            <Main selectedQuestion={selectedQuestion} />
           </GridItem>
-          {/* Headline in the first row and second column */}
         </Grid>
       </Box>
     </>
@@ -102,13 +119,20 @@ const Headline = () => {
   );
 };
 
-const Sidebar = () => {
+const Sidebar = ({
+  questions = [],
+  onQuestionSelect,
+  selectedQuestion,
+  pollCode,
+}) => {
   const handleBackButtonClick = () => {
     if (document.exitFullscreen) {
       document.exitFullscreen();
     }
   };
+
   const PollCode = localStorage.getItem("Poll_Code");
+
   return (
     <Box minH="100vh" borderRadius="2rem 0 0 2rem">
       <NavLink to="/Createpoll">
@@ -121,39 +145,46 @@ const Sidebar = () => {
         textAlign="center"
         flexDirection="column"
         justifyContent="center"
-        alignItems="center"
       >
         <Text>Join at</Text>
         <Heading>React&Rise.com</Heading>
         <Heading>{PollCode}</Heading>
       </Flex>
+      <Divider mt="4rem" />
+      {questions.map((q, index) => (
+        <React.Fragment key={index}>
+          <Button
+            minW="100%"
+            variant={selectedQuestion === q.question ? "solid" : "ghost"}
+            colorScheme={selectedQuestion === q.question ? "blue" : "gray"}
+            onClick={() => onQuestionSelect(q.question)}
+            textAlign="left"
+          >
+            {q.question}
+          </Button>
+          <Divider />
+        </React.Fragment>
+      ))}
     </Box>
   );
 };
-
-const Main = () => {
+const Main = ({ selectedQuestion }) => {
   const { colorMode } = useColorMode();
   const bgColor = colorMode === "light" ? "#FFF9D0" : "#333333";
-
-  const Question = localStorage.getItem("question");
 
   return (
     <>
       <Box bgColor={bgColor} minH="100vh" borderRadius="0 2rem 2rem 0">
-        <Heading p="2rem">{Question}</Heading>
+        <Heading p="2rem">{selectedQuestion}</Heading>
 
         <Tabs>
           <TabList>
             <Tab>Bar Graph</Tab>
-            <Tab>Progress Bar</Tab>
           </TabList>
 
           <TabPanels>
             <TabPanel>
-              <PollBargraph />
-            </TabPanel>
-            <TabPanel>
-              <PollProgressBar />
+              <PollBargraph question={selectedQuestion} />
             </TabPanel>
           </TabPanels>
         </Tabs>
