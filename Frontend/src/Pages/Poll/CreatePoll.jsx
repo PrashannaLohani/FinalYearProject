@@ -154,6 +154,13 @@ const Polling = ({ Pollid }) => {
     ]);
   };
 
+  const deleteQuestion = (questionIndex) => {
+    const newQuestions = questions.filter(
+      (_, index) => index !== questionIndex
+    );
+    setQuestions(newQuestions);
+  };
+
   const [isFullscreen, setIsFullscreen] = useState(false);
   const PresentationClick = () => {
     if (!isFullscreen) {
@@ -232,17 +239,31 @@ const Polling = ({ Pollid }) => {
                 )}
               </Flex>
             ))}
-            <Button
-              leftIcon={<FaPlus />}
-              variant="ghost"
-              border="1px"
-              borderColor="green.500"
-              color="gray"
-              mt="1rem"
-              onClick={() => addOption(questionIndex)}
-            >
-              <Flex justifyContent="flex-start">Add option</Flex>
-            </Button>
+            <Flex alignItems="center" gap="5px">
+              <Button
+                leftIcon={<FaPlus />}
+                variant="ghost"
+                border="1px"
+                borderColor="green.500"
+                color="gray"
+                mt="1rem"
+                onClick={() => addOption(questionIndex)}
+              >
+                Add option
+              </Button>
+              {questions.length > 1 && (
+                <Button
+                  leftIcon={<FaTrashCan />}
+                  color="white"
+                  _hover={{ color: "black", bgColor: "teal" }}
+                  bgColor="black"
+                  mt="1rem"
+                  onClick={() => deleteQuestion(questionIndex)}
+                >
+                  Delete Question
+                </Button>
+              )}
+            </Flex>
           </Box>
         ))}
         <Flex gap="1rem">
