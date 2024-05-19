@@ -44,14 +44,32 @@ class PollCodeCreateAPI(APIView):
 class PollCreateAPI(APIView):
     
     def post(self, request):
-            serializer = PollSerializer(data=request.data)
-        
-            if serializer.is_valid():
-                created_data = serializer.save()
-                return Response(created_data, status=status.HTTP_201_CREATED)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer = PollSerializer(data=request.data)
+        if serializer.is_valid():
+            # Retrieve validated data from serializer
+            poll_id = serializer.validated_data['poll']
+            questions_data = serializer.validated_data['questions']
+            
+            # Save each question and its options
+            for question_data in questions_data:
+                question_text = question_data['question']
+                options_list = question_data['options']
+                
+                # Create an Option instance for each option in options_list
+                for option_text in options_list:
+                    Option.objects.create(
+                        poll=poll_id,
+                        question=question_text,
+                        options=option_text
+                    )
+                
+            # Return a success response
+            return Response({'message': 'Poll created successfully'}, status=status.HTTP_201_CREATED)
+        else:
+            # If serializer validation fails, return error response
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+        
     def get(self,request):
         poll_id = request.query_params.get('poll_id')
         question = request.query_params.get('question')

@@ -170,22 +170,20 @@ const Polling = ({ Pollid }) => {
       }
     }
   };
-  console.log(questions.options);
 
   const submitPoll = async () => {
     try {
       const response = await axios.post("http://127.0.0.1:8000/Poll/create/", {
         poll: Pollid,
         questions: questions.map((q) => ({
-          questions: q.question,
+          question: q.question,
           options: q.options,
         })),
       });
       PresentationClick();
-
       console.log(response.data);
     } catch (error) {
-      console.error("Error submitting poll:", error);
+      console.error("Error submitting poll:", error.response || error.message);
     }
   };
 

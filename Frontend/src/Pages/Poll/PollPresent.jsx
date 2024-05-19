@@ -174,7 +174,7 @@ const Main = ({ selectedQuestion }) => {
 
   return (
     <>
-      <Box bgColor={bgColor} minH="100vh" borderRadius="0 2rem 2rem 0">
+      <Box bgColor={bgColor} minH="auto" borderRadius="0 2rem 2rem 0">
         <Heading p="2rem">{selectedQuestion}</Heading>
 
         <Tabs>
