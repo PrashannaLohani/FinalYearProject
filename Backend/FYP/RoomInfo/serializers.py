@@ -19,3 +19,16 @@ class CommentSerializer(serializers.Serializer):
     user = serializers.CharField(max_length=255)
     message = serializers.CharField(max_length=500)
     
+
+class QuestionSerializer(serializers.Serializer):
+    question = serializers.CharField()
+    options = serializers.ListField(
+        child=serializers.CharField()
+    )
+
+class PollSerializer(serializers.Serializer):
+    poll = serializers.CharField()
+    questions = QuestionSerializer(many=True)
+
+class PollJoinSerializer(serializers.Serializer):
+    poll_id = serializers.IntegerField()
