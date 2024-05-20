@@ -56,7 +56,7 @@ const LoginForm = () => {
     const successPromise = new Promise((resolve, reject) => {
       setTimeout(() => {
         resolve();
-      }, 5000);
+      }, 2000);
     });
     toast.promise(successPromise, {
       success: { title: "Login Successful.", description: "Welcome." },

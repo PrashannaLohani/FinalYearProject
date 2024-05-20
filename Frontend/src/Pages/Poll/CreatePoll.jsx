@@ -114,6 +114,8 @@ const Polling = ({ Pollid }) => {
       { question: "", options: ["Option 1", "Option 2"] },
     ]
   );
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("pollQuestions", JSON.stringify(questions));
@@ -161,7 +163,6 @@ const Polling = ({ Pollid }) => {
     setQuestions(newQuestions);
   };
 
-  const [isFullscreen, setIsFullscreen] = useState(false);
   const PresentationClick = () => {
     if (!isFullscreen) {
       if (document.fullscreenEnabled) {
@@ -179,6 +180,9 @@ const Polling = ({ Pollid }) => {
   };
 
   const submitPoll = async () => {
+    if (isSubmitting) return; // Prevent multiple submissions
+
+    setIsSubmitting(true);
     try {
       const response = await axios.post("http://127.0.0.1:8000/Poll/create/", {
         poll: Pollid,
@@ -191,6 +195,8 @@ const Polling = ({ Pollid }) => {
       console.log(response.data);
     } catch (error) {
       console.error("Error submitting poll:", error.response || error.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -274,6 +280,7 @@ const Polling = ({ Pollid }) => {
               mt="1rem"
               bgColor="black"
               onClick={submitPoll}
+              isDisabled={isSubmitting}
             >
               Submit
             </Button>

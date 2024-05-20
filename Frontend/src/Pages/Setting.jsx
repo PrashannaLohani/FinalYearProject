@@ -11,7 +11,6 @@ import {
   Heading,
   Input,
   Link,
-  Switch,
   Text,
   useColorMode,
   useDisclosure,

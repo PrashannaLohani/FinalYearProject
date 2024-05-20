@@ -152,7 +152,7 @@ const Welcome = ({ full_name }) => {
 const Dashboard = () => {
   return (
     <Box
-      minH="100vh"
+      minH="auto"
       minW="10rem"
       mt="2rem"
       borderRadius="0 5rem 2rem 2rem"
@@ -218,7 +218,11 @@ const RoomDashboard = () => {
 
   return (
     <>
-      <SimpleGrid minChildWidth="300px" Columns={{ base: 1, md: 2 }} gap={4}>
+      <SimpleGrid
+        minChildWidth={{ base: "120px", md: "200px", lg: "400px" }}
+        Columns={{ base: 1, md: 2 }}
+        gap={4}
+      >
         <Box key={1} {...boxStyle}>
           <Flex justifyItems="center" alignItems="center" flexDir="column">
             <Heading size="lg">Total Rooms </Heading>
