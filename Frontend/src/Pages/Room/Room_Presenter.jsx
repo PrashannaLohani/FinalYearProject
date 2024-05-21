@@ -49,6 +49,8 @@ const RoomCode = ({ roomId }) => {
       // After successfully setting the session to true, remove items from localStorage and redirect
       localStorage.removeItem("Roomtoken");
       localStorage.removeItem("username");
+      localStorage.removeItem("pollQuestions");
+      localStorage.removeItem("RoomName");
       window.location.href = "/info";
     } catch (error) {
       console.error("Error ending session:", error);
@@ -70,7 +72,7 @@ const RoomCode = ({ roomId }) => {
       <Tabs size="md" variant="soft-rounded" colorScheme="whiteAlpha">
         <TabList p="1rem">
           <Tab>Comment</Tab>
-          <Tab>Poll</Tab>
+          <Tab> Create Poll</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
@@ -406,7 +408,7 @@ const PollSection = () => {
             </Box>
           ))}
           <Flex gap="1rem">
-            <NavLink to="/PollPresent">
+            <NavLink to="/RoomPollPresent">
               <Button
                 colorScheme="blackAlpha"
                 color="white"

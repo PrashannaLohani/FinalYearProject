@@ -118,7 +118,8 @@ const RoomForm = () => {
               }
             );
             // Save JWT token to localStorage
-            localStorage.setItem("Roomtoken", response.data.Roomtoken);
+            localStorage.setItem("Roomtoken", response.data.ID);
+            localStorage.setItem("RoomName", response.data.name);
             setRoomId(response.data.ID);
             setRoomName(response.data.name);
             setIsModalOpen(true);

@@ -50,7 +50,7 @@ function App() {
         <Route path="/Error" element={<Error />} />
 
         <Route path="/PollParticipant" element={<PollParticipant />} />
-        <Route path="/RoomPollParticipant" element={<RoomPollPresent />} />
+        <Route path="/RoomPollPresent" element={<RoomPollPresent />} />
         <Route path="/PollPresent" element={<PollPresent />} />
         <Route path="/ParticipantRoom" element={<ParticipantRoom />} />
       </>
