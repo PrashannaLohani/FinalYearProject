@@ -10,4 +10,5 @@ urlpatterns = [
     path('vote/', views.VoteOption.as_view(), name='vote-option'),
     path('totaluser/', views.UserJoin.as_view(), name='total-user'),
     path('deactivate/', views.DeactivatePollAPI.as_view(), name='deactivate-poll'),
+    path('stats/', views.Stats.as_view(), name='Stats'),
 ]

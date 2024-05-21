@@ -89,15 +89,6 @@ const BarGraph = () => {
     },
   };
 
-  // Function to set background color of the entire chart
-  useEffect(() => {
-    if (chartRef.current && chartRef.current.chartInstance) {
-      chartRef.current.chartInstance.options.plugins.background.color =
-        colors[colorMode].background;
-      chartRef.current.chartInstance.update();
-    }
-  }, [colorMode]);
-
   // Render loading indicator while fetching data
   if (!roomData) {
     return <div>Loading...</div>;

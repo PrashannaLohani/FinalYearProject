@@ -291,12 +291,54 @@ const RoomDashboard = () => {
                 ))}
           </Accordion>
         </Box>
+        <Box
+          key={3}
+          maxH="auto"
+          minH="25rem"
+          borderRadius="2rem"
+          boxShadow="rgba(100, 100, 111, 0.2) 0px 7px 29px 0px"
+          gridColumn="span 3"
+          p="2rem"
+        >
+          <Flex justifyItems="center" flexDir="column">
+            <Heading size="lg">Poll History</Heading>
+            <Accordion
+              allowToggle
+              mt="1rem"
+              style={{ maxHeight: "300px", overflow: "auto" }}
+            >
+              <AccordionItem>
+                <h2>
+                  <AccordionButton>
+                    <Box as="b" flex="1" textAlign="left">
+                      Room ID:
+                    </Box>
+                    <AccordionIcon />
+                  </AccordionButton>
+                </h2>
+                <AccordionPanel pb={4}>
+                  <p>Question: </p>
+                  <p>Total vote: </p>
+                  <p>Option 1: </p>
+                  <p>Option 2: </p>
+                  <p>Option 3: </p>
+                </AccordionPanel>
+              </AccordionItem>
+            </Accordion>
+          </Flex>
+        </Box>
       </SimpleGrid>
     </>
   );
 };
 
 const PollDashboard = () => {
+  const [data, setData] = useState({
+    total_polls: 0,
+    total_votes: 0,
+    poll_data: [],
+  });
+  const [loading, setLoading] = useState(true);
   const boxStyle = {
     style: {
       maxHeight: "auto",
@@ -307,6 +349,38 @@ const PollDashboard = () => {
       boxShadow: "rgba(100, 100, 111, 0.2) 0px 7px 29px 0px",
     },
   };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        const response = await axios.get("http://127.0.0.1:8000/Poll/stats/", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setData(response.data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+  const groupedPollData = data.poll_data.reduce((acc, poll) => {
+    if (!acc[poll.poll]) {
+      acc[poll.poll] = {};
+    }
+    if (!acc[poll.poll][poll.question]) {
+      acc[poll.poll][poll.question] = [];
+    }
+    acc[poll.poll][poll.question].push({
+      options: poll.options,
+      votes: poll.votes,
+    });
+    return acc;
+  }, {});
+
   return (
     <SimpleGrid
       minChildWidth={{ base: "120px", md: "200px", lg: "300px" }}
@@ -315,9 +389,9 @@ const PollDashboard = () => {
     >
       <Box key={1} {...boxStyle} gridColumn="span 2">
         <Flex justifyItems="center" alignItems="center" flexDir="column">
-          <Heading size="lg">Total Poll Rooms </Heading>
+          <Heading size="lg">Total Poll Rooms</Heading>
           <Text fontSize="2xl" mt="1rem">
-            20
+            {loading ? "Loading..." : data.total_polls}
           </Text>
         </Flex>
       </Box>
@@ -325,7 +399,7 @@ const PollDashboard = () => {
         <Flex justifyItems="center" alignItems="center" flexDir="column">
           <Heading size="lg">Total Voting</Heading>
           <Text fontSize="2xl" mt="1rem">
-            20
+            {loading ? "Loading..." : data.total_votes}
           </Text>
         </Flex>
       </Box>
@@ -345,23 +419,38 @@ const PollDashboard = () => {
             mt="1rem"
             style={{ maxHeight: "300px", overflow: "auto" }}
           >
-            <AccordionItem>
-              <h2>
-                <AccordionButton>
-                  <Box as="b" flex="1" textAlign="left">
-                    Room ID:
-                  </Box>
-                  <AccordionIcon />
-                </AccordionButton>
-              </h2>
-              <AccordionPanel pb={4}>
-                <p>Question: </p>
-                <p>Total vote: </p>
-                <p>Option 1: </p>
-                <p>Option 2: </p>
-                <p>Option 3: </p>
-              </AccordionPanel>
-            </AccordionItem>
+            {Object.keys(groupedPollData).length > 0 ? (
+              Object.keys(groupedPollData).map((pollId, index) => (
+                <AccordionItem key={index}>
+                  <h2>
+                    <AccordionButton>
+                      <Box as="b" flex="1" textAlign="left">
+                        Poll ID: {pollId}
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                  </h2>
+                  <AccordionPanel pb={4}>
+                    {Object.keys(groupedPollData[pollId]).map((question, i) => (
+                      <div key={i}>
+                        <p>
+                          <strong>Question:</strong>
+                          {question}
+                        </p>
+                        {groupedPollData[pollId][question].map((option, j) => (
+                          <p key={j}>
+                            Option {j + 1}: {option.options} (Votes:{" "}
+                            {option.votes})
+                          </p>
+                        ))}
+                      </div>
+                    ))}
+                  </AccordionPanel>
+                </AccordionItem>
+              ))
+            ) : (
+              <Text>No poll data available</Text>
+            )}
           </Accordion>
         </Flex>
       </Box>

@@ -189,3 +189,45 @@ class DeactivatePollAPI(APIView):
             poll.save()
 
             return Response({'message': 'Room deactivated successfully', 'poll_id': poll_id}, status=status.HTTP_200_OK)
+
+class Stats(APIView):
+    def get(self, request):
+        token = request.headers.get('Authorization')
+        if token:
+            try:
+                # Extract the token from the Authorization header
+                token = token.split()[1]
+                decoded_token = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
+
+                # Extract email from the token
+                email = decoded_token.get('email')
+
+                # Fetch the user associated with the token
+                user = Signup.objects.get(email=email)
+
+                # Fetch total number of polls created by the user
+                total_polls = PollCode.objects.filter(user=user).count()
+
+                # Fetch total number of votes from all options
+                total_votes = Option.objects.aggregate(total_votes=Sum('votes'))['total_votes']
+                if total_votes is None:
+                    total_votes = 0
+
+                # Fetch all poll options with their votes
+                poll_data = Option.objects.all().values('poll', 'question', 'options', 'votes')
+
+                return Response({
+                    'total_polls': total_polls,
+                    'total_votes': total_votes,
+                    'poll_data': list(poll_data)
+                }, status=status.HTTP_200_OK)
+            except jwt.ExpiredSignatureError:
+                return Response({'error': 'Token has expired'}, status=status.HTTP_401_UNAUTHORIZED)
+            except jwt.InvalidTokenError:
+                return Response({'error': 'Invalid token'}, status=status.HTTP_401_UNAUTHORIZED)
+            except Signup.DoesNotExist:
+                return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+            except Exception as e:
+                return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response({'error': 'Authorization header not found'}, status=status.HTTP_400_BAD_REQUEST)

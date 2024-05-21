@@ -1,4 +1,3 @@
-
 import jwt
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -21,10 +20,10 @@ class Stats(APIView):
                 decoded_token = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
 
                 # Extract user_id from the token
-                full_name = decoded_token.get('full_name')
+                email = decoded_token.get('email')
 
                 # Fetch the user associated with the token
-                user = Signup.objects.get(full_name=full_name)
+                user = Signup.objects.get(email=email)
 
                 # Fetch the rooms associated with the user
                 rooms = Room.objects.filter(user=user)
@@ -221,3 +220,7 @@ class DeactivateRoomAPI(APIView):
             room.save()
 
             return Response({'message': 'Room deactivated successfully', 'room_id': room_id}, status=status.HTTP_200_OK)
+        
+class RoomPollAPI(APIView):
+    def post(self, request):
+        pass
