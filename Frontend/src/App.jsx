@@ -23,6 +23,7 @@ import CreatePoll from "./Pages/Poll/CreatePoll";
 import PollPresent from "./Pages/Poll/PollPresent";
 import PrivateRoute from "./Layout/PrivateRoute";
 import PollParticipant from "./Pages/Poll/PollParticipant";
+import RoomPollPresent from "./Pages/Room/RoomPollPresent";
 
 function App() {
   const router = createBrowserRouter(
@@ -49,6 +50,7 @@ function App() {
         <Route path="/Error" element={<Error />} />
 
         <Route path="/PollParticipant" element={<PollParticipant />} />
+        <Route path="/RoomPollParticipant" element={<RoomPollPresent />} />
         <Route path="/PollPresent" element={<PollPresent />} />
         <Route path="/ParticipantRoom" element={<ParticipantRoom />} />
       </>
