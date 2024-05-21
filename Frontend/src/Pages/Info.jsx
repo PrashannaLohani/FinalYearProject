@@ -189,10 +189,12 @@ const RoomDashboard = () => {
       boxShadow: "rgba(100, 100, 111, 0.2) 0px 7px 29px 0px",
     },
   };
+
   const [totalRooms, setTotalRooms] = useState(0);
   const [roomData, setRoomData] = useState(null);
   const [participantsData, setParticipantsData] = useState(0);
   const [totalComments, setTotalComments] = useState(0);
+  const [pollData, setPollData] = useState([]);
 
   const token = localStorage.getItem("accessToken");
 
@@ -211,16 +213,31 @@ const RoomDashboard = () => {
       setRoomData(response.data.room_data);
       setParticipantsData(response.data.total_participants);
       setTotalComments(response.data.total_comments);
+      setPollData(response.data.poll_data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
+  const groupedPollData = pollData.reduce((acc, poll) => {
+    if (!acc[poll.poll]) {
+      acc[poll.poll] = {};
+    }
+    if (!acc[poll.poll][poll.question]) {
+      acc[poll.poll][poll.question] = [];
+    }
+    acc[poll.poll][poll.question].push({
+      options: poll.options.split(","),
+      votes: poll.votes,
+    });
+    return acc;
+  }, {});
+
   return (
     <>
       <SimpleGrid
         minChildWidth={{ base: "120px", md: "200px", lg: "400px" }}
-        Columns={{ base: 1, md: 2 }}
+        columns={{ base: 1, md: 2 }}
         gap={4}
       >
         <Box key={1} {...boxStyle}>
@@ -284,7 +301,6 @@ const RoomDashboard = () => {
                     <AccordionPanel pb={4}>
                       <p>Room ID: {room.room_id}</p>
                       <p>No. of People joined: {room.num_of_people}</p>
-
                       <p>No. of comments: {room.num_of_comments}</p>
                     </AccordionPanel>
                   </AccordionItem>
@@ -292,7 +308,7 @@ const RoomDashboard = () => {
           </Accordion>
         </Box>
         <Box
-          key={3}
+          key={6}
           maxH="auto"
           minH="25rem"
           borderRadius="2rem"
@@ -307,23 +323,37 @@ const RoomDashboard = () => {
               mt="1rem"
               style={{ maxHeight: "300px", overflow: "auto" }}
             >
-              <AccordionItem>
-                <h2>
-                  <AccordionButton>
-                    <Box as="b" flex="1" textAlign="left">
-                      Room ID:
-                    </Box>
-                    <AccordionIcon />
-                  </AccordionButton>
-                </h2>
-                <AccordionPanel pb={4}>
-                  <p>Question: </p>
-                  <p>Total vote: </p>
-                  <p>Option 1: </p>
-                  <p>Option 2: </p>
-                  <p>Option 3: </p>
-                </AccordionPanel>
-              </AccordionItem>
+              {Object.keys(groupedPollData).map((roomId) => (
+                <AccordionItem key={roomId}>
+                  <h2>
+                    <AccordionButton>
+                      <Box as="b" flex="1" textAlign="left">
+                        Room ID: {roomId}
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                  </h2>
+                  <AccordionPanel pb={4}>
+                    {Object.keys(groupedPollData[roomId]).map((question) => (
+                      <Box key={question} mb="1rem">
+                        <Text fontWeight="bold">Question: {question}</Text>
+                        {groupedPollData[roomId][question].map(
+                          (optionData, idx) => (
+                            <Box key={idx}>
+                              {optionData.options.map((option, i) => (
+                                <Text key={i}>
+                                  Option {i + 1}: {option} - Votes:{" "}
+                                  {optionData.votes}
+                                </Text>
+                              ))}
+                            </Box>
+                          )
+                        )}
+                      </Box>
+                    ))}
+                  </AccordionPanel>
+                </AccordionItem>
+              ))}
             </Accordion>
           </Flex>
         </Box>

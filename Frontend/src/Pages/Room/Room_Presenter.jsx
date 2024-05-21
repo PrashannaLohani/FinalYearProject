@@ -293,14 +293,22 @@ const PollSection = () => {
     setQuestions(newQuestions);
   };
 
+  const Roomid = localStorage.getItem("Roomtoken");
   const submitPoll = async () => {
+    if (isSubmitting) return; // Prevent multiple submissions
+
     setIsSubmitting(true);
     try {
-      await axios.post("/api/submitPoll", { questions });
-      alert("Poll submitted successfully");
+      const response = await axios.post("http://127.0.0.1:8000/room/options/", {
+        poll: Roomid,
+        questions: questions.map((q) => ({
+          question: q.question,
+          options: q.options,
+        })),
+      });
+      PresentationClick();
     } catch (error) {
-      console.error("Error submitting poll:", error);
-      alert("Failed to submit poll");
+      console.error("Error submitting poll:", error.response || error.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -414,6 +422,8 @@ const PollSection = () => {
                 color="white"
                 mt="1rem"
                 bgColor="black"
+                onClick={submitPoll}
+                isDisabled={isSubmitting}
               >
                 Submit
               </Button>

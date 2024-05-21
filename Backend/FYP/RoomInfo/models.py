@@ -46,3 +46,10 @@ class RoomPoll(models.Model):
 
     def __str__(self):
         return self.question
+    def to_dict(self):
+        return {
+            "poll": self.poll,
+            "question": self.question,
+            "options": self.options,
+            "votes": self.votes,
+        }

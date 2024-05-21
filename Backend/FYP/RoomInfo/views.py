@@ -1,12 +1,12 @@
 import jwt
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import RoomSerializer, JoinSerializer,CommentSerializer
+from .serializers import RoomSerializer, JoinSerializer,CommentSerializer,PollSerializer
 from rest_framework import status
 from FYP import settings
 import random
 import string
-from .models import Room,Comment
+from .models import Room,Comment,RoomPoll
 from CRM.models import Signup
 from django.http import JsonResponse
 
@@ -35,10 +35,19 @@ class Stats(APIView):
                 room_data = [room.to_dict() for room in rooms]
 
                 total_participants = sum(room.num_of_people for room in rooms)
-
                 total_comments = sum(room.num_of_comments for room in rooms)
 
-                return Response({'room_data': room_data, 'total_rooms': total_rooms,"total_participants":total_participants,"total_comments":total_comments}, status=status.HTTP_200_OK)
+                # Fetch poll data for the rooms
+                polls = RoomPoll.objects.all()
+                poll_data = [poll.to_dict() for poll in polls]
+
+                return Response({
+                    'room_data': room_data,
+                    'total_rooms': total_rooms,
+                    "total_participants": total_participants,
+                    "total_comments": total_comments,
+                    "poll_data": poll_data
+                }, status=status.HTTP_200_OK)
             except jwt.ExpiredSignatureError:
                 return Response({'error': 'Token has expired'}, status=status.HTTP_401_UNAUTHORIZED)
             except jwt.InvalidTokenError:
@@ -223,4 +232,41 @@ class DeactivateRoomAPI(APIView):
         
 class RoomPollAPI(APIView):
     def post(self, request):
-        pass
+        serializer = PollSerializer(data=request.data)
+        if serializer.is_valid():
+            # Retrieve validated data from serializer
+            poll_id = serializer.validated_data['poll']
+            questions_data = serializer.validated_data['questions']
+            
+            # Save each question and its options
+            for question_data in questions_data:
+                question_text = question_data['question']
+                options_list = question_data['options']
+                
+                # Create an Option instance for each option in options_list
+                for option_text in options_list:
+                    RoomPoll.objects.create(
+                        poll=poll_id,
+                        question=question_text,
+                        options=option_text
+                    )
+                
+            # Return a success response
+            return Response({'message': 'Poll created successfully'}, status=status.HTTP_201_CREATED)
+        else:
+            # If serializer validation fails, return error response
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        
+    def get(self, request):
+        poll_id = request.query_params.get('poll_id')
+        question = request.query_params.get('question')
+        
+        if not poll_id or not question:
+            return Response({'error': 'Poll ID and question are required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            poll_options = RoomPoll.objects.filter(poll=poll_id, question=question).values('options', 'votes').distinct()
+            return Response({'poll_options': list(poll_options)}, status=status.HTTP_200_OK)
+        except RoomPoll.DoesNotExist:
+            return Response({'error': 'Poll options not found'}, status=status.HTTP_404_NOT_FOUND)

@@ -17,6 +17,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { FaArrowLeft, FaChartBar, FaUserGroup, FaTv } from "react-icons/fa6";
 import { NavLink } from "react-router-dom";
+import RoomPollBargraph from "./Components/RoomPollBargraph";
 
 export default function RoomPollPresent() {
   const [questions, setQuestions] = useState([]);
@@ -88,14 +89,13 @@ const Headline = () => {
   );
 };
 const Sidebar = ({ questions = [], onQuestionSelect, selectedQuestion }) => {
+  const PollCode = localStorage.getItem("Roomtoken");
+  const roomName = localStorage.getItem("RoomName");
   const handleBackButtonClick = () => {
     window.location.href = `/RoomPresenter?roomId=${PollCode}&roomName=${roomName}`;
 
     document.exitFullscreen();
   };
-
-  const PollCode = localStorage.getItem("Roomtoken");
-  const roomName = localStorage.getItem("RoomName");
 
   return (
     <Box minH="100vh" borderRadius="2rem 0 0 2rem">
@@ -148,7 +148,7 @@ const Main = ({ selectedQuestion }) => {
 
           <TabPanels>
             <TabPanel>
-              {/* <PollBargraph question={selectedQuestion} /> */}
+              <RoomPollBargraph question={selectedQuestion} />
             </TabPanel>
           </TabPanels>
         </Tabs>

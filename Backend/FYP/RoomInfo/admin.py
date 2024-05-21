@@ -17,5 +17,8 @@ class CommentsAdmin(admin.ModelAdmin):
         return obj.read
 
 admin.site.register(Comment, CommentsAdmin) 
-admin.site.register(RoomPoll) 
+class RoomPollAdmin(admin.ModelAdmin):
+    list_display = ('poll', 'question', 'options', 'votes')
+    search_fields = ('poll__poll_code__poll_id', 'question')  
+admin.site.register(RoomPoll,RoomPollAdmin) 
 
