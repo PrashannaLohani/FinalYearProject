@@ -91,7 +91,7 @@ const Section1 = () => {
 
         // Store room details in localStorage
         localStorage.setItem("username", roomResponse.data.username);
-        localStorage.setItem("User-Token", roomResponse.data.token);
+        localStorage.setItem("RoomID", roomResponse.data.room);
         handleEntry(); // Display success message
         setTimeout(() => {
           handleEnterClick("/ParticipantRoom"); // Redirect to ParticipantRoom
@@ -108,7 +108,6 @@ const Section1 = () => {
 
           // Store poll details in localStorage
           localStorage.setItem("Poll_Id", pollResponse.data.poll_id);
-          localStorage.setItem("question", pollResponse.data.question);
           handleEntry(); // Display success message
           setTimeout(() => {
             handleEnterClick("/PollParticipant"); // Redirect to PollParticipant

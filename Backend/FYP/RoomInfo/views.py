@@ -270,3 +270,54 @@ class RoomPollAPI(APIView):
             return Response({'poll_options': list(poll_options)}, status=status.HTTP_200_OK)
         except RoomPoll.DoesNotExist:
             return Response({'error': 'Poll options not found'}, status=status.HTTP_404_NOT_FOUND)
+
+class ParticipantOption(APIView):
+    def get(self, request):
+        try:
+            poll_id = request.query_params.get('poll_id')
+            if not poll_id:
+                return Response({'error': 'Poll ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Get all distinct questions for the specified poll ID
+            questions = RoomPoll.objects.filter(poll=poll_id).values_list('question', flat=True).distinct()
+            if not questions:
+                return Response({'error': 'No questions found for this poll ID'}, status=status.HTTP_404_NOT_FOUND)
+
+            response_data = []
+            for question in questions:
+                poll_options = RoomPoll.objects.filter(poll=poll_id, question=question).values('options', 'votes')
+                response_data.append({
+                    'question': question,
+                    'poll_options': list(poll_options)
+                })
+
+            return Response(response_data, status=status.HTTP_200_OK)
+        except RoomPoll.DoesNotExist:
+            return Response({'error': 'Poll options not found'}, status=status.HTTP_404_NOT_FOUND)
+
+class VoteOption(APIView):
+    def post(self, request):
+        poll = request.data.get('poll')
+        votes = request.data.get('votes')
+        
+        if not poll or not votes:
+            return Response({'error': 'Poll ID and votes are required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            for vote in votes:
+                question = vote.get('question')
+                selected_option = vote.get('selected_option')
+                if not question or not selected_option:
+                    continue
+                print(f"Processing vote for question: {question}, selected option: {selected_option}")
+                # Get the selected option from the database
+                options = RoomPoll.objects.filter(poll=poll, question=question, options=selected_option)
+                for option in options:
+                    # Increment the vote count for each option
+                    option.votes += 1
+                    option.save()
+                print(f"Vote count incremented for option: {option}")
+            
+            return Response({'message': 'Votes registered successfully'}, status=status.HTTP_200_OK)
+        except RoomPoll.DoesNotExist:
+            return Response({'error': 'Option not found'}, status=status.HTTP_404_NOT_FOUND)

@@ -69,7 +69,7 @@ const RoomCode = ({ roomId }) => {
           End session
         </Button>
       </Flex>
-      <Tabs size="md" variant="soft-rounded" colorScheme="whiteAlpha">
+      <Tabs size="md" variant="soft-rounded" colorScheme="blackAlpha">
         <TabList p="1rem">
           <Tab>Comment</Tab>
           <Tab> Create Poll</Tab>

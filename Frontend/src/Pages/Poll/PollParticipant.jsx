@@ -69,7 +69,7 @@ const PollCode = () => {
 
 const Main = () => {
   const [pollData, setPollData] = useState([]);
-  const [selectedOption, setSelectedOption] = useState(null);
+  const [selectedOptions, setSelectedOptions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -110,12 +110,11 @@ const Main = () => {
         if (filteredData.length > 0) {
           setCurrentQuestion(filteredData[0]);
         }
-        const savedSelectedOption = localStorage.getItem(
-          `selected_option_${filteredData[0]?.question}`
-        );
-        if (savedSelectedOption) {
-          setSelectedOption(savedSelectedOption);
-        }
+
+        // Load selected options from localStorage
+        const savedSelectedOptions =
+          JSON.parse(localStorage.getItem("selected_options")) || [];
+        setSelectedOptions(savedSelectedOptions);
       } catch (error) {
         console.error("Error fetching poll data:", error);
       }
@@ -125,16 +124,23 @@ const Main = () => {
   }, []);
 
   const handleOptionClick = async (question, option) => {
-    setSelectedOption(option);
-    localStorage.setItem(`selected_option_${question}`, option);
+    const updatedSelectedOptions = selectedOptions.filter(
+      (item) => item.question !== question
+    );
+    updatedSelectedOptions.push({ question, selected_option: option });
+    setSelectedOptions(updatedSelectedOptions);
+    localStorage.setItem(
+      "selected_options",
+      JSON.stringify(updatedSelectedOptions)
+    );
+
     try {
       const pollCode = localStorage.getItem("Poll_Id");
-      const response = await axios.post("http://127.0.0.1:8000/Poll/vote/", {
-        poll_id: pollCode,
-        question: question,
-        selected_option: option,
+      await axios.post("http://127.0.0.1:8000/Poll/vote/", {
+        poll: pollCode,
+        votes: updatedSelectedOptions,
       });
-      console.log(response.data); // Optionally handle success response
+      // Optionally handle success response
     } catch (error) {
       console.error("Error voting:", error);
     }
@@ -142,11 +148,12 @@ const Main = () => {
 
   const handleQuestionClick = (questionData) => {
     setCurrentQuestion(questionData);
-    const savedSelectedOption = localStorage.getItem(
-      `selected_option_${questionData.question}`
-    );
-    setSelectedOption(savedSelectedOption || null); // Reset selected option if not found in localStorage
     onClose();
+  };
+
+  const getSelectedOption = (question) => {
+    const selected = selectedOptions.find((item) => item.question === question);
+    return selected ? selected.selected_option : null;
   };
 
   return (
@@ -200,9 +207,13 @@ const Main = () => {
                   onClick={() =>
                     handleOptionClick(currentQuestion.question, option.options)
                   }
-                  isDisabled={selectedOption !== null}
+                  isDisabled={
+                    getSelectedOption(currentQuestion.question) !== null
+                  }
                   opacity={
-                    selectedOption !== null && selectedOption !== option.options
+                    getSelectedOption(currentQuestion.question) !== null &&
+                    getSelectedOption(currentQuestion.question) !==
+                      option.options
                       ? 0.5
                       : 1
                   }
@@ -211,7 +222,7 @@ const Main = () => {
                 </Button>
               ))}
             </SimpleGrid>
-            {selectedOption && (
+            {getSelectedOption(currentQuestion.question) && (
               <Flex justifyContent="center">
                 <Text mt="2rem" fontSize="xl" color="green.500">
                   Thank you for your response!

@@ -8,6 +8,7 @@ import jwt
 from FYP import settings
 from CRM.models import Signup
 from django.db.models import Sum
+from django.db import transaction
 
 # Create your views here.
 class PollCodeCreateAPI(APIView):
@@ -78,7 +79,7 @@ class PollCreateAPI(APIView):
             return Response({'error': 'Poll ID and question are required'}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            poll_options = Option.objects.filter(poll=poll_id, question=question).values('options', 'votes').distinct()
+            poll_options = Option.objects.filter(poll=poll_id, question=question).values('options', 'votes').distinct('options')
             return Response({'poll_options': list(poll_options)}, status=status.HTTP_200_OK)
         except Option.DoesNotExist:
             return Response({'error': 'Poll options not found'}, status=status.HTTP_404_NOT_FOUND)
@@ -109,20 +110,28 @@ class ParticipantOption(APIView):
         
 class VoteOption(APIView):
     def post(self, request):
-        poll_id = request.data.get('poll_id')
-        question = request.data.get('question')
-        selected_option = request.data.get('selected_option')
+        poll = request.data.get('poll')
+        votes = request.data.get('votes')
         
-        if not poll_id or not question or not selected_option:
-            return Response({'error': 'Poll ID, question, and selected_option are required'}, status=status.HTTP_400_BAD_REQUEST)
+        if not poll or not votes:
+            return Response({'error': 'Poll ID and votes are required'}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            # Get the selected option from the database
-            option = Option.objects.get(poll=poll_id, question=question, options=selected_option)
-            # Increment the vote count for the selected option
-            option.votes += 1
-            option.save()
-            return Response({'message': 'Vote registered successfully'}, status=status.HTTP_200_OK)
+            for vote in votes:
+                question = vote.get('question')
+                selected_option = vote.get('selected_option')
+                if not question or not selected_option:
+                    continue
+                print(f"Processing vote for question: {question}, selected option: {selected_option}")
+                # Get the selected option from the database
+                options = Option.objects.filter(poll=poll, question=question, options=selected_option)
+                for option in options:
+                    # Increment the vote count for each option
+                    option.votes += 1
+                    option.save()
+                print(f"Vote count incremented for option: {option}")
+            
+            return Response({'message': 'Votes registered successfully'}, status=status.HTTP_200_OK)
         except Option.DoesNotExist:
             return Response({'error': 'Option not found'}, status=status.HTTP_404_NOT_FOUND)
         
@@ -147,9 +156,7 @@ class JoinPollApi(APIView):
                     if option:
                         question = option.question
                         return Response({
-                            'poll_id': poll.poll_id, 
-                            'num_of_people': poll.num_of_people,
-                            'question': question  
+                            'poll_id': poll.poll_id,  
                         }, status=status.HTTP_201_CREATED)
                     else:
                         return Response({'error': 'No options found for this poll. Please wait for the presenter to set up options.'}, status=status.HTTP_400_BAD_REQUEST)

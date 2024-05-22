@@ -11,4 +11,6 @@ urlpatterns = [
     path('upvote/',views.CommentUpVote.as_view(), name='Vote'),
     path('deactivate/',views.DeactivateRoomAPI.as_view(), name='Room-end'),
     path('options/',views.RoomPollAPI.as_view(), name='Poll-option'),
+    path('participantoption/',views.ParticipantOption.as_view(), name = 'participant-option'),
+    path('vote/', views.VoteOption.as_view(), name='vote-option'),
 ]

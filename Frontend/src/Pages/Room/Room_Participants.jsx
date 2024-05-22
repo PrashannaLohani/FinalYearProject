@@ -11,11 +11,17 @@ import {
   Text,
   Spacer,
   Image,
+  Tabs,
+  TabList,
+  Tab,
+  TabPanels,
+  TabPanel,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { FaHeart } from "react-icons/fa6";
 import Navbar from "../../Layout/Navbar";
+import PollParticipant from "./RoomPollParticipants";
 
 export default function ParticipantRoom() {
   const [roomCode, setRoomCode] = useState("");
@@ -45,17 +51,6 @@ export default function ParticipantRoom() {
       {accessToken ? <Navbar /> : <NavbarWithoutLogin />}
       <Box minH="100vh" p={{ base: "1rem", md: "3rem", lg: "3rem" }}>
         <RoomCode roomCode={roomCode} />
-        <Box
-          minH="auto"
-          borderRadius="2rem"
-          boxShadow="rgba(255, 255, 255, 0.1) 0px 1px 1px 0px inset, rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px"
-          minW="20rem"
-          p="2rem"
-        >
-          <RoomHeading />
-          <CommentSection roomCode={roomCode} />
-          <CommentInput roomCode={roomCode} />
-        </Box>
       </Box>
     </>
   );
@@ -115,17 +110,21 @@ const RoomCode = ({ roomCode }) => {
           Exit
         </Button>
       </Flex>
+      <Tabs size="md" variant="soft-rounded" colorScheme="blackAlpha">
+        <TabList p="1rem">
+          <Tab>Comment</Tab>
+          <Tab>Poll</Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel>
+            <CommentSection roomCode={roomCode} />
+          </TabPanel>
+          <TabPanel>
+            <PollParticipant />
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
     </Box>
-  );
-};
-
-const RoomHeading = () => {
-  return (
-    <>
-      <Flex alignItems="center" justifyContent="space-between" flexWrap="wrap">
-        <Heading size="lg">Comments and Questions</Heading>
-      </Flex>
-    </>
   );
 };
 
@@ -161,47 +160,6 @@ const CommentSection = ({ roomCode }) => {
       console.error("Error upvoting comment:", error);
     }
   };
-
-  return (
-    <Box mt="2rem" minH="50vh" p="2rem">
-      <SimpleGrid
-        columns={3}
-        spacing="1rem"
-        minChildWidth={{ base: "200px", md: "400px" }}
-        autoRows="auto"
-      >
-        {filteredComments.map((comment, index) => (
-          <Card key={index} variant="outline" maxW="30rem" bgColor="#A94D4A">
-            <CardHeader>
-              <Flex
-                alignItems="center"
-                justifyContent="space-between"
-                flexWrap="wrap"
-              >
-                <Heading size="lg">{comment.user}</Heading>
-                <Flex alignItems="center" gap="5px">
-                  <Text as="b">Upvote:</Text>
-                  <Button bgColor="black">
-                    <FaHeart
-                      style={{ color: "white" }}
-                      onClick={() =>
-                        handleUpvote(comment.room, comment.message)
-                      }
-                    />
-                  </Button>
-                </Flex>
-              </Flex>
-            </CardHeader>
-            <CardBody>
-              <Text fontSize="md">{comment.message}</Text>
-            </CardBody>
-          </Card>
-        ))}
-      </SimpleGrid>
-    </Box>
-  );
-};
-const CommentInput = ({ roomCode }) => {
   const [comment, setComment] = useState("");
   const username = localStorage.getItem("username");
 
@@ -225,22 +183,80 @@ const CommentInput = ({ roomCode }) => {
   };
 
   return (
-    <Flex gap="1rem" alignItems="center">
-      <Input
-        placeholder="Write Comments / Questions"
-        type="text"
-        value={comment}
-        onChange={(e) => setComment(e.target.value)}
-        required
-      />
-      <Button
-        colorScheme="blackAlpha"
-        bgColor="black"
-        onClick={handleSubmit}
-        color="white"
+    <>
+      <Box
+        minH="auto"
+        borderRadius="2rem"
+        boxShadow="rgba(255, 255, 255, 0.1) 0px 1px 1px 0px inset, rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px"
+        minW="20rem"
+        p="2rem"
       >
-        Submit
-      </Button>
-    </Flex>
+        <Flex
+          alignItems="center"
+          justifyContent="space-between"
+          flexWrap="wrap"
+        >
+          <Heading size="lg">Comments and Questions</Heading>
+        </Flex>
+        <Box mt="2rem" minH="50vh" p="2rem">
+          <SimpleGrid
+            columns={3}
+            spacing="1rem"
+            minChildWidth={{ base: "200px", md: "400px" }}
+            autoRows="auto"
+          >
+            {filteredComments.map((comment, index) => (
+              <Card
+                key={index}
+                variant="outline"
+                maxW="30rem"
+                bgColor="#A94D4A"
+              >
+                <CardHeader>
+                  <Flex
+                    alignItems="center"
+                    justifyContent="space-between"
+                    flexWrap="wrap"
+                  >
+                    <Heading size="lg">{comment.user}</Heading>
+                    <Flex alignItems="center" gap="5px">
+                      <Text as="b">Upvote:</Text>
+                      <Button bgColor="black">
+                        <FaHeart
+                          style={{ color: "white" }}
+                          onClick={() =>
+                            handleUpvote(comment.room, comment.message)
+                          }
+                        />
+                      </Button>
+                    </Flex>
+                  </Flex>
+                </CardHeader>
+                <CardBody>
+                  <Text fontSize="md">{comment.message}</Text>
+                </CardBody>
+              </Card>
+            ))}
+          </SimpleGrid>
+        </Box>
+        <Flex gap="1rem" alignItems="center">
+          <Input
+            placeholder="Write Comments / Questions"
+            type="text"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            required
+          />
+          <Button
+            colorScheme="blackAlpha"
+            bgColor="black"
+            onClick={handleSubmit}
+            color="white"
+          >
+            Submit
+          </Button>
+        </Flex>
+      </Box>
+    </>
   );
 };
