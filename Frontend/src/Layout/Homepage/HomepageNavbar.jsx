@@ -38,7 +38,7 @@ export default function HomepageNav() {
               width="100%"
               height={{ base: "20px", md: "40px" }}
               objectFit="cover"
-              src="./Image/React&Rise_Text.png"
+              src="./Image/React&Rise_TextWhite.png"
             />
           </Box>
         </NavLink>

@@ -45,7 +45,7 @@ export default function Navbar() {
                 width="100%"
                 height="40px"
                 objectFit="cover"
-                src="./Image/React&Rise_Text.png"
+                src="./Image/React&Rise_TextWhite.png"
               />
             </Box>
           </NavLink>
