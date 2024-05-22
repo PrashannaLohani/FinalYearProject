@@ -285,26 +285,23 @@ const RoomDashboard = () => {
             style={{ maxHeight: "300px", overflow: "auto" }}
           >
             {roomData &&
-              roomData
-                .slice(-6)
-                .reverse()
-                .map((room, index) => (
-                  <AccordionItem key={index}>
-                    <h2>
-                      <AccordionButton>
-                        <Box as="b" flex="1" textAlign="left">
-                          {room.room_name}
-                        </Box>
-                        <AccordionIcon />
-                      </AccordionButton>
-                    </h2>
-                    <AccordionPanel pb={4}>
-                      <p>Room ID: {room.room_id}</p>
-                      <p>No. of People joined: {room.num_of_people}</p>
-                      <p>No. of comments: {room.num_of_comments}</p>
-                    </AccordionPanel>
-                  </AccordionItem>
-                ))}
+              roomData.slice().map((room, index) => (
+                <AccordionItem key={index}>
+                  <h2>
+                    <AccordionButton>
+                      <Box as="b" flex="1" textAlign="left">
+                        {room.room_name}
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                  </h2>
+                  <AccordionPanel pb={4}>
+                    <p>Room ID: {room.room_id}</p>
+                    <p>No. of People joined: {room.num_of_people}</p>
+                    <p>No. of comments: {room.num_of_comments}</p>
+                  </AccordionPanel>
+                </AccordionItem>
+              ))}
           </Accordion>
         </Box>
         <Box

@@ -91,6 +91,9 @@ const NavbarWithoutLogin = () => {
 const RoomCode = ({ roomCode }) => {
   const handleEndSession = () => {
     const accessToken = localStorage.getItem("accessToken");
+    localStorage.getItem("RoomID");
+    localStorage.getItem("username");
+
     if (accessToken) {
       window.location.href = "/info";
     } else {
@@ -210,7 +213,7 @@ const CommentSection = ({ roomCode }) => {
                 key={index}
                 variant="outline"
                 maxW="30rem"
-                bgColor="#A94D4A"
+                bgColor="#7AB2B2"
               >
                 <CardHeader>
                   <Flex

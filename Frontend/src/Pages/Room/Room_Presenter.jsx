@@ -69,7 +69,7 @@ const RoomCode = ({ roomId }) => {
           End session
         </Button>
       </Flex>
-      <Tabs size="md" variant="soft-rounded" colorScheme="blackAlpha">
+      <Tabs size="md" variant="soft-rounded" colorScheme="teal">
         <TabList p="1rem">
           <Tab>Comment</Tab>
           <Tab> Create Poll</Tab>
@@ -166,11 +166,11 @@ const CommentSection = ({ roomId }) => {
             <Text>Number of comments: {numOfComments}</Text>
           </Flex>
         </Flex>
-        <Box mt="2rem" minH="100vh" p="2rem">
+        <Box mt="2rem" minH="80vh" p="2rem">
           <SimpleGrid
             columns={3}
             spacing="5px"
-            minChildWidth={{ base: "200px", md: "400px" }}
+            minChildWidth={{ base: "180px", md: "200px", lg: "300px" }}
             autoRows="auto"
           >
             {filteredComments.map((comment, index) => (
@@ -178,7 +178,7 @@ const CommentSection = ({ roomId }) => {
                 key={index}
                 variant="outline"
                 maxW="30rem"
-                bgColor=" #A94D4A"
+                bgColor=" #7AB2B2"
               >
                 <CardHeader>
                   <Flex
@@ -317,7 +317,7 @@ const PollSection = () => {
   return (
     <>
       <Box
-        minH="100vh"
+        minH="80vh"
         borderRadius="2rem"
         boxShadow="rgba(255, 255, 255, 0.1) 0px 1px 1px 0px inset, rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px"
         minW="20rem"

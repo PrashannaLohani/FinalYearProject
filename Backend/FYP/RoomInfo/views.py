@@ -15,29 +15,17 @@ class Stats(APIView):
         token = request.headers.get('Authorization')
         if token:
             try:
-                # Extract the token from the Authorization header
                 token = token.split()[1]
                 decoded_token = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
-
-                # Extract user_id from the token
                 email = decoded_token.get('email')
-
-                # Fetch the user associated with the token
                 user = Signup.objects.get(email=email)
+                rooms = Room.objects.filter(user=user).order_by('-created_at')  # Order by created_at descending
 
-                # Fetch the rooms associated with the user
-                rooms = Room.objects.filter(user=user)
-
-                # Count the total number of rooms created by the user
                 total_rooms = rooms.count()
-                
-                # Serialize the room data
                 room_data = [room.to_dict() for room in rooms]
-
                 total_participants = sum(room.num_of_people for room in rooms)
                 total_comments = sum(room.num_of_comments for room in rooms)
 
-                # Fetch poll data for the rooms
                 polls = RoomPoll.objects.all()
                 poll_data = [poll.to_dict() for poll in polls]
 

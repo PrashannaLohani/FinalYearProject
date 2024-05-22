@@ -21,17 +21,11 @@ const BarGraph = () => {
     Legend
   );
 
-  // State to hold the current color mode
   const [colorMode, setColorMode] = useState("light");
-  // State to hold room data
   const [roomData, setRoomData] = useState(null);
-
-  // Chart reference to access the underlying Chart.js instance
   const chartRef = useRef();
-
   const token = localStorage.getItem("accessToken");
 
-  // Retrieve color mode from local storage
   useEffect(() => {
     const storedColorMode = localStorage.getItem("chakra-ui-color-mode");
     if (storedColorMode) {
@@ -39,7 +33,6 @@ const BarGraph = () => {
     }
   }, []);
 
-  // Fetch room data when component mounts
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -48,15 +41,15 @@ const BarGraph = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        setRoomData(response.data.room_data); // Set roomData to response.data.room_data
+        console.log("Response data:", response.data); // Log the entire response
+        setRoomData(response.data.room_data);
       } catch (error) {
         console.error("Error fetching room data:", error);
       }
     };
     fetchData();
-  }, []);
+  }, [token]);
 
-  // Define color schemes for light and dark modes
   const colors = {
     light: {
       label: "rgba(0, 0, 0, 0.8)",
@@ -71,7 +64,6 @@ const BarGraph = () => {
     },
   };
 
-  // Set chart options based on the color mode
   const options = {
     responsive: true,
     plugins: {
@@ -89,13 +81,13 @@ const BarGraph = () => {
     },
   };
 
-  // Render loading indicator while fetching data
   if (!roomData) {
     return <div>Loading...</div>;
   }
 
-  // Extract labels and data from roomData
-  const recentRoomData = roomData.slice(-6).reverse();
+  // Use roomData as received from the backend
+  const recentRoomData = roomData.slice(0, 6); // Taking only the first 6 entries if needed
+
   const labels = recentRoomData.map((room) => room.room_name);
   const numPeopleData = recentRoomData.map((room) => room.num_of_people);
   const numCommentsData = recentRoomData.map((room) => room.num_of_comments);
