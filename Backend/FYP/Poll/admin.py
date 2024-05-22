@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Poll, PollCode, Option
+from .models import PollCode, Option
 
 class OptionAdmin(admin.ModelAdmin):
     list_display = ('poll', 'question', 'options', 'votes')
@@ -12,9 +12,3 @@ class PollCodeAdmin(admin.ModelAdmin):
     search_fields = ('poll_id',)  
 
 admin.site.register(PollCode, PollCodeAdmin)
-
-class PollAdmin(admin.ModelAdmin):
-    list_display = ('poll_id',  'question','option', 'num_of_people', 'num_of_vote', 'created_at')
-    search_fields = ('poll_code__poll_id', 'question')  
-
-admin.site.register(Poll, PollAdmin)

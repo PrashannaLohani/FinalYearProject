@@ -22,25 +22,3 @@ class Option(models.Model):
 
     def __str__(self):
         return self.question
-
-
-class Poll(models.Model):
-    poll_id = models.CharField(max_length=255, default=None)
-    question = models.CharField(max_length=255)
-    option = models.CharField(max_length=255, default=None)
-    num_of_people = models.IntegerField(default=0)
-    num_of_vote = models.IntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.question
-
-    def to_dict(self):
-        return {
-            'poll_id': str(self.poll_code.poll_id),
-            'question': self.question,
-            'options': [{'option': option.option, 'vote': option.vote} for option in self.poll_code.options.all()],
-            'user': self.poll_code.user.username,
-            'num_of_people': self.num_of_people,
-            'num_of_vote': self.num_of_vote
-        }

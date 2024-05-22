@@ -90,14 +90,20 @@ class ParticipantOption(APIView):
             if not poll_id:
                 return Response({'error': 'Poll ID is required'}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Get the most recent question and its options for the specified poll ID
-            most_recent_question = Option.objects.filter(poll=poll_id).order_by('-id').first()
-            if not most_recent_question:
+            # Get all distinct questions for the specified poll ID
+            questions = Option.objects.filter(poll=poll_id).values_list('question', flat=True).distinct()
+            if not questions:
                 return Response({'error': 'No questions found for this poll ID'}, status=status.HTTP_404_NOT_FOUND)
 
-            poll_options = Option.objects.filter(poll=poll_id, question=most_recent_question.question).values('options', 'votes')
+            response_data = []
+            for question in questions:
+                poll_options = Option.objects.filter(poll=poll_id, question=question).values('options', 'votes')
+                response_data.append({
+                    'question': question,
+                    'poll_options': list(poll_options)
+                })
 
-            return Response({'question': most_recent_question.question, 'poll_options': list(poll_options)}, status=status.HTTP_200_OK)
+            return Response(response_data, status=status.HTTP_200_OK)
         except Option.DoesNotExist:
             return Response({'error': 'Poll options not found'}, status=status.HTTP_404_NOT_FOUND)
         

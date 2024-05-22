@@ -74,7 +74,7 @@ const Welcome = ({ full_name }) => {
     });
     toast.promise(successPromise, {
       success: { title: "Room Entered.", description: "Welcome." },
-      loading: { title: "Validating Room...", description: "Please wait" },
+      loading: { title: "Creating Room...", description: "Please wait" },
       error: { title: "Failed", description: "Something went wrong" },
     });
   };
