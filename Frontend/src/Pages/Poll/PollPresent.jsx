@@ -39,15 +39,14 @@ export default function PollPresent() {
     <>
       <Box p={{ base: "1rem", md: "2rem", lg: "2rem" }} minHeight="auto">
         <Grid templateColumns="1fr 3fr" templateRows="auto 1fr">
-          {/* Headline in the first row and second column */}
           <GridItem colSpan={1} colStart={2}>
             <Headline />
           </GridItem>
-          {/* Sidebar and Main in the second row */}
           <GridItem>
             <Sidebar
               questions={questions}
               onQuestionSelect={setSelectedQuestion}
+              selectedQuestion={selectedQuestion}
             />
           </GridItem>
           <GridItem>
@@ -67,11 +66,9 @@ const Headline = () => {
         document.documentElement.requestFullscreen();
         setIsFullscreen(true);
       } else {
-        // Full-screen mode is not supported
         console.error("Full-screen mode is not supported.");
       }
     } else {
-      // Exit full-screen mode
       if (document.exitFullscreen) {
         document.exitFullscreen();
         setIsFullscreen(false);
@@ -119,12 +116,7 @@ const Headline = () => {
   );
 };
 
-const Sidebar = ({
-  questions = [],
-  onQuestionSelect,
-  selectedQuestion,
-  pollCode,
-}) => {
+const Sidebar = ({ questions = [], onQuestionSelect, selectedQuestion }) => {
   const handleBackButtonClick = () => {
     if (document.exitFullscreen) {
       document.exitFullscreen();
@@ -168,6 +160,7 @@ const Sidebar = ({
     </Box>
   );
 };
+
 const Main = ({ selectedQuestion }) => {
   const { colorMode } = useColorMode();
   const bgColor = colorMode === "light" ? "#FFF9D0" : "#333333";

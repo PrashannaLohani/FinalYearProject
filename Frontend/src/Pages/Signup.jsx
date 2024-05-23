@@ -211,12 +211,7 @@ const Signup = () => {
                         isRequired
                       />
                       <InputRightElement width="4.5rem">
-                        <Button
-                          h="1.75rem"
-                          size="sm"
-                          onClick={showPass}
-                          bg="white"
-                        >
+                        <Button h="1.75rem" size="sm" onClick={showPass}>
                           {showPassword ? <FaEyeSlash /> : <FaEye />}
                         </Button>
                       </InputRightElement>
@@ -239,12 +234,7 @@ const Signup = () => {
                         isRequired
                       />
                       <InputRightElement width="4.5rem">
-                        <Button
-                          h="1.75rem"
-                          size="sm"
-                          onClick={showConfirmPass}
-                          bg="white"
-                        >
+                        <Button h="1.75rem" size="sm" onClick={showConfirmPass}>
                           {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
                         </Button>
                       </InputRightElement>
@@ -289,6 +279,7 @@ const Signup = () => {
                     w="full"
                     colorScheme="blackAlpha"
                     bgColor="Black"
+                    color="white"
                     mt="1rem"
                     type="submit"
                     isDisabled={!values?.checkbox || isSubmitting}

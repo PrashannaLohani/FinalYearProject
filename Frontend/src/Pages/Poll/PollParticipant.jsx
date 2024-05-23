@@ -19,7 +19,7 @@ import {
   IconButton,
 } from "@chakra-ui/react";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { FaChartBar, FaAlignJustify } from "react-icons/fa6";
 
 export default function PollParticipant() {
@@ -72,6 +72,7 @@ const Main = () => {
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const ws = useRef(null); // Ref for WebSocket
 
   const backgroundColor = [
     "rgba(255, 99, 132, 1)",
@@ -83,6 +84,46 @@ const Main = () => {
     "rgba(0, 128, 0, 1)",
     "rgba(255, 0, 255, 1)",
   ];
+
+  useEffect(() => {
+    const pollCode = localStorage.getItem("Poll_Id");
+    if (currentQuestion) {
+      const encodedQuestion = encodeURIComponent(currentQuestion.question);
+      ws.current = new WebSocket(`ws://127.0.0.1:8000/ws/poll/${pollCode}/`);
+
+      ws.current.onopen = () => {
+        console.log("WebSocket connection opened");
+      };
+
+      ws.current.onclose = (event) => {
+        console.log("WebSocket connection closed", event);
+      };
+
+      ws.current.onerror = (error) => {
+        console.error("WebSocket error observed:", error);
+      };
+
+      ws.current.onmessage = (event) => {
+        const message = JSON.parse(event.data);
+        console.log("Received message from server:", message);
+        if (message.question === currentQuestion.question) {
+          setPollData((prevData) =>
+            prevData.map((data) =>
+              data.question === currentQuestion.question
+                ? { ...data, poll_options: message.options }
+                : data
+            )
+          );
+        }
+      };
+
+      return () => {
+        if (ws.current) {
+          ws.current.close();
+        }
+      };
+    }
+  }, [currentQuestion]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -140,7 +181,18 @@ const Main = () => {
         poll: pollCode,
         votes: updatedSelectedOptions,
       });
-      // Optionally handle success response
+
+      // Send vote to WebSocket server
+      if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+        ws.current.send(
+          JSON.stringify({
+            action: "vote",
+            poll_id: pollCode,
+            question,
+            option,
+          })
+        );
+      }
     } catch (error) {
       console.error("Error voting:", error);
     }

@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Box } from "@chakra-ui/react";
 import { Bar } from "react-chartjs-2";
-import axios from "axios";
-
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -12,6 +10,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import axios from "axios";
 
 ChartJS.register(
   CategoryScale,
@@ -28,9 +27,6 @@ const options = {
     legend: {
       display: false,
     },
-    label: {
-      color: "white",
-    },
   },
   scales: {
     y: {
@@ -45,11 +41,13 @@ const options = {
 };
 
 export default function PollBargraph({ question }) {
-  const [pollData, setPollData] = useState(null);
+  const [pollData, setPollData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const pollCode = localStorage.getItem("Poll_Code");
+
     const fetchData = async () => {
-      const pollCode = localStorage.getItem("Poll_Code");
       try {
         const response = await axios.get(
           "http://127.0.0.1:8000/Poll/options/",
@@ -61,15 +59,42 @@ export default function PollBargraph({ question }) {
           }
         );
         setPollData(response.data.poll_options);
+        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching poll data:", error);
+        setIsLoading(false);
       }
     };
 
     fetchData();
+
+    const socket = new WebSocket(`ws://127.0.0.1:8000/ws/poll/${pollCode}/`);
+
+    socket.onopen = () => {
+      console.log("WebSocket connection established");
+    };
+
+    socket.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      if (message.question === question || message.question === "all") {
+        setPollData(message.options);
+      }
+    };
+
+    socket.onclose = (event) => {
+      if (!event.wasClean) {
+        // Reconnect logic can be added here if needed
+      }
+    };
+
+    socket.onerror = (error) => {};
+
+    return () => {
+      socket.close();
+    };
   }, [question]);
 
-  if (!pollData) {
+  if (isLoading) {
     return <div>Loading...</div>;
   }
 
@@ -95,6 +120,7 @@ export default function PollBargraph({ question }) {
       },
     ],
   };
+
   return (
     <Box p="2rem">
       <Bar options={options} data={data} />
