@@ -24,22 +24,28 @@ class CommentConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
+        room = text_data_json['room']
+        user = text_data_json['user']
 
         # Send message to room group
         await self.channel_layer.group_send(
             self.room_group_name,
             {
                 'type': 'comment_message',
+                'room': room,
+                'user': user,
                 'message': message
             }
         )
 
     async def comment_message(self, event):
         message = event['message']
+        room = event['room']
+        user = event['user']
 
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
-            'room': event['room'],
-            'user': event['user'],
-            'message': event['message']
+            'room': room,
+            'user': user,
+            'message': message
         }))

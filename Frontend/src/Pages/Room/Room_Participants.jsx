@@ -18,7 +18,7 @@ import {
   TabPanel,
 } from "@chakra-ui/react";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaHeart } from "react-icons/fa6";
 import Navbar from "../../Layout/Navbar";
 import PollParticipant from "./RoomPollParticipants";
@@ -116,12 +116,16 @@ const CommentSection = ({ roomID }) => {
   const [comments, setComments] = useState([]);
   const [comment, setComment] = useState("");
   const username = localStorage.getItem("username");
+  const socketRef = useRef(null);
 
   useEffect(() => {
     const fetchComments = async () => {
       try {
         const response = await axios.get(
-          `http://127.0.0.1:8000/room/comments/`
+          "http://127.0.0.1:8000/room/comments/",
+          {
+            params: { room_code: roomID },
+          }
         );
         setComments(response.data);
       } catch (error) {
@@ -131,34 +135,40 @@ const CommentSection = ({ roomID }) => {
 
     fetchComments();
 
-    const socket = new WebSocket(`ws://127.0.0.1:8000/ws/room/${roomID}/`);
+    socketRef.current = new WebSocket(`ws://127.0.0.1:8000/ws/room/${roomID}/`);
 
-    socket.onopen = () => {
+    socketRef.current.onopen = () => {
       console.log("WebSocket connection established");
     };
 
-    socket.onmessage = (event) => {
+    socketRef.current.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      setComments((prevComments) => [
-        ...prevComments,
-        {
-          room: data.room,
-          user: data.user,
-          message: data.message,
-        },
-      ]);
+      console.log("WebSocket message received:", data);
+      if (data.room === roomID) {
+        setComments((prevComments) => [
+          ...prevComments,
+          {
+            room: data.room,
+            user: data.user,
+            message: data.message,
+            vote: 0, // Assuming vote is 0 for new comments; adjust as necessary
+          },
+        ]);
+      }
     };
 
-    socket.onclose = () => {
+    socketRef.current.onclose = () => {
       console.log("WebSocket connection closed");
     };
 
-    socket.onerror = (error) => {
+    socketRef.current.onerror = (error) => {
       console.log("WebSocket error:", error);
     };
 
     return () => {
-      socket.close();
+      if (socketRef.current) {
+        socketRef.current.close();
+      }
     };
   }, [roomID]);
 
@@ -170,93 +180,73 @@ const CommentSection = ({ roomID }) => {
         message: comment,
       };
 
-      // Post the new comment to the server
       await axios.post("http://127.0.0.1:8000/room/comments/", newComment);
 
-      // Update the local state immediately
-      setComments((prevComments) => [...prevComments, newComment]);
-
-      setComment(""); // Clear the input field after successful submission
+      setComment("");
     } catch (error) {
       console.error("Error:", error);
     }
   };
 
-  // Filter comments based on roomID
-  const filteredComments = comments.filter(
-    (comment) => comment.room === roomID
-  );
-
   return (
-    <>
-      <Box
-        minH="auto"
-        borderRadius="2rem"
-        boxShadow="rgba(255, 255, 255, 0.1) 0px 1px 1px 0px inset, rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px"
-        minW="20rem"
-        p="2rem"
-      >
-        <Flex
-          alignItems="center"
-          justifyContent="space-between"
-          flexWrap="wrap"
+    <Box
+      minH="auto"
+      borderRadius="2rem"
+      boxShadow="rgba(255, 255, 255, 0.1) 0px 1px 1px 0px inset, rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px"
+      minW="20rem"
+      p="2rem"
+    >
+      <Flex alignItems="center" justifyContent="space-between" flexWrap="wrap">
+        <Heading size="lg">Comments and Questions</Heading>
+      </Flex>
+      <Box mt="2rem" minH="50vh" p="2rem">
+        <SimpleGrid
+          columns={3}
+          spacing="1rem"
+          minChildWidth={{ base: "200px", md: "400px" }}
+          autoRows="auto"
         >
-          <Heading size="lg">Comments and Questions</Heading>
-        </Flex>
-        <Box mt="2rem" minH="50vh" p="2rem">
-          <SimpleGrid
-            columns={3}
-            spacing="1rem"
-            minChildWidth={{ base: "200px", md: "400px" }}
-            autoRows="auto"
-          >
-            {filteredComments.map((comment, index) => (
-              <Card
-                key={index}
-                variant="outline"
-                maxW="30rem"
-                bgColor="#7AB2B2"
-              >
-                <CardHeader>
-                  <Flex
-                    alignItems="center"
-                    justifyContent="space-between"
-                    flexWrap="wrap"
-                  >
-                    <Heading size="lg">{comment.user}</Heading>
-                    <Flex alignItems="center" gap="5px">
-                      <Text as="b">Upvote:</Text>
-                      <Button bgColor="black">
-                        <FaHeart style={{ color: "white" }} />
-                      </Button>
-                    </Flex>
+          {comments.map((comment, index) => (
+            <Card key={index} variant="outline" maxW="30rem" bgColor="#7AB2B2">
+              <CardHeader>
+                <Flex
+                  alignItems="center"
+                  justifyContent="space-between"
+                  flexWrap="wrap"
+                >
+                  <Heading size="lg">{comment.user}</Heading>
+                  <Flex alignItems="center" gap="5px">
+                    <Text as="b">Upvote:</Text>
+                    <Button bgColor="black">
+                      <FaHeart style={{ color: "white" }} />
+                    </Button>
                   </Flex>
-                </CardHeader>
-                <CardBody>
-                  <Text fontSize="md">{comment.message}</Text>
-                </CardBody>
-              </Card>
-            ))}
-          </SimpleGrid>
-        </Box>
-        <Flex gap="1rem" alignItems="center">
-          <Input
-            placeholder="Write Comments / Questions"
-            type="text"
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            required
-          />
-          <Button
-            colorScheme="blackAlpha"
-            bgColor="black"
-            onClick={handleSubmit}
-            color="white"
-          >
-            Submit
-          </Button>
-        </Flex>
+                </Flex>
+              </CardHeader>
+              <CardBody>
+                <Text fontSize="md">{comment.message}</Text>
+              </CardBody>
+            </Card>
+          ))}
+        </SimpleGrid>
       </Box>
-    </>
+      <Flex gap="1rem" alignItems="center">
+        <Input
+          placeholder="Write Comments / Questions"
+          type="text"
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          required
+        />
+        <Button
+          colorScheme="blackAlpha"
+          bgColor="black"
+          onClick={handleSubmit}
+          color="white"
+        >
+          Submit
+        </Button>
+      </Flex>
+    </Box>
   );
 };

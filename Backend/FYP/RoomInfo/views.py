@@ -202,19 +202,22 @@ class CommentUpVote(APIView):
             comment.save()
 
             # Notify via WebSocket
-            self.notify_room_update(room_id)
+            self.notify_room_update(room_id, comment)
 
             return Response({'message': 'Upvote successful'}, status=status.HTTP_200_OK)
         except Comment.DoesNotExist:
             return Response({'error': 'Comment not found'}, status=status.HTTP_404_NOT_FOUND)
     
-    def notify_room_update(self, room_code):
+    def notify_room_update(self, room_id, comment):
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
-            "room_updates",
+            f'room_{room_id}',
             {
-                'type': 'room_update',
-                'room_id': room_code
+                'type': 'comment_message',
+                'room': room_id,
+                'user': comment.user,
+                'message': comment.message,
+                'vote': comment.vote
             }
         )
 
