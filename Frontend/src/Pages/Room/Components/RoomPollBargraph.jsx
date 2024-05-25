@@ -2,25 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Box } from "@chakra-ui/react";
 import { Bar } from "react-chartjs-2";
 import axios from "axios";
-
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+import { w3cwebsocket as W3CWebSocket } from "websocket"; // Import WebSocket library
 
 const options = {
   responsive: true,
@@ -67,6 +49,31 @@ export default function RoomPollBargraph({ question }) {
     };
 
     fetchData();
+    const pollCode = localStorage.getItem("Roomtoken");
+    const socket = new WebSocket(`ws://127.0.0.1:8000/ws/poll/${pollCode}/`);
+
+    socket.onopen = () => {
+      console.log("WebSocket connection established");
+    };
+
+    socket.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      if (message.question === question || message.question === "all") {
+        setPollData(message.options);
+      }
+    };
+
+    socket.onclose = (event) => {
+      if (!event.wasClean) {
+        // Reconnect logic can be added here if needed
+      }
+    };
+
+    socket.onerror = (error) => {};
+
+    return () => {
+      socket.close();
+    };
   }, [question]);
 
   if (!pollData) {

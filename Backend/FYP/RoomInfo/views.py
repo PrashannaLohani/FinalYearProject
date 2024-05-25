@@ -330,26 +330,43 @@ class VoteOption(APIView):
                 if not question or not selected_option:
                     continue
 
-                # Get the selected option from the database
                 options = RoomPoll.objects.filter(poll=poll, question=question, options=selected_option)
                 for option in options:
-                    # Increment the vote count for each option
                     option.votes += 1
                     option.save()
 
-                # Notify via WebSocket
-                self.notify_poll_update(poll)
+            # Notify via WebSocket
+            self.notify_votes_updated(poll)
 
             return Response({'message': 'Votes registered successfully'}, status=status.HTTP_200_OK)
         except RoomPoll.DoesNotExist:
             return Response({'error': 'Option not found'}, status=status.HTTP_404_NOT_FOUND)
     
-    def notify_poll_update(self, poll_id):
+        
+    def notify_votes_updated(self, poll_id):
         channel_layer = get_channel_layer()
+        options = RoomPoll.objects.filter(poll=poll_id).values('question', 'options', 'votes')
+
+        # Process options to ensure distinct options per question
+        distinct_options = {}
+        for option in options:
+            question = option['question']
+            if question not in distinct_options:
+                distinct_options[question] = []
+            # Check if the option is already added
+            if not any(opt['options'] == option['options'] for opt in distinct_options[question]):
+                distinct_options[question].append(option)
+
+        # Convert the distinct options dictionary to a list of options per question
+        distinct_options_list = []
+        for question, opts in distinct_options.items():
+            distinct_options_list.extend(opts)
+
         async_to_sync(channel_layer.group_send)(
-            "poll_updates",
+            f'poll_{poll_id}',
             {
-                'type': 'poll_update',
-                'poll_id': poll_id
+                'type': 'poll_message',
+                'question': 'all',  # This could be more specific if needed
+                'options': distinct_options_list
             }
         )

@@ -18,8 +18,9 @@ import {
   IconButton,
 } from "@chakra-ui/react";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { FaChartBar, FaAlignJustify } from "react-icons/fa6";
+
 export default function RoomPollParticipant() {
   return (
     <Box minH="100vh" p={{ base: "1rem", md: "1rem" }}>
@@ -33,6 +34,7 @@ const Main = () => {
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const socketRef = useRef(null);
 
   const backgroundColor = [
     "rgba(255, 99, 132, 1)",
@@ -82,6 +84,38 @@ const Main = () => {
     };
 
     fetchData();
+
+    // Initialize WebSocket connection
+    socketRef.current = new WebSocket(
+      `ws://127.0.0.1:8000/ws/poll/${localStorage.getItem("RoomID")}/`
+    );
+
+    socketRef.current.onopen = () => {
+      console.log("WebSocket connection established for poll");
+    };
+
+    socketRef.current.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log("WebSocket poll message received:", data);
+      if (data.type === "poll_update") {
+        // Fetch updated poll data
+        fetchData();
+      }
+    };
+
+    socketRef.current.onclose = () => {
+      console.log("WebSocket connection closed for poll");
+    };
+
+    socketRef.current.onerror = (error) => {
+      console.log("WebSocket poll error:", error);
+    };
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.close();
+      }
+    };
   }, []);
 
   const handleOptionClick = async (question, option) => {
@@ -101,7 +135,15 @@ const Main = () => {
         poll: pollCode,
         votes: updatedSelectedOptions,
       });
-      // Optionally handle success response
+
+      // Notify WebSocket clients about the new vote
+      if (socketRef.current) {
+        socketRef.current.send(
+          JSON.stringify({
+            message: `Vote casted for question: ${question}`,
+          })
+        );
+      }
     } catch (error) {
       console.error("Error voting:", error);
     }

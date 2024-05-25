@@ -72,8 +72,6 @@ const NavbarWithoutLogin = () => {
 const RoomCode = ({ roomID }) => {
   const handleEndSession = () => {
     const accessToken = localStorage.getItem("accessToken");
-    localStorage.getItem("RoomID");
-    localStorage.getItem("username");
 
     if (accessToken) {
       window.location.href = "/info";
@@ -116,7 +114,6 @@ const CommentSection = ({ roomID }) => {
   const [comments, setComments] = useState([]);
   const [comment, setComment] = useState("");
   const username = localStorage.getItem("username");
-  const socketRef = useRef(null);
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -135,40 +132,35 @@ const CommentSection = ({ roomID }) => {
 
     fetchComments();
 
-    socketRef.current = new WebSocket(`ws://127.0.0.1:8000/ws/room/${roomID}/`);
+    const socket = new WebSocket(`ws://127.0.0.1:8000/ws/room/${roomID}/`);
 
-    socketRef.current.onopen = () => {
+    socket.onopen = () => {
       console.log("WebSocket connection established");
     };
 
-    socketRef.current.onmessage = (event) => {
+    socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log("WebSocket message received:", data);
-      if (data.room === roomID) {
-        setComments((prevComments) => [
-          ...prevComments,
-          {
-            room: data.room,
-            user: data.user,
-            message: data.message,
-            vote: 0, // Assuming vote is 0 for new comments; adjust as necessary
-          },
-        ]);
-      }
+      setComments((prevComments) => [
+        ...prevComments,
+        {
+          room: data.room,
+          user: data.user,
+          message: data.message,
+          vote: data.vote,
+        },
+      ]);
     };
 
-    socketRef.current.onclose = () => {
+    socket.onclose = () => {
       console.log("WebSocket connection closed");
     };
 
-    socketRef.current.onerror = (error) => {
+    socket.onerror = (error) => {
       console.log("WebSocket error:", error);
     };
 
     return () => {
-      if (socketRef.current) {
-        socketRef.current.close();
-      }
+      socket.close();
     };
   }, [roomID]);
 
