@@ -35,8 +35,6 @@ class Comment(models.Model):
     def __str__(self):
         return self.message  # Returning message as a string representation
 
-    def get_unique_identifier(self):
-        return f"{self.room}-{self.message}"  # Creating a unique identifier
 
 class RoomPoll(models.Model):
     poll = models.CharField(max_length=255,default=None)

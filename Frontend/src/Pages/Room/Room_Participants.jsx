@@ -22,35 +22,16 @@ import { useEffect, useState } from "react";
 import { FaHeart } from "react-icons/fa6";
 import Navbar from "../../Layout/Navbar";
 import PollParticipant from "./RoomPollParticipants";
+import RoomPollParticipant from "./RoomPollParticipants";
 
 export default function ParticipantRoom() {
-  const [roomCode, setRoomCode] = useState("");
-
-  useEffect(() => {
-    const sendComment = async () => {
-      const userToken = localStorage.getItem("User-Token");
-      try {
-        const response = await axios.post(
-          "http://127.0.0.1:8000/room/Userinfo/",
-          {
-            token: userToken,
-          }
-        );
-        setRoomCode(response.data.room);
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
-
-    sendComment(); // Call the function to send the comment when the component mounts
-  }, []);
-
   const accessToken = localStorage.getItem("accessToken");
+  const roomID = localStorage.getItem("RoomID");
   return (
     <>
       {accessToken ? <Navbar /> : <NavbarWithoutLogin />}
       <Box minH="100vh" p={{ base: "1rem", md: "3rem", lg: "3rem" }}>
-        <RoomCode roomCode={roomCode} />
+        <RoomCode roomID={roomID} />
       </Box>
     </>
   );
@@ -88,7 +69,7 @@ const NavbarWithoutLogin = () => {
   );
 };
 
-const RoomCode = ({ roomCode }) => {
+const RoomCode = ({ roomID }) => {
   const handleEndSession = () => {
     const accessToken = localStorage.getItem("accessToken");
     localStorage.getItem("RoomID");
@@ -103,7 +84,7 @@ const RoomCode = ({ roomCode }) => {
   return (
     <Box>
       <Flex alignItems="center" justifyContent="space-between" px="2rem">
-        <Heading mb="1rem">Room Code: {roomCode}</Heading>{" "}
+        <Heading mb="1rem">Room ID: {roomID}</Heading>{" "}
         <Button
           bgColor="black"
           colorScheme="blackAlpha"
@@ -120,10 +101,10 @@ const RoomCode = ({ roomCode }) => {
         </TabList>
         <TabPanels>
           <TabPanel>
-            <CommentSection roomCode={roomCode} />
+            <CommentSection roomID={roomID} />
           </TabPanel>
           <TabPanel>
-            <PollParticipant />
+            <RoomPollParticipant />
           </TabPanel>
         </TabPanels>
       </Tabs>
@@ -131,59 +112,80 @@ const RoomCode = ({ roomCode }) => {
   );
 };
 
-const CommentSection = ({ roomCode }) => {
+const CommentSection = ({ roomID }) => {
   const [comments, setComments] = useState([]);
+  const [comment, setComment] = useState("");
+  const username = localStorage.getItem("username");
 
   useEffect(() => {
     const fetchComments = async () => {
       try {
         const response = await axios.get(
-          "http://127.0.0.1:8000/room/comments/"
+          `http://127.0.0.1:8000/room/comments/`
         );
-        setComments(response.data); // Assuming the response is an array of comments
+        setComments(response.data);
       } catch (error) {
         console.error("Error fetching comments:", error);
       }
     };
 
     fetchComments();
-  }, []); // Fetch comments when the component mounts
 
-  // Filter comments based on roomCode
-  const filteredComments = comments.filter(
-    (comment) => comment.room === roomCode
-  );
-  const handleUpvote = async (roomId, message) => {
-    try {
-      await axios.post("http://127.0.0.1:8000/room/upvote/", {
-        room_id: roomId,
-        message: message,
-      });
-    } catch (error) {
-      console.error("Error upvoting comment:", error);
-    }
-  };
-  const [comment, setComment] = useState("");
-  const username = localStorage.getItem("username");
+    const socket = new WebSocket(`ws://127.0.0.1:8000/ws/room/${roomID}/`);
+
+    socket.onopen = () => {
+      console.log("WebSocket connection established");
+    };
+
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      setComments((prevComments) => [
+        ...prevComments,
+        {
+          room: data.room,
+          user: data.user,
+          message: data.message,
+        },
+      ]);
+    };
+
+    socket.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+
+    socket.onerror = (error) => {
+      console.log("WebSocket error:", error);
+    };
+
+    return () => {
+      socket.close();
+    };
+  }, [roomID]);
 
   const handleSubmit = async () => {
     try {
-      // Make a POST request to the backend to send the comment
-      await axios.post("http://127.0.0.1:8000/room/comments/", {
-        room: roomCode,
+      const newComment = {
+        room: roomID,
         user: username,
         message: comment,
-      });
+      };
 
-      // Reset the comment input after successful submission
-      setComment("");
+      // Post the new comment to the server
+      await axios.post("http://127.0.0.1:8000/room/comments/", newComment);
 
-      // Optionally, you can trigger a refresh of the comments
-      // or update the UI in response to the successful submission
+      // Update the local state immediately
+      setComments((prevComments) => [...prevComments, newComment]);
+
+      setComment(""); // Clear the input field after successful submission
     } catch (error) {
       console.error("Error:", error);
     }
   };
+
+  // Filter comments based on roomID
+  const filteredComments = comments.filter(
+    (comment) => comment.room === roomID
+  );
 
   return (
     <>
@@ -225,12 +227,7 @@ const CommentSection = ({ roomCode }) => {
                     <Flex alignItems="center" gap="5px">
                       <Text as="b">Upvote:</Text>
                       <Button bgColor="black">
-                        <FaHeart
-                          style={{ color: "white" }}
-                          onClick={() =>
-                            handleUpvote(comment.room, comment.message)
-                          }
-                        />
+                        <FaHeart style={{ color: "white" }} />
                       </Button>
                     </Flex>
                   </Flex>

@@ -90,6 +90,7 @@ const RoomCode = ({ roomId }) => {
 const CommentSection = ({ roomId }) => {
   const [numOfComments, setNumOfComments] = useState(0);
   const [numOfPeople, setNumOfPeople] = useState(0);
+  const [comments, setComments] = useState([]);
 
   useEffect(() => {
     const fetchCommentsCount = async () => {
@@ -106,12 +107,7 @@ const CommentSection = ({ roomId }) => {
     };
 
     fetchCommentsCount();
-
-    return () => {
-      // Cleanup if needed
-    };
   }, [roomId]);
-  const [comments, setComments] = useState([]);
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -126,7 +122,40 @@ const CommentSection = ({ roomId }) => {
     };
 
     fetchComments();
-  }, []); // Fetch comments when the component mounts
+
+    const socket = new WebSocket(`ws://127.0.0.1:8000/ws/room/${roomId}/`);
+
+    socket.onopen = () => {
+      console.log("WebSocket connection established");
+    };
+
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      setComments((prevComments) => [
+        ...prevComments,
+        {
+          room: data.room,
+          user: data.user,
+          message: data.message,
+          vote: data.vote,
+          isRead: false, // Set the default value of isRead to false
+        },
+      ]);
+    };
+
+    socket.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+
+    socket.onerror = (error) => {
+      console.log("WebSocket error:", error);
+    };
+
+    return () => {
+      socket.close();
+    };
+  }, [roomId]);
+
   const roomIdNumber = parseInt(roomId);
 
   // Filter comments based on roomId

@@ -11,7 +11,6 @@ import {
   useDisclosure,
   Drawer,
   DrawerBody,
-  DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
   DrawerContent,
@@ -21,7 +20,7 @@ import {
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { FaChartBar, FaAlignJustify } from "react-icons/fa6";
-export default function PollParticipant() {
+export default function RoomPollParticipant() {
   return (
     <Box minH="100vh" p={{ base: "1rem", md: "1rem" }}>
       <Main />
