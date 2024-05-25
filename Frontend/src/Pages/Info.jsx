@@ -226,10 +226,17 @@ const RoomDashboard = () => {
     if (!acc[poll.poll][poll.question]) {
       acc[poll.poll][poll.question] = [];
     }
-    acc[poll.poll][poll.question].push({
-      options: poll.options.split(","),
-      votes: poll.votes,
-    });
+    const existingOptionIndex = acc[poll.poll][poll.question].findIndex(
+      (optionData) => optionData.options[0] === poll.options
+    );
+    if (existingOptionIndex === -1) {
+      acc[poll.poll][poll.question].push({
+        options: [poll.options],
+        votes: poll.votes,
+      });
+    } else {
+      acc[poll.poll][poll.question][existingOptionIndex].votes += poll.votes;
+    }
     return acc;
   }, {});
 
@@ -401,10 +408,23 @@ const PollDashboard = () => {
     if (!acc[poll.poll][poll.question]) {
       acc[poll.poll][poll.question] = [];
     }
-    acc[poll.poll][poll.question].push({
-      options: poll.options,
-      votes: poll.votes,
-    });
+
+    // Check if the option already exists for the current question
+    const existingOptionIndex = acc[poll.poll][poll.question].findIndex(
+      (option) => option.options === poll.options
+    );
+
+    // If the option doesn't exist, add it to the list
+    if (existingOptionIndex === -1) {
+      acc[poll.poll][poll.question].push({
+        options: poll.options,
+        votes: poll.votes,
+      });
+    } else {
+      // If the option exists, update its votes count
+      acc[poll.poll][poll.question][existingOptionIndex].votes += poll.votes;
+    }
+
     return acc;
   }, {});
 

@@ -126,15 +126,16 @@ const Content = () => {
 
   const { colorMode, toggleColorMode } = useColorMode();
   const [theme, setTheme] = useState(colorMode);
-  const [icon, setIcon] = useState(<FaRegLightbulb />);
+  const [icon, setIcon] = useState(
+    colorMode === "light" ? <FaMoon /> : <FaRegLightbulb />
+  );
 
   const handleThemeChange = () => {
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
     toggleColorMode();
-    setIcon(colorMode === "light" ? <FaRegLightbulb /> : <FaMoon />);
+    setIcon(newTheme === "light" ? <FaMoon /> : <FaRegLightbulb />);
   };
-
   return (
     <>
       <Box minH="100vh" padding="3rem">
@@ -241,7 +242,8 @@ const Content = () => {
                     Background
                   </Box>
                   <Text display="flex" alignItems="center">
-                    You are using light background{" "}
+                    You are using {colorMode === "light" ? "light" : "dark"}{" "}
+                    background
                   </Text>
                 </Flex>
                 <AccordionIcon />
@@ -253,7 +255,7 @@ const Content = () => {
                   height="5rem"
                   leftIcon={icon}
                   onClick={handleThemeChange} // Use onClick instead of onChange
-                  isClick={colorMode === "light"} // Adjust to use colorMode directly
+                  isClick={colorMode === "Dark"} // Adjust to use colorMode directly
                 >
                   {colorMode === "light" ? "Light" : "Dark"}
                 </Button>

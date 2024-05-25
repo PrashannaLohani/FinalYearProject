@@ -21,7 +21,6 @@ import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { FaHeart } from "react-icons/fa6";
 import Navbar from "../../Layout/Navbar";
-import PollParticipant from "./RoomPollParticipants";
 import RoomPollParticipant from "./RoomPollParticipants";
 
 export default function ParticipantRoom() {
