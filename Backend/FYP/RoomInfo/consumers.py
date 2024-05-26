@@ -6,16 +6,13 @@ class CommentConsumer(AsyncWebsocketConsumer):
         self.room_id = self.scope['url_route']['kwargs']['room_id']
         self.room_group_name = f'room_{self.room_id}'
 
-        # Join room group
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
         )
-
         await self.accept()
 
     async def disconnect(self, close_code):
-        # Leave room group
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
@@ -26,15 +23,16 @@ class CommentConsumer(AsyncWebsocketConsumer):
         message = text_data_json['message']
         room = text_data_json['room']
         user = text_data_json['user']
+        vote = text_data_json.get('vote', 0)  # Ensure vote is handled
 
-        # Send message to room group
         await self.channel_layer.group_send(
             self.room_group_name,
             {
                 'type': 'comment_message',
                 'room': room,
                 'user': user,
-                'message': message
+                'message': message,
+                'vote': vote,
             }
         )
 
@@ -42,14 +40,14 @@ class CommentConsumer(AsyncWebsocketConsumer):
         message = event['message']
         room = event['room']
         user = event['user']
+        vote = event['vote']
 
-        # Send message to WebSocket
         await self.send(text_data=json.dumps({
             'room': room,
             'user': user,
-            'message': message
+            'message': message,
+            'vote': vote,
         }))
-
 class PollConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.poll_id = self.scope['url_route']['kwargs']['poll_id']

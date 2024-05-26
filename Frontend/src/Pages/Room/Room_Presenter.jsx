@@ -18,7 +18,7 @@ import {
   Tabs,
   Text,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import axios from "axios";
 import { FaChartBar, FaTv, FaPlus, FaTrashCan } from "react-icons/fa6";
@@ -90,7 +90,9 @@ const RoomCode = ({ roomId }) => {
 const CommentSection = ({ roomId }) => {
   const [numOfComments, setNumOfComments] = useState(0);
   const [numOfPeople, setNumOfPeople] = useState(0);
-  const [comments, setComments] = useState([]);
+  const [prevComments, setPrevComments] = useState([]);
+  const [newComments, setNewComments] = useState([]);
+  const socketRef = useRef(null);
 
   useEffect(() => {
     const fetchCommentsCount = async () => {
@@ -113,9 +115,12 @@ const CommentSection = ({ roomId }) => {
     const fetchComments = async () => {
       try {
         const response = await axios.get(
-          "http://127.0.0.1:8000/room/comments/"
+          "http://127.0.0.1:8000/room/comments/",
+          {
+            params: { room_code: roomId },
+          }
         );
-        setComments(response.data); // Assuming the response is an array of comments
+        setPrevComments(response.data);
       } catch (error) {
         console.error("Error fetching comments:", error);
       }
@@ -123,7 +128,12 @@ const CommentSection = ({ roomId }) => {
 
     fetchComments();
 
+    if (socketRef.current) {
+      socketRef.current.close();
+    }
+
     const socket = new WebSocket(`ws://127.0.0.1:8000/ws/room/${roomId}/`);
+    socketRef.current = socket;
 
     socket.onopen = () => {
       console.log("WebSocket connection established");
@@ -131,16 +141,7 @@ const CommentSection = ({ roomId }) => {
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      setComments((prevComments) => [
-        ...prevComments,
-        {
-          room: data.room,
-          user: data.user,
-          message: data.message,
-          vote: data.vote,
-          isRead: false, // Set the default value of isRead to false
-        },
-      ]);
+      setNewComments((prevComments) => [...prevComments, data]);
     };
 
     socket.onclose = () => {
@@ -155,99 +156,82 @@ const CommentSection = ({ roomId }) => {
       socket.close();
     };
   }, [roomId]);
-
-  const roomIdNumber = parseInt(roomId);
-
-  // Filter comments based on roomId
-  const filteredComments = comments.filter(
-    (comment) => comment.room === roomIdNumber
-  );
-
   const handleReadClick = (index) => {
-    // Create a copy of the comments array
-    const updatedComments = [...filteredComments];
-    // Toggle the isRead property of the clicked comment
+    const updatedComments = [...comments];
     updatedComments[index] = {
       ...updatedComments[index],
       isRead: !updatedComments[index].isRead,
     };
-    // Update the state with the modified array
     setComments(updatedComments);
   };
 
   return (
-    <>
-      <Box
-        minH="100vh"
-        borderRadius="2rem"
-        boxShadow="rgba(255, 255, 255, 0.1) 0px 1px 1px 0px inset, rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px"
-        minW="20rem"
-        p="2rem"
-      >
-        <Flex
-          alignItems="center"
-          justifyContent="space-between"
-          flexWrap="wrap"
-        >
-          <Heading size="lg">Comments and Questions</Heading>
-          <Flex flexDir="column">
-            <Text>Number of People joined: {numOfPeople}</Text>
-            <Text>Number of comments: {numOfComments}</Text>
-          </Flex>
+    <Box
+      minH="100vh"
+      borderRadius="2rem"
+      boxShadow="rgba(255, 255, 255, 0.1) 0px 1px 1px 0px inset, rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px"
+      minW="20rem"
+      p="2rem"
+    >
+      <Flex alignItems="center" justifyContent="space-between" flexWrap="wrap">
+        <Heading size="lg">Comments and Questions</Heading>
+        <Flex flexDir="column">
+          <Text>Number of People joined: {numOfPeople}</Text>
+          <Text>Number of comments: {numOfComments}</Text>
         </Flex>
-        <Box mt="2rem" minH="80vh" p="2rem">
-          <SimpleGrid
-            columns={3}
-            spacing="5px"
-            minChildWidth={{ base: "180px", md: "200px", lg: "300px" }}
-            autoRows="auto"
-          >
-            {filteredComments.map((comment, index) => (
-              <Card
-                key={index}
-                variant="outline"
-                maxW="30rem"
-                bgColor=" #7AB2B2"
-              >
-                <CardHeader>
-                  <Flex
-                    alignItems="center"
-                    justifyContent="space-between"
-                    flexWrap="wrap"
-                  >
-                    <Heading size="lg">{comment.user}</Heading>
-                    <Flex alignItems="center" gap="5px">
-                      <Text as="b">Upvote:</Text>
-                      <Text>{comment.vote}</Text>
-                    </Flex>
+      </Flex>
+      <Box mt="2rem" minH="80vh" p="2rem">
+        <SimpleGrid
+          columns={3}
+          spacing="5px"
+          minChildWidth={{ base: "180px", md: "200px", lg: "300px" }}
+          autoRows="auto"
+        >
+          {[...prevComments, ...newComments].map((comment, index) => (
+            <Card
+              key={comment.id}
+              variant="outline"
+              maxW="30rem"
+              bgColor="#7AB2B2"
+            >
+              <CardHeader>
+                <Flex
+                  alignItems="center"
+                  justifyContent="space-between"
+                  flexWrap="wrap"
+                >
+                  <Heading size="lg">{comment.user}</Heading>
+                  <Flex alignItems="center" gap="5px">
+                    <Text as="b">Upvote:</Text>
+                    <Text>{comment.vote}</Text>
                   </Flex>
-                </CardHeader>
-                <CardBody>
-                  <Text
-                    fontSize="md"
-                    style={{
-                      textDecoration: comment.isRead ? "line-through" : "none",
-                    }}
-                  >
-                    {comment.message}
-                  </Text>
-                </CardBody>
-                <CardFooter>
-                  <Button
-                    colorScheme="blackAlpha"
-                    onClick={() => handleReadClick(index)}
-                    bgColor="black"
-                    color="white"
-                  >
-                    {comment.isRead ? "Unread" : "Read"}
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
-          </SimpleGrid>
-        </Box>
+                </Flex>
+              </CardHeader>
+              <CardBody>
+                <Text
+                  fontSize="md"
+                  style={{
+                    textDecoration: comment.isRead ? "line-through" : "none",
+                  }}
+                >
+                  {comment.message}
+                </Text>
+              </CardBody>
+              <CardFooter>
+                <Button
+                  colorScheme="blackAlpha"
+                  onClick={() => handleReadClick(index)}
+                  bgColor="black"
+                  color="white"
+                >
+                  {comment.isRead ? "Unread" : "Read"}
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
+        </SimpleGrid>
       </Box>
-    </>
+    </Box>
   );
 };
 

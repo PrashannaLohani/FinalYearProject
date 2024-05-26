@@ -149,7 +149,7 @@ class CommentAPI(APIView):
             room_obj.save()
 
             # Notify via WebSocket
-            self.notify_room_update(room, message, user)
+            self.notify_room_update(room, message, user, comment.vote)
 
             # Return a success response
             return Response({'message': 'Comment posted successfully'}, status=status.HTTP_201_CREATED)
@@ -167,7 +167,7 @@ class CommentAPI(APIView):
 
         return JsonResponse(comment_data, safe=False)
 
-    def notify_room_update(self, room_code, message, user):
+    def notify_room_update(self, room_code, message, user, vote):
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
             f'room_{room_code}',
@@ -175,7 +175,8 @@ class CommentAPI(APIView):
                 'type': 'comment_message',
                 'room': room_code,
                 'user': user,
-                'message': message
+                'message': message,
+                'vote': vote,
             }
         )
 
@@ -196,8 +197,10 @@ class CommentUpVote(APIView):
     def post(self, request):
         room_id = request.data.get('room_id')
         message = request.data.get('message')
+        user = request.data.get('user')  # Get the user from the request
+
         try:
-            comment = Comment.objects.get(room=room_id, message=message)
+            comment = Comment.objects.get(room=room_id, message=message, user=user)
             comment.vote += 1
             comment.save()
 
@@ -207,7 +210,9 @@ class CommentUpVote(APIView):
             return Response({'message': 'Upvote successful'}, status=status.HTTP_200_OK)
         except Comment.DoesNotExist:
             return Response({'error': 'Comment not found'}, status=status.HTTP_404_NOT_FOUND)
-    
+        except Comment.MultipleObjectsReturned:
+            return Response({'error': 'Multiple comments found, cannot upvote'}, status=status.HTTP_400_BAD_REQUEST)
+
     def notify_room_update(self, room_id, comment):
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
@@ -220,8 +225,6 @@ class CommentUpVote(APIView):
                 'vote': comment.vote
             }
         )
-
-
 class DeactivateRoomAPI(APIView):
     def post(self, request):
         if request.method == 'POST':

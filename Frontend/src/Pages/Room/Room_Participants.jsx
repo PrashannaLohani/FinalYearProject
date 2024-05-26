@@ -18,7 +18,7 @@ import {
   TabPanel,
 } from "@chakra-ui/react";
 import axios from "axios";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { FaHeart } from "react-icons/fa6";
 import Navbar from "../../Layout/Navbar";
 import RoomPollParticipant from "./RoomPollParticipants";
@@ -112,6 +112,7 @@ const RoomCode = ({ roomID }) => {
 const CommentSection = ({ roomID }) => {
   const [comments, setComments] = useState([]);
   const [comment, setComment] = useState("");
+  const [upvotedComments, setUpvotedComments] = useState({});
   const username = localStorage.getItem("username");
 
   useEffect(() => {
@@ -139,15 +140,20 @@ const CommentSection = ({ roomID }) => {
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      setComments((prevComments) => [
-        ...prevComments,
-        {
-          room: data.room,
-          user: data.user,
-          message: data.message,
-          vote: data.vote,
-        },
-      ]);
+      setComments((prevComments) => {
+        const commentExists = prevComments.find(
+          (comment) => comment.id === data.id
+        );
+        if (commentExists) {
+          // Update the existing comment
+          return prevComments.map((comment) =>
+            comment.id === data.id ? data : comment
+          );
+        } else {
+          // Add the new comment
+          return [...prevComments, data];
+        }
+      });
     };
 
     socket.onclose = () => {
@@ -173,9 +179,33 @@ const CommentSection = ({ roomID }) => {
 
       await axios.post("http://127.0.0.1:8000/room/comments/", newComment);
 
+      // Fetch comments again to include the newly submitted comment
+      const response = await axios.get("http://127.0.0.1:8000/room/comments/", {
+        params: { room_code: roomID },
+      });
+
+      setComments(response.data);
       setComment("");
     } catch (error) {
       console.error("Error:", error);
+    }
+  };
+
+  const handleUpvote = async (comment) => {
+    try {
+      await axios.post("http://127.0.0.1:8000/room/upvote/", {
+        room_id: comment.room,
+        message: comment.message,
+        user: comment.user,
+      });
+
+      // Update the upvoted state for this comment
+      setUpvotedComments((prev) => ({
+        ...prev,
+        [comment.id]: true,
+      }));
+    } catch (error) {
+      console.error("Error upvoting comment:", error);
     }
   };
 
@@ -197,8 +227,13 @@ const CommentSection = ({ roomID }) => {
           minChildWidth={{ base: "200px", md: "400px" }}
           autoRows="auto"
         >
-          {comments.map((comment, index) => (
-            <Card key={index} variant="outline" maxW="30rem" bgColor="#7AB2B2">
+          {comments.map((comment) => (
+            <Card
+              key={comment.id}
+              variant="outline"
+              maxW="30rem"
+              bgColor="#7AB2B2"
+            >
               <CardHeader>
                 <Flex
                   alignItems="center"
@@ -208,7 +243,11 @@ const CommentSection = ({ roomID }) => {
                   <Heading size="lg">{comment.user}</Heading>
                   <Flex alignItems="center" gap="5px">
                     <Text as="b">Upvote:</Text>
-                    <Button bgColor="black">
+                    <Button
+                      bgColor="black"
+                      onClick={() => handleUpvote(comment)}
+                      isDisabled={upvotedComments[comment.id]} // Disable the button if the comment is upvoted
+                    >
                       <FaHeart style={{ color: "white" }} />
                     </Button>
                   </Flex>

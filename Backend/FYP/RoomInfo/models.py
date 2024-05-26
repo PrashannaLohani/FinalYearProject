@@ -33,7 +33,7 @@ class Comment(models.Model):
     vote= models.IntegerField(default=0)
 
     def __str__(self):
-        return self.message  # Returning message as a string representation
+        return self.message  
 
 
 class RoomPoll(models.Model):
