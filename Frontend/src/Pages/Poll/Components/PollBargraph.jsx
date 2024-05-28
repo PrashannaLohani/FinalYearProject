@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Box } from "@chakra-ui/react";
 import { Bar } from "react-chartjs-2";
 import {
@@ -40,73 +40,92 @@ const options = {
   },
 };
 
-export default function PollBargraph({ question }) {
+export default function PollBargraph({ qid }) {
   const [pollData, setPollData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const ws = useRef(null);
+
+  const fetchData = async (pollCode, qid) => {
+    try {
+      const response = await axios.get("http://127.0.0.1:8000/Poll/options/", {
+        params: { poll_id: pollCode, qid: qid },
+      });
+      const { poll_options } = response.data;
+      console.log("Fetched poll options:", poll_options);
+      setPollData(poll_options || []);
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error fetching poll data:", error);
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     const pollCode = localStorage.getItem("Poll_Code");
 
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          "http://127.0.0.1:8000/Poll/options/",
-          {
-            params: {
-              question: question,
-              poll_id: pollCode,
-            },
-          }
-        );
-        setPollData(response.data.poll_options);
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Error fetching poll data:", error);
-        setIsLoading(false);
-      }
-    };
+    if (qid) {
+      fetchData(pollCode, qid);
+    }
 
-    fetchData();
+    if (pollCode && qid) {
+      const encodedQid = encodeURIComponent(qid);
+      ws.current = new WebSocket(
+        `ws://127.0.0.1:8000/ws/poll/${pollCode}/${encodedQid}/`
+      );
 
-    const socket = new WebSocket(`ws://127.0.0.1:8000/ws/poll/${pollCode}/`);
+      ws.current.onopen = () => {
+        console.log("WebSocket connection established");
+      };
 
-    socket.onopen = () => {
-      console.log("WebSocket connection established");
-    };
+      ws.current.onmessage = (event) => {
+        const message = JSON.parse(event.data);
+        console.log("WebSocket message received:", message);
+        if (message.qid === qid && message.action === "vote") {
+          fetchData(pollCode, qid); // Fetch the updated poll data
+        }
+      };
 
-    socket.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      if (message.question === question || message.question === "all") {
-        setPollData(message.options);
-      }
-    };
+      ws.current.onclose = (event) => {
+        if (!event.wasClean) {
+          console.log(
+            "WebSocket connection closed unexpectedly. Reconnecting..."
+          );
+          setTimeout(() => {
+            const newSocket = new WebSocket(
+              `ws://127.0.0.1:8000/ws/poll/${pollCode}/${encodedQid}/`
+            );
+            newSocket.onopen = ws.current.onopen;
+            newSocket.onmessage = ws.current.onmessage;
+            newSocket.onclose = ws.current.onclose;
+            newSocket.onerror = ws.current.onerror;
+            ws.current = newSocket;
+          }, 1000);
+        }
+      };
 
-    socket.onclose = (event) => {
-      if (!event.wasClean) {
-        // Reconnect logic can be added here if needed
-      }
-    };
+      ws.current.onerror = (error) => {
+        console.error("WebSocket error observed:", error);
+      };
 
-    socket.onerror = (error) => {};
+      return () => {
+        ws.current.close();
+      };
+    }
+  }, [qid]);
 
-    return () => {
-      socket.close();
-    };
-  }, [question]);
-
-  if (isLoading) {
-    return <div>Loading...</div>;
+  if (!pollData || pollData.length === 0) {
+    return <div>No data available</div>;
   }
 
   const labels = pollData.map((option) => option.options);
-  const votes = pollData.map((option) => option.votes);
+  const data = pollData.map((option) => option.votes);
 
-  const data = {
-    labels,
+  const chartData = {
+    labels: labels,
     datasets: [
       {
         label: "",
-        data: votes,
+        data: data,
         backgroundColor: [
           "rgba(255, 99, 132, 1)",
           "rgba(54, 162, 235, 1)",
@@ -123,7 +142,7 @@ export default function PollBargraph({ question }) {
 
   return (
     <Box p="2rem">
-      <Bar options={options} data={data} />
+      <Bar options={options} data={chartData} />
     </Box>
   );
 }

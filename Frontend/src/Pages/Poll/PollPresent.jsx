@@ -15,46 +15,66 @@ import {
   useColorMode,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { FaArrowLeft, FaChartBar, FaUserGroup, FaTv } from "react-icons/fa6";
+import { FaArrowLeft, FaChartBar, FaTv } from "react-icons/fa";
+import { FaUserGroup } from "react-icons/fa6";
 import { NavLink } from "react-router-dom";
-
 import PollBargraph from "./Components/PollBargraph";
 import axios from "axios";
 
 export default function PollPresent() {
   const [questions, setQuestions] = useState([]);
-  const [selectedQuestion, setSelectedQuestion] = useState("");
+  const [selectedQuestion, setSelectedQuestion] = useState({});
 
   useEffect(() => {
-    const storedQuestions = localStorage.getItem("pollQuestions");
-    const parsedQuestions = storedQuestions ? JSON.parse(storedQuestions) : [];
-    setQuestions(parsedQuestions);
+    const fetchQuestions = async () => {
+      const pollCode = localStorage.getItem("Poll_Code");
+      if (pollCode) {
+        try {
+          console.log("Making API request to fetch questions...");
+          const response = await axios.get(
+            "http://127.0.0.1:8000/Poll/questions/",
+            {
+              params: { poll_id: pollCode },
+            }
+          );
+          console.log("API response received:", response.data);
+          const questions = response.data.questions;
+          setQuestions(questions);
+          console.log("Questions set:", questions);
 
-    if (parsedQuestions.length > 0) {
-      setSelectedQuestion(parsedQuestions[0].question);
-    }
+          if (questions.length > 0) {
+            setSelectedQuestion(questions[0]);
+            console.log("Selected question set:", questions[0]);
+          }
+        } catch (error) {
+          console.error("Error fetching questions:", error);
+        }
+      } else {
+        console.log("Poll_Code not found in localStorage.");
+      }
+    };
+
+    fetchQuestions();
   }, []);
 
   return (
-    <>
-      <Box p={{ base: "1rem", md: "2rem", lg: "2rem" }} minHeight="auto">
-        <Grid templateColumns="1fr 3fr" templateRows="auto 1fr">
-          <GridItem colSpan={1} colStart={2}>
-            <Headline />
-          </GridItem>
-          <GridItem>
-            <Sidebar
-              questions={questions}
-              onQuestionSelect={setSelectedQuestion}
-              selectedQuestion={selectedQuestion}
-            />
-          </GridItem>
-          <GridItem>
-            <Main selectedQuestion={selectedQuestion} />
-          </GridItem>
-        </Grid>
-      </Box>
-    </>
+    <Box p={{ base: "1rem", md: "2rem", lg: "2rem" }} minHeight="auto">
+      <Grid templateColumns="1fr 3fr" templateRows="auto 1fr">
+        <GridItem colSpan={1} colStart={2}>
+          <Headline />
+        </GridItem>
+        <GridItem>
+          <Sidebar
+            questions={questions}
+            onQuestionSelect={setSelectedQuestion}
+            selectedQuestion={selectedQuestion}
+          />
+        </GridItem>
+        <GridItem>
+          <Main selectedQuestion={selectedQuestion} />
+        </GridItem>
+      </Grid>
+    </Box>
   );
 }
 
@@ -144,12 +164,12 @@ const Sidebar = ({ questions = [], onQuestionSelect, selectedQuestion }) => {
       </Flex>
       <Divider mt="4rem" />
       {questions.map((q, index) => (
-        <React.Fragment key={index}>
+        <React.Fragment key={q.qid}>
           <Button
             minW="100%"
-            variant={selectedQuestion === q.question ? "solid" : "ghost"}
-            colorScheme={selectedQuestion === q.question ? "blue" : "gray"}
-            onClick={() => onQuestionSelect(q.question)}
+            variant={selectedQuestion.qid === q.qid ? "solid" : "ghost"}
+            colorScheme={selectedQuestion.qid === q.qid ? "blue" : "gray"}
+            onClick={() => onQuestionSelect(q)}
             textAlign="left"
           >
             {q.question}
@@ -166,22 +186,18 @@ const Main = ({ selectedQuestion }) => {
   const bgColor = colorMode === "light" ? "#FFF9D0" : "#333333";
 
   return (
-    <>
-      <Box bgColor={bgColor} minH="auto" borderRadius="0 2rem 2rem 0">
-        <Heading p="2rem">{selectedQuestion}</Heading>
-
-        <Tabs>
-          <TabList>
-            <Tab>Bar Graph</Tab>
-          </TabList>
-
-          <TabPanels>
-            <TabPanel>
-              <PollBargraph question={selectedQuestion} />
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
-      </Box>
-    </>
+    <Box bgColor={bgColor} minH="auto" borderRadius="0 2rem 2rem 0">
+      <Heading p="2rem">{selectedQuestion.question}</Heading>
+      <Tabs>
+        <TabList>
+          <Tab>Bar Graph</Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel>
+            <PollBargraph qid={selectedQuestion.qid} />
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
+    </Box>
   );
 };

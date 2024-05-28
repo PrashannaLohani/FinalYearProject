@@ -11,7 +11,6 @@ import {
   useDisclosure,
   Drawer,
   DrawerBody,
-  DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
   DrawerContent,
@@ -72,7 +71,7 @@ const Main = () => {
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const ws = useRef(null); // Ref for WebSocket
+  const ws = useRef(null);
 
   const backgroundColor = [
     "rgba(255, 99, 132, 1)",
@@ -88,8 +87,10 @@ const Main = () => {
   useEffect(() => {
     const pollCode = localStorage.getItem("Poll_Id");
     if (currentQuestion) {
-      const encodedQuestion = encodeURIComponent(currentQuestion.question);
-      ws.current = new WebSocket(`ws://127.0.0.1:8000/ws/poll/${pollCode}/`);
+      const encodedQid = encodeURIComponent(currentQuestion.qid);
+      ws.current = new WebSocket(
+        `ws://127.0.0.1:8000/ws/poll/${pollCode}/${encodedQid}/`
+      );
 
       ws.current.onopen = () => {
         console.log("WebSocket connection opened");
@@ -106,10 +107,10 @@ const Main = () => {
       ws.current.onmessage = (event) => {
         const message = JSON.parse(event.data);
         console.log("Received message from server:", message);
-        if (message.question === currentQuestion.question) {
+        if (message.qid === currentQuestion.qid) {
           setPollData((prevData) =>
             prevData.map((data) =>
-              data.question === currentQuestion.question
+              data.qid === currentQuestion.qid
                 ? { ...data, poll_options: message.options }
                 : data
             )
@@ -131,11 +132,7 @@ const Main = () => {
         const pollCode = localStorage.getItem("Poll_Id");
         const response = await axios.get(
           "http://127.0.0.1:8000/Poll/participantoption/",
-          {
-            params: {
-              poll_id: pollCode,
-            },
-          }
+          { params: { poll_id: pollCode } }
         );
         const filteredData = response.data.map((questionData) => {
           const uniqueOptions = Array.from(
@@ -164,15 +161,29 @@ const Main = () => {
     fetchData();
   }, []);
 
-  const handleOptionClick = async (question, option) => {
+  const handleOptionClick = async (qid, question, option) => {
     const updatedSelectedOptions = selectedOptions.filter(
-      (item) => item.question !== question
+      (item) => item.qid !== qid
     );
-    updatedSelectedOptions.push({ question, selected_option: option });
+    updatedSelectedOptions.push({ qid, question, selected_option: option });
     setSelectedOptions(updatedSelectedOptions);
     localStorage.setItem(
       "selected_options",
       JSON.stringify(updatedSelectedOptions)
+    );
+
+    // Optimistically update the local poll data
+    setPollData((prevData) =>
+      prevData.map((data) =>
+        data.qid === qid
+          ? {
+              ...data,
+              poll_options: data.poll_options.map((opt) =>
+                opt.options === option ? { ...opt, votes: opt.votes + 1 } : opt
+              ),
+            }
+          : data
+      )
     );
 
     try {
@@ -188,6 +199,7 @@ const Main = () => {
           JSON.stringify({
             action: "vote",
             poll_id: pollCode,
+            qid,
             question,
             option,
           })
@@ -203,8 +215,8 @@ const Main = () => {
     onClose();
   };
 
-  const getSelectedOption = (question) => {
-    const selected = selectedOptions.find((item) => item.question === question);
+  const getSelectedOption = (qid) => {
+    const selected = selectedOptions.find((item) => item.qid === qid);
     return selected ? selected.selected_option : null;
   };
 
@@ -257,15 +269,16 @@ const Main = () => {
                   bgColor={backgroundColor[idx % backgroundColor.length]}
                   minH="4rem"
                   onClick={() =>
-                    handleOptionClick(currentQuestion.question, option.options)
-                  }
-                  isDisabled={
-                    getSelectedOption(currentQuestion.question) !== null
-                  }
-                  opacity={
-                    getSelectedOption(currentQuestion.question) !== null &&
-                    getSelectedOption(currentQuestion.question) !==
+                    handleOptionClick(
+                      currentQuestion.qid,
+                      currentQuestion.question,
                       option.options
+                    )
+                  }
+                  isDisabled={getSelectedOption(currentQuestion.qid) !== null}
+                  opacity={
+                    getSelectedOption(currentQuestion.qid) !== null &&
+                    getSelectedOption(currentQuestion.qid) !== option.options
                       ? 0.5
                       : 1
                   }
@@ -274,7 +287,7 @@ const Main = () => {
                 </Button>
               ))}
             </SimpleGrid>
-            {getSelectedOption(currentQuestion.question) && (
+            {getSelectedOption(currentQuestion.qid) && (
               <Flex justifyContent="center">
                 <Text mt="2rem" fontSize="xl" color="green.500">
                   Thank you for your response!

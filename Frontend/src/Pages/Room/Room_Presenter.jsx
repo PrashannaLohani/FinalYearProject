@@ -157,12 +157,30 @@ const CommentSection = ({ roomId }) => {
     };
   }, [roomId]);
   const handleReadClick = (index) => {
-    const updatedComments = [...comments];
-    updatedComments[index] = {
-      ...updatedComments[index],
-      isRead: !updatedComments[index].isRead,
-    };
-    setComments(updatedComments);
+    // Create a copy of the previous comments and new comments
+    const updatedPrevComments = [...prevComments];
+    const updatedNewComments = [...newComments];
+
+    // Determine whether the comment at the given index belongs to previous comments or new comments
+    if (index < updatedPrevComments.length) {
+      // If it belongs to previous comments, update its isRead property
+      updatedPrevComments[index] = {
+        ...updatedPrevComments[index],
+        isRead: !updatedPrevComments[index].isRead,
+      };
+    } else {
+      // If it belongs to new comments, calculate its index within new comments array
+      const newIndex = index - updatedPrevComments.length;
+      // Update its isRead property
+      updatedNewComments[newIndex] = {
+        ...updatedNewComments[newIndex],
+        isRead: !updatedNewComments[newIndex].isRead,
+      };
+    }
+
+    // Update the state variables with the updated comments
+    setPrevComments(updatedPrevComments);
+    setNewComments(updatedNewComments);
   };
 
   return (

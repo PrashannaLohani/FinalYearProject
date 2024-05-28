@@ -11,8 +11,9 @@ from django.db.models import Sum
 from django.db import transaction
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
+import uuid
+import re
 
-# Create your views here.
 class PollCodeCreateAPI(APIView):
     def post(self, request):
         authorization_header = request.headers.get('Authorization')
@@ -38,49 +39,76 @@ class PollCreateAPI(APIView):
     def post(self, request):
         serializer = PollSerializer(data=request.data)
         if serializer.is_valid():
-            poll_id = serializer.validated_data['poll']
-            questions_data = serializer.validated_data['questions']
-            
-            with transaction.atomic():
-                for question_data in questions_data:
-                    question_text = question_data['question']
-                    options_list = question_data['options']
-                    for option_text in options_list:
-                        Option.objects.create(
-                            poll=poll_id,
-                            question=question_text,
-                            options=option_text
-                        )
+            poll = serializer.validated_data['poll']
+            questions = serializer.validated_data['questions']
 
-                # Notify via WebSocket
-                self.notify_poll_created(poll_id)
-            
-            return Response({'message': 'Poll created successfully'}, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            question_qid_map = {}
+            options_instances = []
+            for question_data in questions:
+                question_text = question_data['question']
+                if question_text not in question_qid_map:
+                    existing_option = Option.objects.filter(poll=poll, question=question_text).first()
+                    if existing_option:
+                        qid = existing_option.qid
+                    else:
+                        qid = uuid.uuid4()
+                    question_qid_map[question_text] = qid
+                else:
+                    qid = question_qid_map[question_text]
+
+                for option_text in question_data['options']:
+                    option_instance = Option(
+                        qid=qid,
+                        poll=poll,
+                        question=question_text,
+                        options=option_text
+                    )
+                    options_instances.append(option_instance)
+
+            Option.objects.bulk_create(options_instances)
+
+            poll_id = options_instances[0].poll if options_instances else None
+
+            for question, qid in question_qid_map.items():
+                self.notify_poll_created(poll_id, qid)
+
+            return Response({
+                'message': 'Poll created successfully',
+                'poll_id': poll_id
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request):
         poll_id = request.query_params.get('poll_id')
-        question = request.query_params.get('question')
-        if not poll_id or not question:
-            return Response({'error': 'Poll ID and question are required'}, status=status.HTTP_400_BAD_REQUEST)
-        
+        if not poll_id:
+            return Response({'error': 'Poll ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
-            poll_options = Option.objects.filter(poll=poll_id, question=question).values('options', 'votes').distinct('options')
-            return Response({'poll_options': list(poll_options)}, status=status.HTTP_200_OK)
+            questions = Option.objects.filter(poll=poll_id).values('qid', 'question').distinct()
+            return Response({'questions': list(questions)}, status=status.HTTP_200_OK)
         except Option.DoesNotExist:
-            return Response({'error': 'Poll options not found'}, status=status.HTTP_404_NOT_FOUND)
-    
-    def notify_poll_created(self, poll_id):
+            return Response({'error': 'Questions not found for this poll ID'}, status=status.HTTP_404_NOT_FOUND)
+
+    def notify_poll_created(self, poll_id, qid):
         channel_layer = get_channel_layer()
+        sanitized_qid = re.sub(r'\W+', '_', str(qid))
         async_to_sync(channel_layer.group_send)(
-            f'poll_{poll_id}',
+            f'poll_{poll_id}_{sanitized_qid}',
             {
                 'type': 'poll_message',
-                'message': {'status': 'created', 'poll_id': poll_id}
+                'message': {'status': 'created', 'poll_id': poll_id, 'qid': sanitized_qid}
             }
         )
 
+class PresenterOption(APIView):
+    def get(self, request):
+        poll_id = request.query_params.get('poll_id')
+        qid = request.query_params.get('qid')
+
+        if poll_id and qid:
+            options = Option.objects.filter(poll=poll_id, qid=qid).values('options', 'votes')
+            return Response({'poll_options': list(options)}, status=status.HTTP_200_OK)
+        return Response({'error': 'poll_id and qid are required'}, status=status.HTTP_400_BAD_REQUEST)
 
 class ParticipantOption(APIView):
     def get(self, request):
@@ -89,22 +117,24 @@ class ParticipantOption(APIView):
             if not poll_id:
                 return Response({'error': 'Poll ID is required'}, status=status.HTTP_400_BAD_REQUEST)
 
-            questions = Option.objects.filter(poll=poll_id).values_list('question', flat=True).distinct()
+            questions = Option.objects.filter(poll=poll_id).values('qid', 'question').distinct()
             if not questions:
                 return Response({'error': 'No questions found for this poll ID'}, status=status.HTTP_404_NOT_FOUND)
 
             response_data = []
             for question in questions:
-                poll_options = Option.objects.filter(poll=poll_id, question=question).values('options', 'votes')
+                qid = question['qid']
+                question_text = question['question']
+                poll_options = Option.objects.filter(poll=poll_id, qid=qid).values('options', 'votes')
                 response_data.append({
-                    'question': question,
+                    'qid': qid,
+                    'question': question_text,
                     'poll_options': list(poll_options)
                 })
 
             return Response(response_data, status=status.HTTP_200_OK)
         except Option.DoesNotExist:
             return Response({'error': 'Poll options not found'}, status=status.HTTP_404_NOT_FOUND)
-
 
 class VoteOption(APIView):
     def post(self, request):
@@ -126,42 +156,29 @@ class VoteOption(APIView):
                     option.votes += 1
                     option.save()
 
-            # Notify via WebSocket
-            self.notify_votes_updated(poll)
+            for vote in votes:
+                question = vote.get('question')
+                if question:
+                    self.notify_votes_updated(poll, question)
 
             return Response({'message': 'Votes registered successfully'}, status=status.HTTP_200_OK)
         except Option.DoesNotExist:
             return Response({'error': 'Option not found'}, status=status.HTTP_404_NOT_FOUND)
     
-        
-    def notify_votes_updated(self, poll_id):
+    def notify_votes_updated(self, poll_id, question):
         channel_layer = get_channel_layer()
-        options = Option.objects.filter(poll=poll_id).values('question', 'options', 'votes')
-
-        # Process options to ensure distinct options per question
-        distinct_options = {}
-        for option in options:
-            question = option['question']
-            if question not in distinct_options:
-                distinct_options[question] = []
-            # Check if the option is already added
-            if not any(opt['options'] == option['options'] for opt in distinct_options[question]):
-                distinct_options[question].append(option)
-
-        # Convert the distinct options dictionary to a list of options per question
-        distinct_options_list = []
-        for question, opts in distinct_options.items():
-            distinct_options_list.extend(opts)
+        sanitized_question = re.sub(r'\W+', '_', question)
+        options = Option.objects.filter(poll=poll_id, question=question).values('question', 'options', 'votes')
+        options_list = list(options)
 
         async_to_sync(channel_layer.group_send)(
-            f'poll_{poll_id}',
+            f'poll_{poll_id}_{sanitized_question}',
             {
                 'type': 'poll_message',
-                'question': 'all',  # This could be more specific if needed
-                'options': distinct_options_list
+                'question': sanitized_question,
+                'options': options_list
             }
         )
-
 
 class JoinPollApi(APIView):
     def post(self, request):
@@ -186,7 +203,6 @@ class JoinPollApi(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 class UserJoin(APIView):
     def get(self, request):
         try:
@@ -202,7 +218,6 @@ class UserJoin(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
 class DeactivatePollAPI(APIView):
     def post(self, request):
         poll_id = request.data.get('poll_id')
@@ -211,7 +226,6 @@ class DeactivatePollAPI(APIView):
             poll.active = False
             poll.save()
             
-            # Notify via WebSocket
             self.notify_poll_deactivated(poll_id)
 
             return Response({'message': 'Poll deactivated successfully', 'poll_id': poll_id}, status=status.HTTP_200_OK)
@@ -228,7 +242,6 @@ class DeactivatePollAPI(APIView):
             }
         )
 
-
 class Stats(APIView):
     def get(self, request):
         token = request.headers.get('Authorization')
@@ -243,7 +256,7 @@ class Stats(APIView):
                 total_votes = Option.objects.aggregate(total_votes=Sum('votes'))['total_votes']
                 if total_votes is None:
                     total_votes = 0
-
+                
                 poll_data = Option.objects.all().values('poll', 'question', 'options', 'votes')
 
                 return Response({

@@ -1,6 +1,6 @@
 from django.db import models
 from CRM.models import Signup
-from django.db.models import JSONField
+import uuid
 
 
 # Create your models here.
@@ -15,10 +15,8 @@ class PollCode(models.Model):
 
 
 class Option(models.Model):
-    poll = models.CharField(max_length=255,default=None)
+    qid = models.UUIDField(default=uuid.uuid4, editable=False)
+    poll = models.CharField(max_length=255, default=None)
     question = models.CharField(max_length=255)
-    options = models.CharField(max_length=255, default=None)
+    options = models.CharField(max_length=255)
     votes = models.IntegerField(default=0)
-
-    def __str__(self):
-        return self.question
