@@ -181,8 +181,9 @@ class VerifyAPI(APIView):
 
             subject = 'Reset your password'
             message = f'Hi {user.full_name},\n\nPlease click the following link to reset your password:\n{reset_password_full_url}'
-            sender_email = settings.DEFAULT_FROM_EMAIL
+            sender_email = settings.EMAIL_HOST
             recipient_email = [email]
+            print(recipient_email)
 
             send_mail(subject, message, sender_email, recipient_email)
 
