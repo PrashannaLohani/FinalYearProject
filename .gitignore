@@ -1,0 +1,8 @@
+# React
+node_modules/
+build/
+.env
+.vscode/
+
+# Logs
+*.log
