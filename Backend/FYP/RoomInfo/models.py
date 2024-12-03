@@ -37,6 +37,7 @@ class Comment(models.Model):
 
 
 class RoomPoll(models.Model):
+    user = models.ForeignKey(Signup, on_delete=models.CASCADE, default=None)
     poll = models.CharField(max_length=255,default=None)
     question = models.CharField(max_length=255)
     options = models.CharField(max_length=255, default=None)
@@ -46,6 +47,7 @@ class RoomPoll(models.Model):
         return self.question
     def to_dict(self):
         return {
+            'user': self.user.id,
             "poll": self.poll,
             "question": self.question,
             "options": self.options,

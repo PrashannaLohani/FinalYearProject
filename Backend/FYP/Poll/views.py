@@ -251,13 +251,14 @@ class Stats(APIView):
                 decoded_token = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
                 email = decoded_token.get('email')
                 user = Signup.objects.get(email=email)
+                polls = PollCode.objects.filter(user=user)
 
-                total_polls = PollCode.objects.filter(user=user).count()
-                total_votes = Option.objects.aggregate(total_votes=Sum('votes'))['total_votes']
+                total_polls = polls.count()
+                total_votes = polls.aggregate(total_votes=Sum('votes'))['total_votes']
                 if total_votes is None:
                     total_votes = 0
                 
-                poll_data = Option.objects.all().values('poll', 'question', 'options', 'votes')
+                poll_data =[poll.to_dict() for poll in polls]
 
                 return Response({
                     'total_polls': total_polls,

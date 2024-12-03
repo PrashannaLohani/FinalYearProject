@@ -41,7 +41,6 @@ const BarGraph = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log("Response data:", response.data); // Log the entire response
         setRoomData(response.data.room_data);
       } catch (error) {
         console.error("Error fetching room data:", error);

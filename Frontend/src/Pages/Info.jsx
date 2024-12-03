@@ -468,7 +468,7 @@ const PollDashboard = () => {
           >
             {Object.keys(groupedPollData).length > 0 ? (
               Object.keys(groupedPollData).map((pollId, index) => (
-                <AccordionItem key={index}>
+                <AccordionItem key={pollId}>
                   <h2>
                     <AccordionButton>
                       <Box as="b" flex="1" textAlign="left">

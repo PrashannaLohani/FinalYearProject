@@ -18,7 +18,7 @@ class CommentsAdmin(admin.ModelAdmin):
 
 admin.site.register(Comment, CommentsAdmin) 
 class RoomPollAdmin(admin.ModelAdmin):
-    list_display = ('poll', 'question', 'options', 'votes')
+    list_display = ('user','poll', 'question', 'options', 'votes')
     search_fields = ('poll__poll_code__poll_id', 'question')  
 admin.site.register(RoomPoll,RoomPollAdmin) 
 
